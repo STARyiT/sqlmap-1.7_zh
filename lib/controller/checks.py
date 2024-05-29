@@ -155,8 +155,8 @@ def checkSqlInjection(place, parameter, value):
                 # DBMS
 
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                    msg = "it looks like the back-end DBMS is '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
-                    msg += "Do you want to skip test payloads specific for other DBMSes? [Y/n]"
+                    msg = "后端DBMS疑似是 '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                    msg += "你是否跳过其他DBMS的特定Payload测试? [Y/n]"
                     kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
@@ -164,12 +164,11 @@ def checkSqlInjection(place, parameter, value):
             # payload), ask the user to extend the tests to all DBMS-specific,
             # regardless of --level and --risk values provided
             if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                msg = "for the remaining tests, do you want to include all tests "
-                msg += "for '%s' extending provided " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
-                msg += "level (%d)" % conf.level if conf.level < 5 else ""
+                msg += "对于剩余的测试，你是否想包含所有的 '%s' 测试，并执行" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                msg += "检测等级为 (%d)" % conf.level if conf.level < 5 else ""
                 msg += " and " if conf.level < 5 and conf.risk < 3 else ""
-                msg += "risk (%d)" % conf.risk if conf.risk < 3 else ""
-                msg += " values? [Y/n]" if conf.level < 5 and conf.risk < 3 else " value? [Y/n]"
+                msg += "检测风险为 (%d)" % conf.risk if conf.risk < 3 else ""
+                msg += " 吗? [Y/n]" if conf.level < 5 and conf.risk < 3 else " 吗? [Y/n]"
                 kb.extendTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             title = test.title
@@ -205,8 +204,8 @@ def checkSqlInjection(place, parameter, value):
                         title = title.replace("[COLSTOP]", str(conf.uColsStop))
 
                 elif conf.uCols is not None:
-                    debugMsg = "skipping test '%s' because the user " % title
-                    debugMsg += "provided custom column range %s" % conf.uCols
+                    debugMsg = "跳过测试 '%s' 因为用户 " % title
+                    debugMsg += "提供的自定义列范围 %s" % conf.uCols
                     logger.debug(debugMsg)
                     continue
 
@@ -224,18 +223,18 @@ def checkSqlInjection(place, parameter, value):
             # Skip test if the user's wants to test only for a specific
             # technique
             if conf.technique and isinstance(conf.technique, list) and stype not in conf.technique:
-                debugMsg = "skipping test '%s' because user " % title
-                debugMsg += "specified testing of only "
-                debugMsg += "%s techniques" % " & ".join(PAYLOAD.SQLINJECTION[_] for _ in conf.technique)
+                debugMsg = "跳过测试 '%s' 因为用户 " % title
+                debugMsg += "指定了测试 "
+                debugMsg += "%s 范围" % " & ".join(PAYLOAD.SQLINJECTION[_] for _ in conf.technique)
                 logger.debug(debugMsg)
                 continue
 
             # Skip test if it is the same SQL injection type already
             # identified by another test
             if injection.data and stype in injection.data:
-                debugMsg = "skipping test '%s' because " % title
-                debugMsg += "the payload for %s has " % PAYLOAD.SQLINJECTION[stype]
-                debugMsg += "already been identified"
+                debugMsg = "跳过测试 '%s' 因为 " % title
+                debugMsg += "该Payload已经是识别的 %s " % PAYLOAD.SQLINJECTION[stype]
+                debugMsg += "作为有效负载"
                 logger.debug(debugMsg)
                 continue
 
@@ -248,16 +247,16 @@ def checkSqlInjection(place, parameter, value):
             # Skip tests if title, vector or DBMS is not included by the
             # given test filter
             if conf.testFilter and not any(conf.testFilter in str(item) or re.search(conf.testFilter, str(item), re.I) for item in (test.title, test.vector, payloadDbms)):
-                debugMsg = "skipping test '%s' because its " % title
-                debugMsg += "name/vector/DBMS is not included by the given filter"
+                debugMsg = "跳过测试 '%s' 因为它的 " % title
+                debugMsg += "name/vector/DBMS未包含在给定的过滤器中"
                 logger.debug(debugMsg)
                 continue
 
             # Skip tests if title, vector or DBMS is included by the
             # given skip filter
             if conf.testSkip and any(conf.testSkip in str(item) or re.search(conf.testSkip, str(item), re.I) for item in (test.title, test.vector, payloadDbms)):
-                debugMsg = "skipping test '%s' because its " % title
-                debugMsg += "name/vector/DBMS is included by the given skip filter"
+                debugMsg = "跳过测试 '%s' 因为它的 " % title
+                debugMsg += "name/vector/DBMS未包含在给定的过滤器中"
                 logger.debug(debugMsg)
                 continue
 
@@ -265,14 +264,12 @@ def checkSqlInjection(place, parameter, value):
                 # Skip DBMS-specific test if it does not match the user's
                 # provided DBMS
                 if conf.dbms and not intersect(payloadDbms, conf.dbms, True):
-                    debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "its declared DBMS is different than provided"
+                    debugMsg = "跳过测试 '%s' 因为其声明的DBMS与识别的不同 " % title
                     logger.debug(debugMsg)
                     continue
 
                 elif kb.dbmsFilter and not intersect(payloadDbms, kb.dbmsFilter, True):
-                    debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "its declared DBMS is different than provided"
+                    debugMsg = "跳过测试 '%s' 因为其声明的DBMS与识别的不同 " % title
                     logger.debug(debugMsg)
                     continue
 
@@ -282,17 +279,14 @@ def checkSqlInjection(place, parameter, value):
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific payload)
                 elif injection.dbms and not intersect(payloadDbms, injection.dbms, True):
-                    debugMsg = "skipping test '%s' because " % title
-                    debugMsg += "its declared DBMS is different than identified"
+                    debugMsg = "跳过测试'%s' 因为其声明的DBMS与识别的不同 " % title
                     logger.debug(debugMsg)
                     continue
 
                 # Skip DBMS-specific test if it does not match the
                 # previously identified DBMS (via DBMS-specific error message)
                 elif kb.reduceTests and not intersect(payloadDbms, kb.reduceTests, True):
-                    debugMsg = "skipping test '%s' because the heuristic " % title
-                    debugMsg += "tests showed that the back-end DBMS "
-                    debugMsg += "could be '%s'" % unArrayizeValue(kb.reduceTests)
+                    debugMsg = "由于启发式测试显示后端数据库管理系统可能是 '%s',因此跳过测试 '%s'" % (unArrayizeValue(kb.reduceTests), title)
                     logger.debug(debugMsg)
                     continue
 
@@ -305,16 +299,14 @@ def checkSqlInjection(place, parameter, value):
                 # Skip test if the risk is higher than the provided (or default)
                 # value
                 if test.risk > conf.risk:
-                    debugMsg = "skipping test '%s' because the risk (%d) " % (title, test.risk)
-                    debugMsg += "is higher than the provided (%d)" % conf.risk
+                    debugMsg = "由于风险(%d)高于提供的风险(%d),因此跳过测试 '%s'" % (test.risk, conf.risk, title)
                     logger.debug(debugMsg)
                     continue
 
                 # Skip test if the level is higher than the provided (or default)
                 # value
                 if test.level > conf.level:
-                    debugMsg = "skipping test '%s' because the level (%d) " % (title, test.level)
-                    debugMsg += "is higher than the provided (%d)" % conf.level
+                    debugMsg = "由于级别(%d)高于提供的级别(%d),因此跳过测试 '%s'" % (test.level, conf.level, title)
                     logger.debug(debugMsg)
                     continue
 
@@ -328,15 +320,13 @@ def checkSqlInjection(place, parameter, value):
                     break
 
             if clause != [0] and injection.clause and injection.clause != [0] and not clauseMatch:
-                debugMsg = "skipping test '%s' because the clauses " % title
-                debugMsg += "differ from the clause already identified"
+                debugMsg = "由于子句与已经识别的子句不同,因此跳过测试 '%s'" % title
                 logger.debug(debugMsg)
                 continue
 
             # Skip test if the user provided custom character (for UNION-based payloads)
             if conf.uChar is not None and ("random number" in title or "(NULL)" in title):
-                debugMsg = "skipping test '%s' because the user " % title
-                debugMsg += "provided a specific character, %s" % conf.uChar
+                debugMsg = "由于用户提供了特定字符 %s,因此跳过测试 '%s'" % (conf.uChar, title)
                 logger.debug(debugMsg)
                 continue
 
@@ -346,19 +336,15 @@ def checkSqlInjection(place, parameter, value):
                     _ = test.request.columns.split('-')[-1]
                     if conf.uCols is None and _.isdigit():
                         if kb.futileUnion is None:
-                            msg = "it is recommended to perform "
-                            msg += "only basic UNION tests if there is not "
-                            msg += "at least one other (potential) "
-                            msg += "technique found. Do you want to reduce "
-                            msg += "the number of requests? [Y/n] "
+                            msg = "如果没有找到至少一种其他(潜在的)技术,建议仅执行基本的 UNION 测试。你想减少请求的数量吗? [Y/n]  "
                             kb.futileUnion = readInput(msg, default='Y', boolean=True)
 
                         if kb.futileUnion and int(_) > 10:
-                            debugMsg = "skipping test '%s'" % title
+                            debugMsg = "跳过测试 '%s'" % title
                             logger.debug(debugMsg)
                             continue
 
-            infoMsg = "testing '%s'" % title
+            infoMsg = "正在测试 '%s'" % title
             logger.info(infoMsg)
 
             # Force back-end DBMS according to the current test DBMS value
@@ -545,7 +531,7 @@ def checkSqlInjection(place, parameter, value):
                                         _ = comparison(kb.heuristicPage, None, getRatioValue=True)
                                         if (_ or 0) > (kb.matchRatio or 0):
                                             kb.matchRatio = _
-                                            logger.debug("adjusting match ratio for current parameter to %.3f" % kb.matchRatio)
+                                            logger.debug("将当前参数的匹配比例调整为 %.3f" % kb.matchRatio)
 
                                     # Reducing false-positive "appears" messages in heavily dynamic environment
                                     if kb.heavilyDynamic and not Request.queryPage(reqPayload, place, raise404=False):
@@ -573,7 +559,7 @@ def checkSqlInjection(place, parameter, value):
                                                     suggestion = conf.string = candidate
                                                     injectable = True
 
-                                                    infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
+                                                    infoMsg = "%s 参数 '%s' 似乎可以通过 '%s' 注入 (使用 --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                                     logger.info(infoMsg)
 
                                                     break
@@ -583,7 +569,7 @@ def checkSqlInjection(place, parameter, value):
                                     if all((falseCode, trueCode)) and falseCode != trueCode:
                                         suggestion = conf.code = trueCode
 
-                                        infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --code=%d)" % ("%s " % paramType if paramType != parameter else "", parameter, title, conf.code)
+                                        infoMsg = "%s 参数 '%s' 似乎可以通过 '%s' 注入 (使用 --code=%d)" % ("%s " % paramType if paramType != parameter else "", parameter, title, conf.code)
                                         logger.info(infoMsg)
                                     else:
                                         trueSet = set(extractTextTagContent(trueRawResponse))
@@ -608,7 +594,7 @@ def checkSqlInjection(place, parameter, value):
 
                                             suggestion = conf.string = candidate
 
-                                            infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
+                                            infoMsg = "%s 参数 '%s' 似乎可以进行 '%s' 注入 (with --string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.string).lstrip('u').strip("'"))
                                             logger.info(infoMsg)
 
                                         if not any((conf.string, conf.notString)):
@@ -622,11 +608,11 @@ def checkSqlInjection(place, parameter, value):
 
                                                 suggestion = conf.notString = candidate
 
-                                                infoMsg = "%sparameter '%s' appears to be '%s' injectable (with --not-string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.notString).lstrip('u').strip("'"))
+                                                infoMsg = "%s 参数 '%s' 似乎可以进行 '%s' 注入 (with --not-string=\"%s\")" % ("%s " % paramType if paramType != parameter else "", parameter, title, repr(conf.notString).lstrip('u').strip("'"))
                                                 logger.info(infoMsg)
 
                                 if not suggestion:
-                                    infoMsg = "%sparameter '%s' appears to be '%s' injectable " % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                    infoMsg = "%s 参数 '%s' 似乎可以进行 '%s' 注入 " % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                     singleTimeLogMessage(infoMsg)
 
                         # In case of error-based SQL injection
@@ -644,15 +630,13 @@ def checkSqlInjection(place, parameter, value):
                                     result = output == '1'
 
                                     if result:
-                                        infoMsg = "%sparameter '%s' is '%s' injectable " % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                        infoMsg = "%s 参数 '%s' 是 '%s' 可注入 " % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                         logger.info(infoMsg)
 
                                         injectable = True
 
                             except SqlmapConnectionException as ex:
-                                debugMsg = "problem occurred most likely because the "
-                                debugMsg += "server hasn't recovered as expected from the "
-                                debugMsg += "used error-based payload ('%s')" % getSafeExString(ex)
+                                debugMsg = "问题可能发生是因为服务器没有按预期响应基于错误的有效载荷 ('%s')" % getSafeExString(ex)
                                 logger.debug(debugMsg)
 
                         # In case of time-based blind or stacked queries
@@ -673,7 +657,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
-                                    infoMsg = "%sparameter '%s' appears to be '%s' injectable " % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                    infoMsg = "%s 参数 '%s' 似乎是可注入的 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -693,26 +677,20 @@ def checkSqlInjection(place, parameter, value):
                             elif not Backend.getIdentifiedDbms():
                                 if kb.heuristicDbms is None:
                                     if kb.heuristicTest == HEURISTIC_TEST.POSITIVE or injection.data:
-                                        warnMsg = "using unescaped version of the test "
-                                        warnMsg += "because of zero knowledge of the "
-                                        warnMsg += "back-end DBMS. You can try to "
-                                        warnMsg += "explicitly set it with option '--dbms'"
+                                        warnMsg = "由于对后端数据库管理系统没有任何了解,所以使用未转义的测试版本。你可以尝试使用'--dbms'选项来明确设置后端数据库管理系统。"
                                         singleTimeWarnMessage(warnMsg)
                                 else:
                                     Backend.forceDbms(kb.heuristicDbms)
 
                             if unionExtended:
-                                infoMsg = "automatically extending ranges for UNION "
-                                infoMsg += "query injection technique tests as "
-                                infoMsg += "there is at least one other (potential) "
-                                infoMsg += "technique found"
+                                infoMsg = "检测到至少还有一种其他(潜在的)技术,因此自动扩展 UNION 查询注入技术测试的范围"
                                 singleTimeLogMessage(infoMsg)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, six.string_types):
-                                infoMsg = "%sparameter '%s' is '%s' injectable" % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                infoMsg = "% 参数 '%s' 是 '%s' 注入" % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                 logger.info(infoMsg)
 
                                 injectable = True
@@ -797,14 +775,14 @@ def checkSqlInjection(place, parameter, value):
             Backend.flushForcedDbms()
 
         except KeyboardInterrupt:
-            warnMsg = "user aborted during detection phase"
+            warnMsg = "用户在检测阶段中中断"
             logger.warning(warnMsg)
 
             if conf.multipleTargets:
-                msg = "how do you want to proceed? [ne(X)t target/(s)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
+                msg = "你想如何继续？ [下一个目标(X)/跳过当前测试(S)/结束检测阶段(E)/下一个参数(N)/更改详细程度(C)/退出(Q)]"
                 choice = readInput(msg, default='X', checkBatch=False).upper()
             else:
-                msg = "how do you want to proceed? [(S)kip current test/(e)nd detection phase/(n)ext parameter/(c)hange verbosity/(q)uit]"
+                msg = "你想如何继续？ [跳过当前测试(S)/结束检测阶段(e)/下一个参数(n)/更改详细程度(c)/退出(q)]"
                 choice = readInput(msg, default='S', checkBatch=False).upper()
 
             if choice == 'X':
@@ -814,8 +792,8 @@ def checkSqlInjection(place, parameter, value):
                 choice = None
                 while not ((choice or "").isdigit() and 0 <= int(choice) <= 6):
                     if choice:
-                        logger.warning("invalid value")
-                    msg = "enter new verbosity level: [0-6] "
+                        logger.warning("无效的值")
+                    msg = "请输入新的详细程度级别: [0-6] "
                     choice = readInput(msg, default=str(conf.verbose), checkBatch=False)
                 conf.verbose = int(choice)
                 setVerbosity()
@@ -836,9 +814,7 @@ def checkSqlInjection(place, parameter, value):
     # Return the injection object
     if injection.place is not None and injection.parameter is not None:
         if not conf.dropSetCookie and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data and injection.data[PAYLOAD.TECHNIQUE.BOOLEAN].vector.startswith('OR'):
-            warnMsg = "in OR boolean-based injection cases, please consider usage "
-            warnMsg += "of switch '--drop-set-cookie' if you experience any "
-            warnMsg += "problems during data retrieval"
+            warnMsg = "在 OR 布尔型注入情况下,请考虑使用 '--drop-set-cookie' 选项,如果在数据检索过程中遇到任何问题"
             logger.warning(warnMsg)
 
         if not checkFalsePositives(injection):
@@ -893,8 +869,7 @@ def heuristicCheckDbms(injection):
     kb.injection = popValue()
 
     if retVal:
-        infoMsg = "heuristic (extended) test shows that the back-end DBMS "  # Not as important as "parsing" counter-part (because of false-positives)
-        infoMsg += "could be '%s' " % retVal
+        infoMsg = "启发式(扩展)测试显示后端数据库管理系统可能是 '%s'" % retVal
         logger.info(infoMsg)
 
         kb.heuristicExtendedDbms = retVal
@@ -912,8 +887,7 @@ def checkFalsePositives(injection):
     if all(_ in (PAYLOAD.TECHNIQUE.BOOLEAN, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED) for _ in injection.data) or (len(injection.data) == 1 and PAYLOAD.TECHNIQUE.UNION in injection.data and "Generic" in injection.data[PAYLOAD.TECHNIQUE.UNION].title):
         pushValue(kb.injection)
 
-        infoMsg = "checking if the injection point on %s " % injection.place
-        infoMsg += "parameter '%s' is a false positive" % injection.parameter
+        infoMsg = "检查 %s 参数 '%s' 上的注入点是否为误报" % (injection.place, injection.parameter)
         logger.info(infoMsg)
 
         def _():
@@ -961,7 +935,7 @@ def checkFalsePositives(injection):
                 break
 
         if not retVal:
-            warnMsg = "false positive or unexploitable injection point detected"
+            warnMsg = "检测到误报或无法利用的注入点"
             logger.warning(warnMsg)
 
         kb.injection = popValue()
@@ -975,8 +949,7 @@ def checkSuhosinPatch(injection):
     """
 
     if injection.place in (PLACE.GET, PLACE.URI):
-        debugMsg = "checking for parameter length "
-        debugMsg += "constraining mechanisms"
+        debugMsg = "检查参数长度限制机制"
         logger.debug(debugMsg)
 
         pushValue(kb.injection)
@@ -985,16 +958,14 @@ def checkSuhosinPatch(injection):
         randInt = randomInt()
 
         if not checkBooleanExpression("%d=%s%d" % (randInt, ' ' * SUHOSIN_MAX_VALUE_LENGTH, randInt)):
-            warnMsg = "parameter length constraining "
-            warnMsg += "mechanism detected (e.g. Suhosin patch). "
-            warnMsg += "Potential problems in enumeration phase can be expected"
+            warnMsg = "检测到参数长度限制机制(e.g. Suhosin patch)。可能会在枚举阶段遇到问题"
             logger.warning(warnMsg)
 
         kb.injection = popValue()
 
 @stackedmethod
 def checkFilteredChars(injection):
-    debugMsg = "checking for filtered characters"
+    debugMsg = "检查是否存在过滤字符"
     logger.debug(debugMsg)
 
     pushValue(kb.injection)
@@ -1005,18 +976,13 @@ def checkFilteredChars(injection):
     # all other techniques are already using parentheses in tests
     if len(injection.data) == 1 and PAYLOAD.TECHNIQUE.BOOLEAN in injection.data:
         if not checkBooleanExpression("(%d)=%d" % (randInt, randInt)):
-            warnMsg = "it appears that some non-alphanumeric characters (i.e. ()) are "
-            warnMsg += "filtered by the back-end server. There is a strong "
-            warnMsg += "possibility that sqlmap won't be able to properly "
-            warnMsg += "exploit this vulnerability"
+            warnMsg = "后端服务器似乎过滤了一些非字母数字字符(例如 ())。sqlmap很可能无法正确利用此漏洞"
             logger.warning(warnMsg)
 
     # inference techniques depend on character '>'
     if not any(_ in injection.data for _ in (PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.QUERY)):
         if not checkBooleanExpression("%d>%d" % (randInt + 1, randInt)):
-            warnMsg = "it appears that the character '>' is "
-            warnMsg += "filtered by the back-end server. You are strongly "
-            warnMsg += "advised to rerun with the '--tamper=between'"
+            warnMsg = "后端服务器似乎过滤了字符 '>'。强烈建议您使用 '--tamper=between' 重新运行"
             logger.warning(warnMsg)
 
     kb.injection = popValue()
@@ -1054,7 +1020,7 @@ def heuristicCheckSqlInjection(place, parameter):
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
 
-    infoMsg = "heuristic (basic) test shows that %sparameter '%s' might " % ("%s " % paramType if paramType != parameter else "", parameter)
+    infoMsg = "启发式(基本)测试显示 %s参数 '%s' 可能" % ("%s " % paramType if paramType != parameter else "", parameter)
 
     def _(page):
         return any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
@@ -1076,12 +1042,12 @@ def heuristicCheckSqlInjection(place, parameter):
     kb.heuristicTest = HEURISTIC_TEST.CASTED if casting else HEURISTIC_TEST.NEGATIVE if not result else HEURISTIC_TEST.POSITIVE
 
     if kb.heavilyDynamic:
-        debugMsg = "heuristic check stopped because of heavy dynamicity"
+        debugMsg = "由于存在大量动态性,启发式检查已停止"
         logger.debug(debugMsg)
         return kb.heuristicTest
 
     if casting:
-        errMsg = "possible %s casting detected (e.g. '" % ("integer" if origValue.isdigit() else "type")
+        errMsg = "检测到可能的%s转换 (e.g. '" % ("整数" if origValue.isdigit() else "类型")
 
         platform = conf.url.split('.')[-1].lower()
         if platform == WEB_PLATFORM.ASP:
@@ -1093,21 +1059,21 @@ def heuristicCheckSqlInjection(place, parameter):
         else:
             errMsg += "$%s=intval($_REQUEST[\"%s\"])" % (parameter, parameter)
 
-        errMsg += "') at the back-end web application"
+        errMsg += "') 在后端Web应用程序中"
         logger.error(errMsg)
 
         if kb.ignoreCasted is None:
-            message = "do you want to skip those kind of cases (and save scanning time)? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
+            message = "你想跳过这些情况(以节省扫描时间)吗? %s " % ("[Y/n]" if conf.multipleTargets else "[y/N]")
             kb.ignoreCasted = readInput(message, default='Y' if conf.multipleTargets else 'N', boolean=True)
 
     elif result:
-        infoMsg += "be injectable"
+        infoMsg += "是可注入的"
         if Backend.getErrorParsedDBMSes():
-            infoMsg += " (possible DBMS: '%s')" % Format.getErrorParsedDBMSes()
+            infoMsg += " (可能是DBMS: '%s')" % Format.getErrorParsedDBMSes()
         logger.info(infoMsg)
 
     else:
-        infoMsg += "not be injectable"
+        infoMsg += "不是可注入的"
         logger.warning(infoMsg)
 
     kb.heuristicMode = True
@@ -1123,7 +1089,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     # Reference: https://bugs.python.org/issue18183
     if value.upper() in (page or "").upper():
-        infoMsg = "heuristic (XSS) test shows that %sparameter '%s' might be vulnerable to cross-site scripting (XSS) attacks" % ("%s " % paramType if paramType != parameter else "", parameter)
+        infoMsg = "启发式(XSS)测试显示 %s参数 '%s' 可能存在跨站脚本攻击(XSS)漏洞" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
@@ -1131,7 +1097,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     for match in re.finditer(FI_ERROR_REGEX, page or ""):
         if randStr1.lower() in match.group(0).lower():
-            infoMsg = "heuristic (FI) test shows that %sparameter '%s' might be vulnerable to file inclusion (FI) attacks" % ("%s " % paramType if paramType != parameter else "", parameter)
+            infoMsg = "启发式(FI)测试显示 %s 参数 '%s' 可能受到文件包含(FI)攻击" % ("%s " % paramType if paramType != parameter else "", parameter)
             logger.info(infoMsg)
 
             if conf.beep:
@@ -1160,7 +1126,7 @@ def checkDynParam(place, parameter, value):
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
-    infoMsg = "testing if %sparameter '%s' is dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
+    infoMsg = "测试 %s 参数 '%s' 是否是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
     logger.info(infoMsg)
 
     try:
@@ -1180,14 +1146,12 @@ def checkDynamicContent(firstPage, secondPage):
     """
 
     if kb.nullConnection:
-        debugMsg = "dynamic content checking skipped "
-        debugMsg += "because NULL connection used"
+        debugMsg = "跳过动态内容检查,因为使用了 NULL 连接"
         logger.debug(debugMsg)
         return
 
     if any(page is None for page in (firstPage, secondPage)):
-        warnMsg = "can't check dynamic content "
-        warnMsg += "because of lack of page content"
+        warnMsg = "无法检查动态内容,因为页面内容不足"
         logger.critical(warnMsg)
         return
 
@@ -1214,15 +1178,13 @@ def checkDynamicContent(firstPage, secondPage):
             count += 1
 
             if count > conf.retries:
-                warnMsg = "target URL content appears to be too dynamic. "
-                warnMsg += "Switching to '--text-only' "
+                warnMsg = "目标URL的内容似乎过于动态。切换到 '--text-only' 模式"
                 logger.warning(warnMsg)
 
                 conf.textOnly = True
                 return
 
-            warnMsg = "target URL content appears to be heavily dynamic. "
-            warnMsg += "sqlmap is going to retry the request(s)"
+            warnMsg = "目标URL的内容似乎非常动态。sqlmap将重试请求"
             singleTimeLogMessage(warnMsg, logging.CRITICAL)
 
             kb.heavilyDynamic = True
@@ -1241,7 +1203,7 @@ def checkStability():
     like for instance string matching (--string).
     """
 
-    infoMsg = "testing if the target URL content is stable"
+    infoMsg = "测试目标URL的内容是否稳定"
     logger.info(infoMsg)
 
     firstPage = kb.originalPage  # set inside checkConnection()
@@ -1259,24 +1221,17 @@ def checkStability():
 
     if kb.pageStable:
         if firstPage:
-            infoMsg = "target URL content is stable"
+            infoMsg = "目标URL的内容是稳定的"
             logger.info(infoMsg)
         else:
-            errMsg = "there was an error checking the stability of page "
-            errMsg += "because of lack of content. Please check the "
-            errMsg += "page request results (and probable errors) by "
-            errMsg += "using higher verbosity levels"
+            errMsg = "由于缺少内容,检查页面稳定性时出现错误。请使用更高的详细程度级别检查页面请求结果(以及可能的错误)"
             logger.error(errMsg)
 
     else:
-        warnMsg = "target URL content is not stable (i.e. content differs). sqlmap will base the page "
-        warnMsg += "comparison on a sequence matcher. If no dynamic nor "
-        warnMsg += "injectable parameters are detected, or in case of "
-        warnMsg += "junk results, refer to user's manual paragraph "
-        warnMsg += "'Page comparison'"
+        warnMsg = "目标URL的内容不稳定(即内容不同)。sqlmap将基于序列匹配器进行页面比较。如果未检测到动态或可注入参数,或者出现垃圾结果,请参考用户手册中的“页面比较”部分"
         logger.warning(warnMsg)
 
-        message = "how do you want to proceed? [(C)ontinue/(s)tring/(r)egex/(q)uit] "
+        message = "你想如何继续？ [(C)继续/(s)字符串/(r)正则表达式/(q)退出]"
         choice = readInput(message, default='C').upper()
 
         if choice == 'Q':
@@ -1285,37 +1240,35 @@ def checkStability():
         elif choice == 'S':
             showStaticWords(firstPage, secondPage)
 
-            message = "please enter value for parameter 'string': "
+            message = "请输入参数 'string' 的值: "
             string = readInput(message)
 
             if string:
                 conf.string = string
 
                 if kb.nullConnection:
-                    debugMsg = "turning off NULL connection "
-                    debugMsg += "support because of string checking"
+                    debugMsg = "由于字符串检查,关闭 NULL 连接支持"
                     logger.debug(debugMsg)
 
                     kb.nullConnection = None
             else:
-                errMsg = "Empty value supplied"
+                errMsg = "提供了空值"
                 raise SqlmapNoneDataException(errMsg)
 
         elif choice == 'R':
-            message = "please enter value for parameter 'regex': "
+            message = "请输入参数 'regex' 的值: "
             regex = readInput(message)
 
             if regex:
                 conf.regex = regex
 
                 if kb.nullConnection:
-                    debugMsg = "turning off NULL connection "
-                    debugMsg += "support because of regex checking"
+                    debugMsg = "由于正则表达式检查,关闭 NULL 连接支持"
                     logger.debug(debugMsg)
 
                     kb.nullConnection = None
             else:
-                errMsg = "Empty value supplied"
+                errMsg = "提供了空值"
                 raise SqlmapNoneDataException(errMsg)
 
         else:
@@ -1338,16 +1291,14 @@ def checkWaf():
     _ = hashDBRetrieve(HASHDB_KEYS.CHECK_WAF_RESULT, True)
     if _ is not None:
         if _:
-            warnMsg = "previous heuristics detected that the target "
-            warnMsg += "is protected by some kind of WAF/IPS"
+            warnMsg = "先前的启发式检测发现目标受到某种WAF/IPS的保护"
             logger.critical(warnMsg)
         return _
 
     if not kb.originalPage:
         return None
 
-    infoMsg = "checking if the target is protected by "
-    infoMsg += "some kind of WAF/IPS"
+    infoMsg = "检查目标是否受到某种WAF/IPS的保护"
     logger.info(infoMsg)
 
     retVal = False
@@ -1383,19 +1334,17 @@ def checkWaf():
 
     if retVal:
         if not kb.identifiedWafs:
-            warnMsg = "heuristics detected that the target "
-            warnMsg += "is protected by some kind of WAF/IPS"
+            warnMsg = "启发式检测发现目标受到某种WAF/IPS的保护"
             logger.critical(warnMsg)
 
-        message = "are you sure that you want to "
-        message += "continue with further target testing? [Y/n] "
+        message = "确定要继续进行进一步的目标测试吗? [Y/n] "
         choice = readInput(message, default='Y', boolean=True)
 
         if not choice:
             raise SqlmapUserQuitException
         else:
             if not conf.tamper:
-                warnMsg = "please consider usage of tamper scripts (option '--tamper')"
+                warnMsg = "请考虑使用篡改脚本(选项'--tamper')"
                 singleTimeWarnMessage(warnMsg)
 
     return retVal
@@ -1414,11 +1363,11 @@ def checkNullConnection():
         kb.nullConnection = _
 
         if _:
-            dbgMsg = "resuming NULL connection method '%s'" % _
+            dbgMsg = "恢复使用空连接方法 '%s'" % _
             logger.debug(dbgMsg)
 
     else:
-        infoMsg = "testing NULL connection to the target URL"
+        infoMsg = "正在测试与目标URL的空连接"
         logger.info(infoMsg)
 
         pushValue(kb.pageCompress)
@@ -1430,7 +1379,7 @@ def checkNullConnection():
             if not page and HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
                 kb.nullConnection = NULLCONNECTION.HEAD
 
-                infoMsg = "NULL connection is supported with HEAD method ('Content-Length')"
+                infoMsg = "使用HEAD方法('Content-Length')支持空连接"
                 logger.info(infoMsg)
             else:
                 page, headers, _ = Request.getPage(auxHeaders={HTTP_HEADER.RANGE: "bytes=-1"})
@@ -1438,7 +1387,7 @@ def checkNullConnection():
                 if page and len(page) == 1 and HTTP_HEADER.CONTENT_RANGE in (headers or {}):
                     kb.nullConnection = NULLCONNECTION.RANGE
 
-                    infoMsg = "NULL connection is supported with GET method ('Range')"
+                    infoMsg = "使用GET方法('Range')支持空连接"
                     logger.info(infoMsg)
                 else:
                     _, headers, _ = Request.getPage(skipRead=True)
@@ -1446,7 +1395,7 @@ def checkNullConnection():
                     if HTTP_HEADER.CONTENT_LENGTH in (headers or {}):
                         kb.nullConnection = NULLCONNECTION.SKIP_READ
 
-                        infoMsg = "NULL connection is supported with 'skip-read' method"
+                        infoMsg = "使用'skip-read'方法支持空连接"
                         logger.info(infoMsg)
 
         except SqlmapConnectionException:
@@ -1465,23 +1414,21 @@ def checkConnection(suppressOutput=False):
     if not re.search(r"\A\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\Z", conf.hostname):
         if not any((conf.proxy, conf.tor, conf.dummy, conf.offline)):
             try:
-                debugMsg = "resolving hostname '%s'" % conf.hostname
+                debugMsg = "正在解析主机名 '%s'" % conf.hostname
                 logger.debug(debugMsg)
                 socket.getaddrinfo(conf.hostname, None)
             except socket.gaierror:
-                errMsg = "host '%s' does not exist" % conf.hostname
+                errMsg = "主机 '%s' 不存在" % conf.hostname
                 raise SqlmapConnectionException(errMsg)
             except socket.error as ex:
-                errMsg = "problem occurred while "
-                errMsg += "resolving a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
+                errMsg = "解析主机名 '%s' 时出现问题 ('%s')" % (conf.hostname, getSafeExString(ex))
                 raise SqlmapConnectionException(errMsg)
             except UnicodeError as ex:
-                errMsg = "problem occurred while "
-                errMsg += "handling a host name '%s' ('%s')" % (conf.hostname, getSafeExString(ex))
+                errMsg = "处理主机名 '%s' 时出现问题 ('%s')" % (conf.hostname, getSafeExString(ex))
                 raise SqlmapDataException(errMsg)
 
     if not suppressOutput and not conf.dummy and not conf.offline:
-        infoMsg = "testing connection to the target URL"
+        infoMsg = "正在测试与目标URL的连接"
         logger.info(infoMsg)
 
     try:
@@ -1491,45 +1438,37 @@ def checkConnection(suppressOutput=False):
         rawResponse = "%s%s" % (listToStrValue(headers.headers if headers else ""), page)
 
         if conf.string:
-            infoMsg = "testing if the provided string is within the "
-            infoMsg += "target URL page content"
+            infoMsg = "正在测试提供的字符串是否在目标URL页面内容中"
             logger.info(infoMsg)
 
             if conf.string not in rawResponse:
-                warnMsg = "you provided '%s' as the string to " % conf.string
-                warnMsg += "match, but such a string is not within the target "
-                warnMsg += "URL raw response, sqlmap will carry on anyway"
+                warnMsg = "您提供的字符串为 '%s',但该字符串不在目标URL的原始响应中,sqlmap将继续执行" % conf.string
                 logger.warning(warnMsg)
 
         if conf.regexp:
-            infoMsg = "testing if the provided regular expression matches within "
-            infoMsg += "the target URL page content"
+            infoMsg = "正在测试提供的正则表达式是否与目标URL页面内容匹配"
             logger.info(infoMsg)
 
             if not re.search(conf.regexp, rawResponse, re.I | re.M):
-                warnMsg = "you provided '%s' as the regular expression " % conf.regexp
-                warnMsg += "which does not have any match within the target URL raw response. sqlmap "
-                warnMsg += "will carry on anyway"
+                warnMsg = "您提供的正则表达式为 '%s',在目标URL的原始响应中没有匹配项,sqlmap将继续执行" % conf.regexp
                 logger.warning(warnMsg)
 
         kb.errorIsNone = False
 
         if any(_ in (kb.serverHeader or "") for _ in PRECONNECT_INCOMPATIBLE_SERVERS):
-            singleTimeWarnMessage("turning off pre-connect mechanism because of incompatible server ('%s')" % kb.serverHeader)
+            singleTimeWarnMessage("由于不兼容的服务器('%s'),关闭预连接机制" % kb.serverHeader)
             conf.disablePrecon = True
 
         if not kb.originalPage and wasLastResponseHTTPError():
             if getLastRequestHTTPError() not in (conf.ignoreCode or []):
-                errMsg = "unable to retrieve page content"
+                errMsg = "无法获取页面内容"
                 raise SqlmapConnectionException(errMsg)
         elif wasLastResponseDBMSError():
-            warnMsg = "there is a DBMS error found in the HTTP response body "
-            warnMsg += "which could interfere with the results of the tests"
+            warnMsg = "在HTTP响应正文中发现了数据库管理系统错误,可能会干扰测试结果"
             logger.warning(warnMsg)
         elif wasLastResponseHTTPError():
             if getLastRequestHTTPError() not in (conf.ignoreCode or []):
-                warnMsg = "the web server responded with an HTTP error code (%d) " % getLastRequestHTTPError()
-                warnMsg += "which could interfere with the results of the tests"
+                warnMsg = "Web服务器响应了一个HTTP错误代码(%d),可能会干扰测试结果 " % getLastRequestHTTPError()
                 logger.warning(warnMsg)
         else:
             kb.errorIsNone = True
@@ -1543,11 +1482,7 @@ def checkConnection(suppressOutput=False):
 
     except SqlmapConnectionException as ex:
         if conf.ipv6:
-            warnMsg = "check connection to a provided "
-            warnMsg += "IPv6 address with a tool like ping6 "
-            warnMsg += "(e.g. 'ping6 -I eth0 %s') " % conf.hostname
-            warnMsg += "prior to running sqlmap to avoid "
-            warnMsg += "any addressing issues"
+            warnMsg = "在运行sqlmap之前,请使用类似ping6的工具检查与提供的IPv6地址的连接(e.g. 'ping6 -I eth0 %s') ,以避免任何寻址问题" % conf.hostname
             singleTimeWarnMessage(warnMsg)
 
         if any(code in kb.httpErrorCodes for code in (_http_client.NOT_FOUND, )):
@@ -1557,7 +1492,7 @@ def checkConnection(suppressOutput=False):
             if conf.multipleTargets:
                 return False
 
-            msg = "it is not recommended to continue in this kind of cases. Do you want to quit and make sure that everything is set up properly? [Y/n] "
+            msg = "在这种情况下,不建议继续执行。您是否要退出并确保一切设置正确? [Y/n] "
             if readInput(msg, default='Y', boolean=True):
                 raise SqlmapSilentQuitException
             else:
@@ -1571,9 +1506,7 @@ def checkConnection(suppressOutput=False):
     if conf.cj and not conf.cookie and not any(_[0] == HTTP_HEADER.COOKIE for _ in conf.httpHeaders) and not conf.dropSetCookie:
         candidate = DEFAULT_COOKIE_DELIMITER.join("%s=%s" % (_.name, _.value) for _ in conf.cj)
 
-        message = "you have not declared cookie(s), while "
-        message += "server wants to set its own ('%s'). " % re.sub(r"(=[^=;]{10}[^=;])[^=;]+([^=;]{10})", r"\g<1>...\g<2>", candidate)
-        message += "Do you want to use those [Y/n] "
+        message = "您没有声明cookie,但服务器想要设置自己的cookie('%s')。您是否要使用这些cookie? [Y/n] " % re.sub(r"(=[^=;]{10}[^=;])[^=;]+([^=;]{10})", r"\g<1>...\g<2>", candidate)
         if readInput(message, default='Y', boolean=True):
             kb.mergeCookies = True
             conf.httpHeaders.append((HTTP_HEADER.COOKIE, candidate))
