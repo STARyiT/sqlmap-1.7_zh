@@ -106,7 +106,7 @@ def _setRequestParams():
 
     # Perform checks on POST parameters
     if conf.method == HTTPMETHOD.POST and conf.data is None:
-        logger.warning("detected empty POST body")
+        logger.warning("检测到空的POST请求体")
         conf.data = ""
 
     if conf.data is not None:
@@ -132,8 +132,7 @@ def _setRequestParams():
             return retVal
 
         if kb.processUserMarks is None and kb.customInjectionMark in conf.data:
-            message = "custom injection marker ('%s') found in %s " % (kb.customInjectionMark, conf.method)
-            message += "body. Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到自定义注入标记('%s')。你想要处理它吗？[Y/n/q] " % (conf.method, kb.customInjectionMark)
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -145,8 +144,7 @@ def _setRequestParams():
                     kb.testOnlyCustom = True
 
         if re.search(JSON_RECOGNITION_REGEX, conf.data):
-            message = "JSON data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到 JSON 数据。你想要处理它吗？[Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -168,8 +166,7 @@ def _setRequestParams():
                                 conf.data = conf.data.replace(match.group(0), match.group(0).replace(match.group(2), _))
 
         elif re.search(JSON_LIKE_RECOGNITION_REGEX, conf.data):
-            message = "JSON-like data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到类似 JSON 的数据。你想要处理它吗？[Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -187,8 +184,7 @@ def _setRequestParams():
                         conf.data = re.sub(r"((?P<name>'[^']+'|\w+)\s*:\s*)(-?\d[\d\.]*\b)", functools.partial(process, repl=r"\g<0>%s" % kb.customInjectionMark), conf.data)
 
         elif re.search(ARRAY_LIKE_RECOGNITION_REGEX, conf.data):
-            message = "Array-like data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到类似数组的数据。你想要处理它吗？[Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -200,8 +196,7 @@ def _setRequestParams():
                     conf.data = re.sub(r"(=[^%s]+)" % DEFAULT_GET_POST_DELIMITER, r"\g<1>%s" % kb.customInjectionMark, conf.data)
 
         elif re.search(XML_RECOGNITION_REGEX, conf.data):
-            message = "SOAP/XML data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到类似多部分的数据。你想要处理它吗？[Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -214,8 +209,7 @@ def _setRequestParams():
                     conf.data = re.sub(r"(<(?P<name>[^>]+)( [^<]*)?>)([^<]+)(</\2)", functools.partial(process, repl=r"\g<1>\g<4>%s\g<5>" % kb.customInjectionMark), conf.data)
 
         elif re.search(MULTIPART_RECOGNITION_REGEX, conf.data):
-            message = "Multipart-like data found in %s body. " % conf.method
-            message += "Do you want to process it? [Y/n/q] "
+            message = "在 %s 请求体中找到类似多部分的数据。你想要处理它吗？[Y/n/q] " % conf.method
             choice = readInput(message, default='Y').upper()
 
             if choice == 'Q':
@@ -246,14 +240,10 @@ def _setRequestParams():
     kb.processUserMarks = True if (kb.postHint and kb.customInjectionMark in (conf.data or "")) else kb.processUserMarks
 
     if re.search(URI_INJECTABLE_REGEX, conf.url, re.I) and not any(place in conf.parameters for place in (PLACE.GET, PLACE.POST)) and not kb.postHint and kb.customInjectionMark not in (conf.data or "") and conf.url.startswith("http"):
-        warnMsg = "you've provided target URL without any GET "
-        warnMsg += "parameters (e.g. 'http://www.site.com/article.php?id=1') "
-        warnMsg += "and without providing any POST parameters "
-        warnMsg += "through option '--data'"
+        warnMsg = "您提供的目标 URL 没有任何 GET 参数 (例如 'http://www.site.com/article.php?id=1'),也没有通过选项 '--data' 提供任何 POST 参数"
         logger.warning(warnMsg)
 
-        message = "do you want to try URI injections "
-        message += "in the target URL itself? [Y/n/q] "
+        message = "您是否要尝试在目标 URL 本身进行 URI 注入？ [Y/n/q] "
         choice = readInput(message, default='Y').upper()
 
         if choice == 'Q':
@@ -270,8 +260,7 @@ def _setRequestParams():
         if kb.customInjectionMark in _:
             if kb.processUserMarks is None:
                 lut = {PLACE.URI: '-u', PLACE.CUSTOM_POST: '--data', PLACE.CUSTOM_HEADER: '--headers/--user-agent/--referer/--cookie'}
-                message = "custom injection marker ('%s') found in option " % kb.customInjectionMark
-                message += "'%s'. Do you want to process it? [Y/n/q] " % lut[place]
+                message = "在选项 '%s' 中找到自定义注入标记('%s')。你想要处理它吗？[Y/n/q] " % (lut[place], kb.customInjectionMark)
                 choice = readInput(message, default='Y').upper()
 
                 if choice == 'Q':
@@ -283,9 +272,7 @@ def _setRequestParams():
                         kb.testOnlyCustom = True
 
                         if "=%s" % kb.customInjectionMark in _:
-                            warnMsg = "it seems that you've provided empty parameter value(s) "
-                            warnMsg += "for testing. Please, always use only valid parameter values "
-                            warnMsg += "so sqlmap could be able to run properly"
+                            warnMsg = "看起来您提供了空的参数值进行测试。请始终只使用有效的参数值,以便 sqlmap 能够正常运行"
                             logger.warning(warnMsg)
 
             if not kb.processUserMarks:
@@ -400,19 +387,16 @@ def _setRequestParams():
                     testableParameters = True
 
     if not conf.parameters:
-        errMsg = "you did not provide any GET, POST and Cookie "
-        errMsg += "parameter, neither an User-Agent, Referer or Host header value"
+        errMsg = "您没有提供任何 GET、POST 和 Cookie 参数,也没有提供 User-Agent、Referer 或 Host 标头值"
         raise SqlmapGenericException(errMsg)
 
     elif not testableParameters:
-        errMsg = "all testable parameters you provided are not present "
-        errMsg += "within the given request data"
+        errMsg = "您提供的所有可测试参数都不在给定的请求数据中"
         raise SqlmapGenericException(errMsg)
 
     if conf.csrfToken:
         if not any(re.search(conf.csrfToken, ' '.join(_), re.I) for _ in (conf.paramDict.get(PLACE.GET, {}), conf.paramDict.get(PLACE.POST, {}), conf.paramDict.get(PLACE.COOKIE, {}))) and not re.search(r"\b%s\b" % conf.csrfToken, conf.data or "") and conf.csrfToken not in set(_[0].lower() for _ in conf.httpHeaders) and conf.csrfToken not in conf.paramDict.get(PLACE.COOKIE, {}) and not all(re.search(conf.csrfToken, _, re.I) for _ in conf.paramDict.get(PLACE.URI, {}).values()):
-            errMsg = "anti-CSRF token parameter '%s' not " % conf.csrfToken._original
-            errMsg += "found in provided GET, POST, Cookie or header values"
+            errMsg = "未在提供的 GET、POST、Cookie 或标头值中找到反-CSRF 令牌参数 '%s'" % conf.csrfToken._original
             raise SqlmapGenericException(errMsg)
     else:
         for place in (PLACE.GET, PLACE.POST, PLACE.COOKIE):
@@ -421,8 +405,7 @@ def _setRequestParams():
 
             for parameter in conf.paramDict.get(place, {}):
                 if any(parameter.lower().count(_) for _ in CSRF_TOKEN_PARAMETER_INFIXES):
-                    message = "%sparameter '%s' appears to hold anti-CSRF token. " % ("%s " % place if place != parameter else "", parameter)
-                    message += "Do you want sqlmap to automatically update it in further requests? [y/N] "
+                    message = "%s参数 '%s' 似乎包含反-CSRF 令牌。您是否希望 sqlmap 在后续请求中自动更新它？ [y/N] " % ("%s " % place if place != parameter else "", parameter)
 
                     if readInput(message, default='N', boolean=True):
                         class _(six.text_type):
@@ -446,9 +429,9 @@ def _setHashDB():
 
             try:
                 os.remove(conf.hashDBFile)
-                logger.info("flushing session file")
+                logger.info("正在清空会话文件")
             except OSError as ex:
-                errMsg = "unable to flush the session file ('%s')" % getSafeExString(ex)
+                errMsg = "无法刷新会话文件 ('%s')" % getSafeExString(ex)
                 raise SqlmapFilePathException(errMsg)
 
     conf.hashDB = HashDB(conf.hashDBFile)
@@ -494,9 +477,7 @@ def _resumeDBMS():
 
     if not value:
         if conf.offline:
-            errMsg = "unable to continue in offline mode "
-            errMsg += "because of lack of usable "
-            errMsg += "session data"
+            errMsg = "由于缺乏可用的会话数据,无法继续离线模式"
             raise SqlmapNoneDataException(errMsg)
         else:
             return
@@ -518,18 +499,16 @@ def _resumeDBMS():
                 break
 
         if not check:
-            message = "you provided '%s' as a back-end DBMS, " % conf.dbms
-            message += "but from a past scan information on the target URL "
-            message += "sqlmap assumes the back-end DBMS is '%s'. " % dbms
-            message += "Do you really want to force the back-end "
-            message += "DBMS value? [y/N] "
+            message = "你提供了 '%s' 作为后端 DBMS," % conf.dbms
+            message += "但从过去的扫描信息中,sqlmap 假设后端 DBMS 是 '%s'。" % dbms
+            message += "你真的想要强制指定后端 DBMS 的值吗？[y/N] "
 
             if not readInput(message, default='N', boolean=True):
                 conf.dbms = None
                 Backend.setDbms(dbms)
                 Backend.setVersionList(dbmsVersion)
     else:
-        infoMsg = "resuming back-end DBMS '%s' " % dbms
+        infoMsg = "恢复后端数据库管理系统 '%s'" % dbms
         logger.info(infoMsg)
 
         Backend.setDbms(dbms)
@@ -548,16 +527,11 @@ def _resumeOS():
     os = value
 
     if os and os != 'None':
-        infoMsg = "resuming back-end DBMS operating system '%s' " % os
+        infoMsg = "恢复后端数据库管理系统操作系统 '%s'" % os
         logger.info(infoMsg)
 
         if conf.os and conf.os.lower() != os.lower():
-            message = "you provided '%s' as back-end DBMS operating " % conf.os
-            message += "system, but from a past scan information on the "
-            message += "target URL sqlmap assumes the back-end DBMS "
-            message += "operating system is %s. " % os
-            message += "Do you really want to force the back-end DBMS "
-            message += "OS value? [y/N] "
+            message = "您提供的后端数据库管理系统操作系统为 '%s',但根据过去的扫描信息,sqlmap 推测后端数据库管理系统操作系统为 %s。您是否确定要强制指定后端数据库管理系统操作系统的值？ [y/N] " % (conf.os, os)
 
             if not readInput(message, default='N', boolean=True):
                 conf.os = os
@@ -583,23 +557,21 @@ def _setResultsFile():
             conf.resultsFP = openFile(conf.resultsFile, "a", UNICODE_ENCODING, buffering=0)
         except (OSError, IOError) as ex:
             try:
-                warnMsg = "unable to create results file '%s' ('%s'). " % (conf.resultsFile, getUnicode(ex))
+                warnMsg = "无法创建结果文件 '%s' ('%s')。" % (conf.resultsFile, getUnicode(ex))
                 handle, conf.resultsFile = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.RESULTS, suffix=".csv")
                 os.close(handle)
                 conf.resultsFP = openFile(conf.resultsFile, "w+", UNICODE_ENCODING, buffering=0)
-                warnMsg += "Using temporary file '%s' instead" % conf.resultsFile
+                warnMsg += "使用临时文件 '%s' 替代" % conf.resultsFile
                 logger.warning(warnMsg)
             except IOError as _:
-                errMsg = "unable to write to the temporary directory ('%s'). " % _
-                errMsg += "Please make sure that your disk is not full and "
-                errMsg += "that you have sufficient write permissions to "
-                errMsg += "create temporary files and/or directories"
+                errMsg = "无法写入临时目录 ('%s')。" % _
+                errMsg += "请确保您的磁盘空间足够,并且您具有足够的写入权限来创建临时文件和/或目录"
                 raise SqlmapSystemException(errMsg)
 
         if not found:
-            conf.resultsFP.writelines("Target URL,Place,Parameter,Technique(s),Note(s)%s" % os.linesep)
+            conf.resultsFP.writelines("目标 URL,位置,参数,技术,备注%s" % os.linesep)
 
-        logger.info("using '%s' as the CSV results file in multiple targets mode" % conf.resultsFile)
+        logger.info("在多目标模式下使用 '%s' 作为 CSV 结果文件" % conf.resultsFile)
 
 def _createFilesDir():
     """
@@ -616,9 +588,7 @@ def _createFilesDir():
             os.makedirs(conf.filePath)
         except OSError as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapfiles")
-            warnMsg = "unable to create files directory "
-            warnMsg += "'%s' (%s). " % (conf.filePath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+            warnMsg = "无法创建文件目录 '%s'(%s)。使用临时目录 '%s' 替代" % (conf.filePath, getUnicode(ex), getUnicode(tempDir))
             logger.warning(warnMsg)
 
             conf.filePath = tempDir
@@ -638,9 +608,7 @@ def _createDumpDir():
             os.makedirs(conf.dumpPath)
         except OSError as ex:
             tempDir = tempfile.mkdtemp(prefix="sqlmapdump")
-            warnMsg = "unable to create dump directory "
-            warnMsg += "'%s' (%s). " % (conf.dumpPath, getUnicode(ex))
-            warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+            warnMsg = "无法创建转储目录 '%s'(%s)。使用临时目录 '%s' 替代" % (conf.dumpPath, getUnicode(ex), getUnicode(tempDir))
             logger.warning(warnMsg)
 
             conf.dumpPath = tempDir
@@ -661,9 +629,7 @@ def _createTargetDirs():
             os.makedirs(conf.outputPath)
     except (OSError, IOError, TypeError) as ex:
         tempDir = tempfile.mkdtemp(prefix="sqlmapoutput")
-        warnMsg = "unable to create output directory "
-        warnMsg += "'%s' (%s). " % (conf.outputPath, getUnicode(ex))
-        warnMsg += "Using temporary directory '%s' instead" % getUnicode(tempDir)
+        warnMsg = "无法创建输出目录 '%s'(%s)。使用临时目录 '%s' 替代" % (conf.outputPath, getUnicode(ex), getUnicode(tempDir))
         logger.warning(warnMsg)
 
         conf.outputPath = tempDir
@@ -679,9 +645,9 @@ def _createTargetDirs():
                 f.write("\n\n%s" % getUnicode(conf.data))
     except IOError as ex:
         if "denied" in getUnicode(ex):
-            errMsg = "you don't have enough permissions "
+            errMsg = "您没有足够的权限 "
         else:
-            errMsg = "something went wrong while trying "
+            errMsg = "在尝试写入输出目录'%s'时出现了问题 "
         errMsg += "to write to the output directory '%s' (%s)" % (paths.SQLMAP_OUTPUT_PATH, getSafeExString(ex))
 
         raise SqlmapMissingPrivileges(errMsg)

@@ -51,12 +51,10 @@ class Wordlist(six.Iterator):
                 try:
                     _ = zipfile.ZipFile(self.current, 'r')
                 except zipfile.error as ex:
-                    errMsg = "something appears to be wrong with "
-                    errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
-                    errMsg += "sure that you haven't made any changes to it"
+                    errMsg = "似乎文件'%s'存在问题('%s')。请确保您没有对其进行任何更改" % (self.current, getSafeExString(ex))
                     raise SqlmapInstallationException(errMsg)
                 if len(_.namelist()) == 0:
-                    errMsg = "no file(s) inside '%s'" % self.current
+                    errMsg = "在'%s'中没有文件" % self.current
                     raise SqlmapDataException(errMsg)
                 self.fp = _.open(_.namelist()[0])
             else:
@@ -77,9 +75,7 @@ class Wordlist(six.Iterator):
             try:
                 retVal = next(self.iter).rstrip()
             except zipfile.error as ex:
-                errMsg = "something appears to be wrong with "
-                errMsg += "the file '%s' ('%s'). Please make " % (self.current, getSafeExString(ex))
-                errMsg += "sure that you haven't made any changes to it"
+                errMsg = "似乎文件'%s'存在问题('%s')。请确保您没有对其进行任何更改" % (self.current, getSafeExString(ex))
                 raise SqlmapInstallationException(errMsg)
             except StopIteration:
                 self.adjust()

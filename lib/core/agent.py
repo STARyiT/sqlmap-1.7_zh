@@ -443,7 +443,7 @@ class Agent(object):
         if "hex" in rootQuery and hasattr(rootQuery.hex, "query"):
             hexField = rootQuery.hex.query % field
         else:
-            warnMsg = "switch '--hex' is currently not supported on DBMS '%s'" % Backend.getIdentifiedDbms()
+            warnMsg = "当前不支持在DBMS '%s'上使用'--hex'开关" % Backend.getIdentifiedDbms()
             singleTimeWarnMessage(warnMsg)
 
         return hexField

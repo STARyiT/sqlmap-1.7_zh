@@ -39,14 +39,14 @@ def update():
     success = False
 
     if TYPE == "pip":
-        infoMsg = "updating sqlmap to the latest stable version from the "
-        infoMsg += "PyPI repository"
+        infoMsg = "正在从PyPI存储库更新sqlmap到最新稳定版本"
+
         logger.info(infoMsg)
 
-        debugMsg = "sqlmap will try to update itself using 'pip' command"
+        debugMsg = "sqlmap将尝试使用'pip'命令进行自更新"
         logger.debug(debugMsg)
 
-        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] 更新进行中" % time.strftime("%X"))
 
         output = ""
         try:
@@ -61,27 +61,26 @@ def update():
             output = getText(output)
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "already up-to-date" in output else "updated to", extractRegexResult(r"\binstalled sqlmap-(?P<result>\d+\.\d+\.\d+)", output) or extractRegexResult(r"\((?P<result>\d+\.\d+\.\d+)\)", output)))
+            logger.info("%s 最新修订版本为 '%s'" % ("已经是最新版本" if "already up-to-date" in output else "已更新至", extractRegexResult(r"\binstalled sqlmap-(?P<result>\d+\.\d+\.\d+)", output) or extractRegexResult(r"\((?P<result>\d+\.\d+\.\d+)\)", output)))
         else:
-            logger.error("update could not be completed ('%s')" % re.sub(r"[^a-z0-9:/\\]+", " ", output).strip())
+            logger.error("无法完成更新('%s')" % re.sub(r"[^a-z0-9:/\\]+", " ", output).strip())
 
     elif not os.path.exists(os.path.join(paths.SQLMAP_ROOT_PATH, ".git")):
-        warnMsg = "not a git repository. It is recommended to clone the 'sqlmapproject/sqlmap' repository "
-        warnMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
+        warnMsg = "不是一个git仓库。建议从GitHub克隆'sqlmapproject/sqlmap'仓库(例如:'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
         logger.warning(warnMsg)
 
         if VERSION == getLatestRevision():
-            logger.info("already at the latest revision '%s'" % getRevisionNumber())
+            logger.info("已经是最新修订版本 '%s'" % (getRevisionNumber() or VERSION))
             return
 
-        message = "do you want to try to fetch the latest 'zipball' from repository and extract it (experimental) ? [y/N]"
+        message = "您是否要尝试从存储库获取最新的'zipball'并解压缩它(实验性功能)？[y/N]"
         if readInput(message, default='N', boolean=True):
             directory = os.path.abspath(paths.SQLMAP_ROOT_PATH)
 
             try:
                 open(os.path.join(directory, "sqlmap.py"), "w+b")
             except Exception as ex:
-                errMsg = "unable to update content of directory '%s' ('%s')" % (directory, getSafeExString(ex))
+                errMsg = "无法更新目录'%s'的内容('%s')" % (directory, getSafeExString(ex))
                 logger.error(errMsg)
             else:
                 attrs = os.stat(os.path.join(directory, "sqlmap.py")).st_mode
@@ -96,7 +95,7 @@ def update():
                             pass
 
                 if glob.glob(os.path.join(directory, '*')):
-                    errMsg = "unable to clear the content of directory '%s'" % directory
+                    errMsg = "无法清空目录'%s'的内容" % directory
                     logger.error(errMsg)
                 else:
                     try:
@@ -112,28 +111,27 @@ def update():
                         if os.path.isfile(filepath):
                             with openFile(filepath, "rb") as f:
                                 version = re.search(r"(?m)^VERSION\s*=\s*['\"]([^'\"]+)", f.read()).group(1)
-                                logger.info("updated to the latest version '%s#dev'" % version)
+                                logger.info("已更新至最新版本 '%s#dev'" % version)
                                 success = True
                     except Exception as ex:
-                        logger.error("update could not be completed ('%s')" % getSafeExString(ex))
+                        logger.error("无法完成更新('%s')" % getSafeExString(ex))
                     else:
                         if not success:
-                            logger.error("update could not be completed")
+                            logger.error("无法完成更新")
                         else:
                             try:
                                 os.chmod(os.path.join(directory, "sqlmap.py"), attrs)
                             except OSError:
-                                logger.warning("could not set the file attributes of '%s'" % os.path.join(directory, "sqlmap.py"))
+                                logger.warning("无法设置文件属性'%s'" % os.path.join(directory, "sqlmap.py"))
 
     else:
-        infoMsg = "updating sqlmap to the latest development revision from the "
-        infoMsg += "GitHub repository"
+        infoMsg = "正在从GitHub存储库更新sqlmap到最新的开发修订版本"
         logger.info(infoMsg)
 
-        debugMsg = "sqlmap will try to update itself using 'git' command"
+        debugMsg = "sqlmap将尝试使用'git'命令进行自更新"
         logger.debug(debugMsg)
 
-        dataToStdout("\r[%s] [INFO] update in progress" % time.strftime("%X"))
+        dataToStdout("\r[%s] [INFO] 更新进行中" % time.strftime("%X"))
 
         output = ""
         try:
@@ -148,24 +146,19 @@ def update():
             output = getText(output)
 
         if success:
-            logger.info("%s the latest revision '%s'" % ("already at" if "Already" in output else "updated to", getRevisionNumber()))
+            logger.info("%s 最新修订版本为 '%s'" % ("已经是最新版本" if "Already" in output else "已更新到", getRevisionNumber()))
         else:
             if "Not a git repository" in output:
-                errMsg = "not a valid git repository. Please checkout the 'sqlmapproject/sqlmap' repository "
-                errMsg += "from GitHub (e.g. 'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
+                errMsg = "不是一个有效的git仓库。请从GitHub上检出'sqlmapproject/sqlmap'仓库(例如:'git clone --depth 1 %s sqlmap')" % GIT_REPOSITORY
                 logger.error(errMsg)
             else:
-                logger.error("update could not be completed ('%s')" % re.sub(r"\W+", " ", output).strip())
+                logger.error("无法完成更新('%s')" % re.sub(r"\W+", " ", output).strip())
 
     if not success:
         if IS_WIN:
-            infoMsg = "for Windows platform it's recommended "
-            infoMsg += "to use a GitHub for Windows client for updating "
-            infoMsg += "purposes (https://desktop.github.com/) or just "
-            infoMsg += "download the latest snapshot from "
-            infoMsg += "https://github.com/sqlmapproject/sqlmap/downloads"
+            infoMsg = "对于Windows平台,建议使用GitHub for Windows客户端进行更新(https://desktop.github.com/),或者只需从https://github.com/sqlmapproject/sqlmap/downloads下载最新的快照"
+
         else:
-            infoMsg = "for Linux platform it's recommended "
-            infoMsg += "to install a standard 'git' package (e.g.: 'apt install git')"
+            infoMsg = "对于Linux平台,建议安装标准的'git'软件包(例如:'apt install git')"
 
         logger.info(infoMsg)

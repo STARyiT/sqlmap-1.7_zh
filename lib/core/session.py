@@ -58,7 +58,7 @@ def setOs():
 
     if "type" in kb.bannerFp:
         Backend.setOs(Format.humanize(kb.bannerFp["type"]))
-        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+    logger.info("后端DBMS是 %s" % Backend.getDbms())
 
     if "distrib" in kb.bannerFp:
         kb.osVersion = Format.humanize(kb.bannerFp["distrib"])

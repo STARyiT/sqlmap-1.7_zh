@@ -312,9 +312,9 @@ class Format(object):
 
         if info and "type" in info:
             if conf.api:
-                infoApi["%s operating system" % target] = info
+                infoApi["%s 操作系统" % target] = info
             else:
-                infoStr += "%s operating system: %s" % (target, Format.humanize(info["type"]))
+                infoStr += "%s 操作系统: %s" % (target, Format.humanize(info["type"]))
 
                 if "distrib" in info:
                     infoStr += " %s" % Format.humanize(info["distrib"])
@@ -330,9 +330,9 @@ class Format(object):
 
         if "technology" in info:
             if conf.api:
-                infoApi["web application technology"] = Format.humanize(info["technology"], ", ")
+                infoApi["WEB应用技术"] = Format.humanize(info["technology"], ", ")
             else:
-                infoStr += "\nweb application technology: %s" % Format.humanize(info["technology"], ", ")
+                infoStr += "\nWEB应用技术: %s" % Format.humanize(info["technology"], ", ")
 
         if conf.api:
             return infoApi
@@ -349,15 +349,12 @@ class Backend(object):
 
         # Little precaution, in theory this condition should always be false
         elif kb.dbms is not None and kb.dbms != dbms:
-            warnMsg = "there appears to be a high probability that "
-            warnMsg += "this could be a false positive case"
+            warnMsg = "这似乎有很高的可能性是一个误报情况"
             logger.warning(warnMsg)
 
-            msg = "sqlmap previously fingerprinted back-end DBMS as "
-            msg += "%s. However now it has been fingerprinted " % kb.dbms
-            msg += "as %s. " % dbms
-            msg += "Please, specify which DBMS should be "
-            msg += "correct [%s (default)/%s] " % (kb.dbms, dbms)
+            msg = "sqlmap先前将后端DBMS识别为%s。" % kb.dbms
+            msg += "但现在它被识别为%s。" % dbms
+            msg += "请指定应该是哪个DBMS正确的[%s(Default)/%s] " % (kb.dbms, dbms)
 
             while True:
                 choice = readInput(msg, default=kb.dbms)
@@ -370,7 +367,7 @@ class Backend(object):
                     kb.dbms = aliasToDbmsEnum(choice)
                     break
                 else:
-                    warnMsg = "invalid value"
+                    warnMsg = "无效的值"
                     logger.warning(warnMsg)
 
         elif kb.dbms is None:
@@ -392,7 +389,7 @@ class Backend(object):
         elif isinstance(versionsList, six.string_types):
             Backend.setVersion(versionsList)
         else:
-            logger.error("invalid format of versionsList")
+            logger.error("versionsList的格式无效")
 
     @staticmethod
     def forceDbms(dbms, sticky=False):
@@ -413,11 +410,8 @@ class Backend(object):
 
         # Little precaution, in theory this condition should always be false
         elif kb.os is not None and isinstance(os, six.string_types) and kb.os.lower() != os.lower():
-            msg = "sqlmap previously fingerprinted back-end DBMS "
-            msg += "operating system %s. However now it has " % kb.os
-            msg += "been fingerprinted to be %s. " % os
-            msg += "Please, specify which OS is "
-            msg += "correct [%s (default)/%s] " % (kb.os, os)
+            msg = "sqlmap 先前识别的后端 DBMS 操作系统为 %s。但现在识别为 %s。" % (kb.os, os)
+            msg += "请指定哪个操作系统是正确的 [%s (Default)/%s] " % (kb.os, os)
 
             while True:
                 choice = readInput(msg, default=kb.os)
@@ -428,7 +422,7 @@ class Backend(object):
                     kb.os = choice.capitalize()
                     break
                 else:
-                    warnMsg = "invalid value"
+                    warnMsg = "无效的值"
                     logger.warning(warnMsg)
 
         elif kb.os is None and isinstance(os, six.string_types):
@@ -454,7 +448,7 @@ class Backend(object):
 
     @staticmethod
     def setArch():
-        msg = "what is the back-end database management system architecture?"
+        msg = "数据库采用的架构是?"
         msg += "\n[1] 32-bit (default)"
         msg += "\n[2] 64-bit"
 
@@ -465,7 +459,7 @@ class Backend(object):
                 kb.arch = 32 if int(choice) == 1 else 64
                 break
             else:
-                warnMsg = "invalid value. Valid values are 1 and 2"
+                warnMsg = "无效的值。有效值为1和2"
                 logger.warning(warnMsg)
 
         return kb.arch
@@ -649,8 +643,7 @@ def paramToDict(place, parameters=None):
                         value = decodeBase64(value, binary=False, encoding=conf.encoding or UNICODE_ENCODING)
                         parameters = re.sub(r"\b%s(\b|\Z)" % re.escape(oldValue), value, parameters)
                     except:
-                        errMsg = "parameter '%s' does not contain " % parameter
-                        errMsg += "valid Base64 encoded value ('%s')" % value
+                        errMsg = "参数'%s'不包含有效的Base64编码值('%s')" % (parameter,value)
                         raise SqlmapValueException(errMsg)
 
                 testableParameters[parameter] = value
@@ -658,21 +651,15 @@ def paramToDict(place, parameters=None):
                 if not conf.multipleTargets and not (conf.csrfToken and re.search(conf.csrfToken, parameter, re.I)):
                     _ = urldecode(testableParameters[parameter], convall=True)
                     if (_.endswith("'") and _.count("'") == 1 or re.search(r'\A9{3,}', _) or re.search(r'\A-\d+\Z', _) or re.search(DUMMY_USER_INJECTION, _)) and not parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX):
-                        warnMsg = "it appears that you have provided tainted parameter values "
-                        warnMsg += "('%s') with most likely leftover " % element
-                        warnMsg += "chars/statements from manual SQL injection test(s). "
-                        warnMsg += "Please, always use only valid parameter values "
-                        warnMsg += "so sqlmap could be able to run properly"
+                        warnMsg = "您似乎提供了带有可能是手动SQL注入测试的残留字符/语句的污染参数值('%s')。请始终只使用有效的参数值,以便sqlmap能够正常运行" % element
                         logger.warning(warnMsg)
 
-                        message = "are you really sure that you want to continue (sqlmap could have problems)? [y/N] "
+                        message = "您确定要继续吗(sqlmap可能会遇到问题)? [y/N] "
 
                         if not readInput(message, default='N', boolean=True):
                             raise SqlmapSilentQuitException
                     elif not _:
-                        warnMsg = "provided value for parameter '%s' is empty. " % parameter
-                        warnMsg += "Please, always use only valid parameter values "
-                        warnMsg += "so sqlmap could be able to run properly"
+                        warnMsg = "参数'%s'的值为空。请始终只使用有效的参数值,以便sqlmap能够正常运行" % parameter
                         logger.warning(warnMsg)
 
                 if place in (PLACE.POST, PLACE.GET):
@@ -711,9 +698,7 @@ def paramToDict(place, parameters=None):
                                 walk(deserialized)
 
                                 if candidates:
-                                    message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
-                                    message += "is JSON deserializable. Do you want to inject inside? [y/N] "
-
+                                    message = "提供的值似乎可以对 %s参数 '%s' 进行 JSON 反序列化。你想要进行注入吗? [y/N]" % ("%s " % place if place != parameter else "", parameter)
                                     if readInput(message, default='N', boolean=True):
                                         del testableParameters[parameter]
                                         testableParameters.update(candidates)
@@ -724,8 +709,7 @@ def paramToDict(place, parameters=None):
                                 pass
 
                             _ = re.sub(regex, r"\g<1>%s\g<%d>" % (kb.customInjectionMark, len(match.groups())), testableParameters[parameter])
-                            message = "it appears that provided value for %sparameter '%s' " % ("%s " % place if place != parameter else "", parameter)
-                            message += "has boundaries. Do you want to inject inside? ('%s') [y/N] " % getUnicode(_)
+                            message = "提供的值似乎对 %s参数 '%s' 有边界。你想要进行注入吗？('%s') [y/N]" % ("%s " % place if place != parameter else "", parameter, getUnicode(_))
 
                             if readInput(message, default='N', boolean=True):
                                 testableParameters[parameter] = re.sub(r"\b(%s\s*=\s*)%s" % (re.escape(parameter), re.escape(testableParameters[parameter])), (r"\g<1>%s" % re.sub(regex, r"\g<1>%s\g<2>" % BOUNDED_INJECTION_MARKER, testableParameters[parameter].replace("\\", r"\\"))), parameters)
@@ -736,22 +720,19 @@ def paramToDict(place, parameters=None):
             paramStr = ", ".join(test for test in conf.testParameter)
 
             if len(conf.testParameter) > 1:
-                warnMsg = "provided parameters '%s' " % paramStr
-                warnMsg += "are not inside the %s" % place
+                warnMsg = "提供的参数'%s'不在%s中" % (paramStr,place)
                 logger.warning(warnMsg)
             else:
                 parameter = conf.testParameter[0]
 
                 if not intersect(USER_AGENT_ALIASES + REFERER_ALIASES + HOST_ALIASES, parameter, True):
-                    debugMsg = "provided parameter '%s' " % paramStr
-                    debugMsg += "is not inside the %s" % place
+                    debugMsg = "提供的参数'%s'不在%s中" % (paramStr,place)
                     logger.debug(debugMsg)
 
         elif len(conf.testParameter) != len(testableParameters):
             for parameter in conf.testParameter:
                 if parameter not in testableParameters:
-                    debugMsg = "provided parameter '%s' " % parameter
-                    debugMsg += "is not inside the %s" % place
+                    debugMsg = "提供的参数'%s'不在%s中" % (parameter, place)
                     logger.debug(debugMsg)
 
     if testableParameters:
@@ -761,8 +742,7 @@ def paramToDict(place, parameters=None):
                     try:
                         decoded = codecs.decode(value, encoding)
                         if len(decoded) > MIN_ENCODED_LEN_CHECK and all(_ in getBytes(string.printable) for _ in decoded):
-                            warnMsg = "provided parameter '%s' " % parameter
-                            warnMsg += "appears to be '%s' encoded" % encoding
+                            warnMsg = "提供的参数'%s'似乎是'%s'编码的" % (parameter, encoding)
                             logger.warning(warnMsg)
                             break
                     except:
@@ -806,30 +786,29 @@ def getManualDirectories():
 
     if conf.webRoot:
         directories = [conf.webRoot]
-        infoMsg = "using '%s' as web server document root" % conf.webRoot
+        infoMsg = "将'%s'作为Web服务器文档根目录" % conf.webRoot
         logger.info(infoMsg)
     elif directories:
-        infoMsg = "retrieved the web server document root: '%s'" % directories
+        infoMsg = "检索到Web服务器文档根目录:'%s'" % directories
         logger.info(infoMsg)
     else:
-        warnMsg = "unable to automatically retrieve the web server "
-        warnMsg += "document root"
+        warnMsg = "无法自动检索Web服务器文档根目录"
         logger.warning(warnMsg)
 
         directories = []
 
-        message = "what do you want to use for writable directory?\n"
-        message += "[1] common location(s) ('%s') (default)\n" % ", ".join(root for root in defaultDocRoot)
-        message += "[2] custom location(s)\n"
-        message += "[3] custom directory list file\n"
-        message += "[4] brute force search"
+        message = "您想要使用哪个可写目录?\n"
+        message += "[1] 常见位置('%s') (default)\n" % ", ".join(root for root in defaultDocRoot)
+        message += "[2] 自定义位置\n"
+        message += "[3] 自定义目录列表文件\n"
+        message += "[4] 暴力搜索"
         choice = readInput(message, default='1')
 
         if choice == '2':
-            message = "please provide a comma separate list of absolute directory paths: "
+            message = "请提供逗号分隔的绝对目录路径列表: "
             directories = readInput(message, default="").split(',')
         elif choice == '3':
-            message = "what's the list file location?\n"
+            message = "列表文件的位置是什么?\n"
             listPath = readInput(message, default="")
             checkFile(listPath)
             directories = getFileItems(listPath)
@@ -863,10 +842,10 @@ def getManualDirectories():
                         if BRUTE_DOC_ROOT_TARGET_MARK not in prefix:
                             break
 
-            infoMsg = "using generated directory list: %s" % ','.join(directories)
+            infoMsg = "使用生成的目录列表: %s" % ','.join(directories)
             logger.info(infoMsg)
 
-            msg = "use any additional custom directories [Enter for None]: "
+            msg = "使用任何其他自定义目录 [按回车键为无]: "
             answer = readInput(msg)
 
             if answer:
@@ -889,7 +868,7 @@ def getAutoDirectories():
     retVal = OrderedSet()
 
     if kb.absFilePaths:
-        infoMsg = "retrieved web server absolute paths: "
+        infoMsg = "检索到Web服务器的绝对路径: "
         infoMsg += "'%s'" % ", ".join(ntToPosixSlashes(path) for path in kb.absFilePaths)
         logger.info(infoMsg)
 
@@ -899,7 +878,7 @@ def getAutoDirectories():
                 directory = ntToPosixSlashes(directory)
                 retVal.add(directory)
     else:
-        warnMsg = "unable to automatically parse any web server path"
+        warnMsg = "无法自动解析任何Web服务器路径"
         logger.warning(warnMsg)
 
     return list(retVal)
@@ -1052,8 +1031,7 @@ def dataToTrafficFile(data):
         conf.trafficFP.write(data)
         conf.trafficFP.flush()
     except IOError as ex:
-        errMsg = "something went wrong while trying "
-        errMsg += "to write to the traffic file '%s' ('%s')" % (conf.trafficFile, getSafeExString(ex))
+        errMsg = "尝试写入流量文件'%s'时出现错误('%s')" % (conf.trafficFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
 def dataToDumpFile(dumpFile, data):
@@ -1062,13 +1040,13 @@ def dataToDumpFile(dumpFile, data):
         dumpFile.flush()
     except IOError as ex:
         if "No space left" in getUnicode(ex):
-            errMsg = "no space left on output device"
+            errMsg = "输出设备上没有剩余空间"
             logger.error(errMsg)
         elif "Permission denied" in getUnicode(ex):
-            errMsg = "permission denied when flushing dump data"
+            errMsg = "刷新转储数据时权限被拒绝"
             logger.error(errMsg)
         else:
-            errMsg = "error occurred when writing dump data to file ('%s')" % getUnicode(ex)
+            errMsg = "写入转储数据到文件时发生错误('%s')" % getUnicode(ex)
             logger.error(errMsg)
 
 def dataToOutFile(filename, data):
@@ -1096,12 +1074,10 @@ def dataToOutFile(filename, data):
                 if filename != _:
                     filename = _
                 else:
-                    errMsg = "couldn't write to the "
-                    errMsg += "output file ('%s')" % getSafeExString(ex)
+                    errMsg = "无法写入输出文件('%s')" % getSafeExString(ex)
                     raise SqlmapGenericException(errMsg)
             except IOError as ex:
-                errMsg = "something went wrong while trying to write "
-                errMsg += "to the output file ('%s')" % getSafeExString(ex)
+                errMsg = "尝试写入输出文件时出现错误('%s')" % getSafeExString(ex)
                 raise SqlmapGenericException(errMsg)
             else:
                 break
@@ -1144,7 +1120,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
     if retVal:
         dataToStdout("%s%s\n" % (message, retVal), forceOutput=not kb.wizardMode, bold=True)
 
-        debugMsg = "used the given answer"
+        debugMsg = "使用给定的答案"
         logger.debug(debugMsg)
 
     if retVal is None:
@@ -1158,7 +1134,7 @@ def readInput(message, default=None, checkBatch=True, boolean=False):
 
             dataToStdout("%s%s\n" % (message, options), forceOutput=not kb.wizardMode, bold=True)
 
-            debugMsg = "used the default behavior, running in batch mode"
+            debugMsg = "使用默认行为,以批处理模式运行"
             logger.debug(debugMsg)
 
             retVal = default
@@ -1626,9 +1602,7 @@ def parseTargetDirect():
         return
 
     if not details:
-        errMsg = "invalid target details, valid syntax is for instance "
-        errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
-        errMsg += "or 'access://DATABASE_FILEPATH'"
+        errMsg = "无效的目标详情,有效的语法示例为'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME'或'access://DATABASE_FILEPATH'"
         raise SqlmapSyntaxException(errMsg)
 
     for dbmsName, data in DBMS_DICT.items():
@@ -1638,16 +1612,13 @@ def parseTargetDirect():
 
                 if dbmsName in (DBMS.ACCESS, DBMS.SQLITE, DBMS.FIREBIRD):
                     if remote:
-                        warnMsg = "direct connection over the network for "
-                        warnMsg += "%s DBMS is not supported" % dbmsName
+                        warnMsg = "不支持直接通过网络连接 %s DBMS" % dbmsName
                         logger.warning(warnMsg)
 
                         conf.hostname = "localhost"
                         conf.port = 0
                 elif not remote:
-                    errMsg = "missing remote connection details (e.g. "
-                    errMsg += "'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' "
-                    errMsg += "or 'access://DATABASE_FILEPATH')"
+                    errMsg = "缺少远程连接详情 (e.g. 'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME' 或 'access://DATABASE_FILEPATH')"
                     raise SqlmapSyntaxException(errMsg)
 
                 if dbmsName in (DBMS.MSSQL, DBMS.SYBASE):
@@ -1655,9 +1626,7 @@ def parseTargetDirect():
                     pymssql = __import__("pymssql")
 
                     if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
-                        errMsg = "'%s' third-party library must be " % data[1]
-                        errMsg += "version >= 1.0.2 to work properly. "
-                        errMsg += "Download from '%s'" % data[2]
+                        errMsg = "'%s'第三方库的版本必须大于等于1.0.2才能正常工作。从'%s'下载" % (data[1], data[2])
                         raise SqlmapMissingDependence(errMsg)
 
                 elif dbmsName == DBMS.MYSQL:
@@ -1682,11 +1651,7 @@ def parseTargetDirect():
                 if _sqlalchemy and data[3] and any(_ in _sqlalchemy.dialects.__all__ for _ in (data[3], data[3].split('+')[0])):
                     pass
                 else:
-                    errMsg = "sqlmap requires '%s' third-party library " % data[1]
-                    errMsg += "in order to directly connect to the DBMS "
-                    errMsg += "'%s'. You can download it from '%s'" % (dbmsName, data[2])
-                    errMsg += ". Alternative is to use a package 'python-sqlalchemy' "
-                    errMsg += "with support for dialect '%s' installed" % data[3]
+                    errMsg = "sqlmap需要'%s'第三方库才能直接连接到DBMS'%s'。您可以从'%s'下载它。另一种选择是安装支持方言'%s'的'python-sqlalchemy'包" % (data[1], dbmsName, data[2], data[3])
                     raise SqlmapMissingDependence(errMsg)
 
 def parseTargetUrl():
@@ -1709,8 +1674,7 @@ def parseTargetUrl():
     originalUrl = conf.url
 
     if re.search(r"://\[.+\]", conf.url) and not socket.has_ipv6:
-        errMsg = "IPv6 communication is not supported "
-        errMsg += "on this platform"
+        errMsg = "在此平台上不支持IPv6通信"
         raise SqlmapGenericException(errMsg)
 
     if not re.search(r"^(http|ws)s?://", conf.url, re.I):
@@ -1725,9 +1689,7 @@ def parseTargetUrl():
     try:
         urlSplit = _urllib.parse.urlsplit(conf.url)
     except ValueError as ex:
-        errMsg = "invalid URL '%s' has been given ('%s'). " % (conf.url, getSafeExString(ex))
-        errMsg += "Please be sure that you don't have any leftover characters (e.g. '[' or ']') "
-        errMsg += "in the hostname part"
+        errMsg = "给出了无效的URL '%s'('%s')。请确保在主机名部分没有任何残留字符 (e.g. '['or']')" % (conf.url, getSafeExString(ex))
         raise SqlmapGenericException(errMsg)
 
     hostnamePort = urlSplit.netloc.split(":") if not re.search(r"\[.+\]", urlSplit.netloc) else filterNone((re.search(r"\[.+\]", urlSplit.netloc).group(0), re.search(r"\](:(?P<port>\d+))?", urlSplit.netloc).group("port")))
@@ -1751,14 +1713,14 @@ def parseTargetUrl():
         invalid = False
 
     if any((invalid, re.search(r"\s", conf.hostname), '..' in conf.hostname, conf.hostname.startswith('.'), '\n' in originalUrl)):
-        errMsg = "invalid target URL ('%s')" % originalUrl
+        errMsg = "无效的目标URL('%s')" % originalUrl
         raise SqlmapSyntaxException(errMsg)
 
     if len(hostnamePort) == 2:
         try:
             conf.port = int(hostnamePort[1])
         except:
-            errMsg = "invalid target URL"
+            errMsg = "无效的目标URL"
             raise SqlmapSyntaxException(errMsg)
     elif conf.scheme in ("https", "wss"):
         conf.port = 443
@@ -1766,7 +1728,7 @@ def parseTargetUrl():
         conf.port = 80
 
     if conf.port < 1 or conf.port > 65535:
-        errMsg = "invalid target URL port (%d)" % conf.port
+        errMsg = "无效的目标URL端口(%d)" % conf.port
         raise SqlmapSyntaxException(errMsg)
 
     conf.url = getUnicode("%s://%s:%d%s" % (conf.scheme, ("[%s]" % conf.hostname) if conf.ipv6 else conf.hostname, conf.port, conf.path))
@@ -1779,13 +1741,13 @@ def parseTargetUrl():
             conf.parameters[PLACE.GET] = urldecode(urlSplit.query, spaceplus=not conf.base64Parameter) if urlSplit.query and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in urlSplit.query else urlSplit.query
 
     if (intersect(REFERER_ALIASES, conf.testParameter, True) or conf.level >= 3) and not any(_[0].upper() == HTTP_HEADER.REFERER.upper() for _ in conf.httpHeaders):
-        debugMsg = "setting the HTTP Referer header to the target URL"
+        debugMsg = "将HTTP Referer header 设置为目标URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.REFERER]
         conf.httpHeaders.append((HTTP_HEADER.REFERER, conf.url.replace(kb.customInjectionMark, "")))
 
     if (intersect(HOST_ALIASES, conf.testParameter, True) or conf.level >= 5) and not any(_[0].upper() == HTTP_HEADER.HOST.upper() for _ in conf.httpHeaders):
-        debugMsg = "setting the HTTP Host header to the target URL"
+        debugMsg = "将HTTP Host header 设置为目标URL"
         logger.debug(debugMsg)
         conf.httpHeaders = [_ for _ in conf.httpHeaders if _[0] != HTTP_HEADER.HOST]
         conf.httpHeaders.append((HTTP_HEADER.HOST, getHostHeader(conf.url)))
@@ -1825,8 +1787,7 @@ def expandAsteriskForColumns(expression):
     match = re.search(r"(?i)\ASELECT(\s+TOP\s+[\d]+)?\s+\*\s+FROM\s+(([`'\"][^`'\"]+[`'\"]|[\w.]+)+)(\s|\Z)", expression)
 
     if match:
-        infoMsg = "you did not provide the fields in your query. "
-        infoMsg += "sqlmap will retrieve the column names itself"
+        infoMsg = "您没有在查询中提供字段。sqlmap将自动检索列名"
         logger.info(infoMsg)
 
         _ = match.group(2).replace("..", '.').replace(".dbo.", '.')
@@ -1851,8 +1812,7 @@ def expandAsteriskForColumns(expression):
             columnsStr = ", ".join(column for column in columns)
             expression = expression.replace('*', columnsStr, 1)
 
-            infoMsg = "the query with expanded column name(s) is: "
-            infoMsg += "%s" % expression
+            infoMsg = "扩展列名后的查询为: %s" % expression
             logger.info(infoMsg)
 
     return expression
@@ -1902,7 +1862,7 @@ def parseUnionPage(page):
 
     if re.search(r"(?si)\A%s.*%s\Z" % (kb.chars.start, kb.chars.stop), page):
         if len(page) > LARGE_OUTPUT_THRESHOLD:
-            warnMsg = "large output detected. This might take a while"
+            warnMsg = "检测到大量输出。这可能需要一些时间"
             logger.warning(warnMsg)
 
         data = BigArray()
@@ -1971,8 +1931,7 @@ def getLocalIP():
         retVal, _ = s.getsockname()
         s.close()
     except:
-        debugMsg = "there was an error in opening socket "
-        debugMsg += "connection toward '%s'" % conf.hostname
+        debugMsg = "打开与'%s'的套接字连接时出现错误" % conf.hostname
         logger.debug(debugMsg)
 
     return retVal
@@ -1993,8 +1952,7 @@ def getRemoteIP():
     try:
         retVal = socket.gethostbyname(conf.hostname)
     except socket.gaierror:
-        errMsg = "address resolution problem "
-        errMsg += "occurred for hostname '%s'" % conf.hostname
+        errMsg = "主机名解析问题发生在主机名'%s'" % conf.hostname
         singleTimeLogMessage(errMsg, logging.ERROR)
 
     return retVal
@@ -2191,8 +2149,7 @@ def safeStringFormat(format_, params):
                 match = re.search(r"(\A|[^A-Za-z0-9])(%s)([^A-Za-z0-9]|\Z)", retVal)
                 if match:
                     if count >= len(params):
-                        warnMsg = "wrong number of parameters during string formatting. "
-                        warnMsg += "Please report by e-mail content \"%r | %r | %r\" to '%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
+                        warnMsg = "在字符串格式化过程中参数数量错误。请通过电子邮件将内容\"%r | %r | %r\"报告给'%s'" % (format_, params, retVal, DEV_EMAIL_ADDRESS)
                         raise SqlmapValueException(warnMsg)
                     else:
                         try:
@@ -2250,13 +2207,13 @@ def showStaticWords(firstPage, secondPage, minLength=3):
     ['this']
     """
 
-    infoMsg = "finding static words in longest matching part of dynamic page content"
+    infoMsg = "在动态页面内容的最长匹配部分中查找静态词"
     logger.info(infoMsg)
 
     firstPage = getFilteredPageContent(firstPage)
     secondPage = getFilteredPageContent(secondPage)
 
-    infoMsg = "static words: "
+    infoMsg = "静态词: "
 
     if firstPage and secondPage:
         match = SequenceMatcher(None, firstPage, secondPage).find_longest_match(0, len(firstPage), 0, len(secondPage))
@@ -2274,7 +2231,7 @@ def showStaticWords(firstPage, secondPage, minLength=3):
 
         infoMsg = infoMsg.rstrip(", ")
     else:
-        infoMsg += "None"
+        infoMsg += "无"
 
     logger.info(infoMsg)
 
@@ -2399,9 +2356,7 @@ def parseXmlFile(xmlFile, handler):
         with contextlib.closing(io.StringIO(readCachedFileContent(xmlFile))) as stream:
             parse(stream, handler)
     except (SAXParseException, UnicodeError) as ex:
-        errMsg = "something appears to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (xmlFile, getSafeExString(ex))
-        errMsg += "sure that you haven't made any changes to it"
+        errMsg = "文件'%s'('%s')似乎有问题。请确保您没有对其进行任何更改" % (xmlFile, getSafeExString(ex))
         raise SqlmapInstallationException(errMsg)
 
 def getSQLSnippet(dbms, sfile, **variables):
@@ -2436,14 +2391,14 @@ def getSQLSnippet(dbms, sfile, **variables):
     variables = re.findall(r"(?<!\bLIKE ')%(\w+)%", retVal, re.I)
 
     if variables:
-        errMsg = "unresolved variable%s '%s' in SQL file '%s'" % ("s" if len(variables) > 1 else "", ", ".join(variables), sfile)
+        errMsg = "在SQL文件'%s'中存在未解析的变量%s '%s'" % ("s" if len(variables) > 1 else "", ", ".join(variables), sfile)
         logger.error(errMsg)
 
-        msg = "do you want to provide the substitution values? [y/N] "
+        msg = "您想提供替换值吗? [y/N] "
 
         if readInput(msg, default='N', boolean=True):
             for var in variables:
-                msg = "insert value for variable '%s': " % var
+                msg = "插入变量 '%s' 的值: " % var
                 val = readInput(msg, default="")
                 retVal = retVal.replace(r"%%%s%%" % var, val)
 
@@ -2465,8 +2420,7 @@ def readCachedFileContent(filename, mode="rb"):
                     with openFile(filename, mode) as f:
                         kb.cache.content[filename] = f.read()
                 except (IOError, OSError, MemoryError) as ex:
-                    errMsg = "something went wrong while trying "
-                    errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
+                    errMsg = "尝试读取文件'%s'的内容时出现错误('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)
 
     return kb.cache.content[filename]
@@ -2572,8 +2526,7 @@ def getFileItems(filename, commentPrefix='#', unicoded=True, lowercase=False, un
                     else:
                         retVal.append(line)
     except (IOError, OSError, MemoryError) as ex:
-        errMsg = "something went wrong while trying "
-        errMsg += "to read the content of file '%s' ('%s')" % (filename, getSafeExString(ex))
+        errMsg = "尝试读取文件'%s'的内容时出现错误('%s')" % (filename, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
     return retVal if not unique else list(retVal.keys())
@@ -2790,8 +2743,7 @@ def wasLastResponseDelayed():
 
     if deviation and not conf.direct and not conf.disableStats:
         if len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
-            warnMsg = "time-based standard deviation method used on a model "
-            warnMsg += "with less than %d response times" % MIN_TIME_RESPONSES
+            warnMsg = "在具有少于%d个响应时间的模型上使用了基于时间的标准差方法" % MIN_TIME_RESPONSES
             logger.warning(warnMsg)
 
         lowerStdLimit = average(kb.responseTimes[kb.responseTimeMode]) + TIME_STDEV_COEFF * deviation
@@ -2799,8 +2751,7 @@ def wasLastResponseDelayed():
 
         if not kb.testMode and retVal:
             if kb.adjustTimeDelay is None:
-                msg = "do you want sqlmap to try to optimize value(s) "
-                msg += "for DBMS delay responses (option '--time-sec')? [Y/n] "
+                msg = "你想让 sqlmap 尝试优化 DBMS 延迟响应的值 (option '--time-sec')? [Y/n] "
 
                 kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE if not readInput(msg, default='Y', boolean=True) else ADJUST_TIME_DELAY.YES
             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
@@ -2826,8 +2777,7 @@ def adjustTimeDelay(lastQueryDuration, lowerStdLimit):
         if lastQueryDuration / (1.0 * conf.timeSec / candidate) > MIN_VALID_DELAYED_RESPONSE:  # Note: to prevent problems with fast responses for heavy-queries like RANDOMBLOB
             conf.timeSec = candidate
 
-            infoMsg = "adjusting time delay to "
-            infoMsg += "%d second%s due to good response times" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+            infoMsg = "由于响应时间良好,将时间延迟调整为%d秒%s" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
             logger.info(infoMsg)
 
 def getLastRequestHTTPError():
@@ -2985,9 +2935,7 @@ def urlencode(value, safe="%&=-_", convall=False, limit=False, spaceplus=False):
         value = re.sub(r"\b[$\w]+=", lambda match: match.group(0).replace('$', DOLLAR_MARKER), value)
 
         if Backend.isDbms(DBMS.MSSQL) and not kb.tamperFunctions and any(ord(_) > 255 for _ in value):
-            warnMsg = "if you experience problems with "
-            warnMsg += "non-ASCII identifier names "
-            warnMsg += "you are advised to rerun with '--tamper=charunicodeencode'"
+            warnMsg = "如果您在使用非ASCII标识符名称时遇到问题,建议您使用 '--tamper=charunicodeencode' 重新运行"
             singleTimeWarnMessage(warnMsg)
 
         if convall or safe is None:
@@ -3040,11 +2988,7 @@ def runningAsAdmin():
 
         isAdmin = isinstance(_, (float, six.integer_types)) and _ == 1
     else:
-        errMsg = "sqlmap is not able to check if you are running it "
-        errMsg += "as an administrator account on this platform. "
-        errMsg += "sqlmap will assume that you are an administrator "
-        errMsg += "which is mandatory for the requested takeover attack "
-        errMsg += "to work properly"
+        errMsg = "sqlmap无法检查您是否以管理员帐户身份在此平台上运行。sqlmap将假定您是管理员,这对于所请求的接管攻击正常工作是必需的"
         logger.error(errMsg)
 
         isAdmin = True
@@ -3216,7 +3160,7 @@ def findDynamicContent(firstPage, secondPage):
     if not firstPage or not secondPage:
         return
 
-    infoMsg = "searching for dynamic content"
+    infoMsg = "搜索动态内容"
     singleTimeLogMessage(infoMsg)
 
     blocks = list(SequenceMatcher(None, firstPage, secondPage).get_matching_blocks())
@@ -3261,7 +3205,7 @@ def findDynamicContent(firstPage, secondPage):
             kb.dynamicMarkings.append((prefix if prefix else None, suffix if suffix else None))
 
     if len(kb.dynamicMarkings) > 0:
-        infoMsg = "dynamic content marked for removal (%d region%s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
+        infoMsg = "标记为删除的动态内容 (%d 区域 %s)" % (len(kb.dynamicMarkings), 's' if len(kb.dynamicMarkings) > 1 else '')
         singleTimeLogMessage(infoMsg)
 
 def removeDynamicContent(page):
@@ -3535,7 +3479,7 @@ def setOptimize():
     conf.nullConnection = not any((conf.data, conf.textOnly, conf.titles, conf.string, conf.notString, conf.regexp, conf.tor))
 
     if not conf.nullConnection:
-        debugMsg = "turning off switch '--null-connection' used indirectly by switch '-o'"
+        debugMsg = "关闭间接使用开关'-o'的开关'--null-connection'"
         logger.debug(debugMsg)
 
 def saveConfig(conf, filename):
@@ -3586,8 +3530,7 @@ def saveConfig(conf, filename):
         try:
             config.write(f)
         except IOError as ex:
-            errMsg = "something went wrong while trying "
-            errMsg += "to write to the configuration file '%s' ('%s')" % (filename, getSafeExString(ex))
+            errMsg = "尝试写入配置文件'%s'时出现错误('%s')" % (filename, getSafeExString(ex))
             raise SqlmapSystemException(errMsg)
 
 def initTechnique(technique=None):
@@ -3608,20 +3551,17 @@ def initTechnique(technique=None):
             for key, value in kb.injection.conf.items():
                 if value and (not hasattr(conf, key) or (hasattr(conf, key) and not getattr(conf, key))):
                     setattr(conf, key, value)
-                    debugMsg = "resuming configuration option '%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, six.string_types) else value)
+                    debugMsg = "恢复配置选项'%s' (%s)" % (key, ("'%s'" % value) if isinstance(value, six.string_types) else value)
                     logger.debug(debugMsg)
 
                     if value and key == "optimize":
                         setOptimize()
         else:
-            warnMsg = "there is no injection data available for technique "
-            warnMsg += "'%s'" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
+            warnMsg = "对于技术'%s',没有可用的注入数据" % enumValueToNameLookup(PAYLOAD.TECHNIQUE, technique)
             logger.warning(warnMsg)
 
     except SqlmapDataException:
-        errMsg = "missing data in old session file(s). "
-        errMsg += "Please use '--flush-session' to deal "
-        errMsg += "with this error"
+        errMsg = "旧会话文件中缺少数据。请使用'--flush-session'来处理此错误"
         raise SqlmapNoneDataException(errMsg)
 
 def arrayizeValue(value):
@@ -3765,12 +3705,11 @@ def showHttpErrorCodes():
     """
 
     if kb.httpErrorCodes:
-        warnMsg = "HTTP error codes detected during run:\n"
+        warnMsg = "运行过程中检测到的HTTP错误代码:\n"
         warnMsg += ", ".join("%d (%s) - %d times" % (code, _http_client.responses[code] if code in _http_client.responses else '?', count) for code, count in kb.httpErrorCodes.items())
         logger.warning(warnMsg)
         if any((str(_).startswith('4') or str(_).startswith('5')) and _ != _http_client.INTERNAL_SERVER_ERROR and _ != kb.originalCode for _ in kb.httpErrorCodes):
-            msg = "too many 4xx and/or 5xx HTTP error codes "
-            msg += "could mean that some kind of protection is involved (e.g. WAF)"
+            msg = "过多的4xx和/或5xx HTTP错误代码可能意味着涉及某种保护机制 (e.g. WAF)"
             logger.debug(msg)
 
 def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible", buffering=1):  # "buffering=1" means line buffered (Reference: http://stackoverflow.com/a/3168436)
@@ -3796,9 +3735,7 @@ def openFile(filename, mode='r', encoding=UNICODE_ENCODING, errors="reversible",
         try:
             return codecs.open(filename, mode, encoding, errors, buffering)
         except IOError:
-            errMsg = "there has been a file opening error for filename '%s'. " % filename
-            errMsg += "Please check %s permissions on a file " % ("write" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "read")
-            errMsg += "and that it's not locked by another process"
+            errMsg = "打开文件'%s'时发生错误。请检查文件的%s权限,并确保它没有被其他进程锁定" % (filename, "写入" if mode and ('w' in mode or 'a' in mode or '+' in mode) else "读取")
             raise SqlmapSystemException(errMsg)
 
 def decodeIntToUnicode(value):
@@ -3848,7 +3785,7 @@ def checkIntegrity():
     if not paths:
         return
 
-    logger.debug("running code integrity check")
+    logger.debug("运行代码完整性检查")
 
     retVal = True
 
@@ -3858,7 +3795,7 @@ def checkIntegrity():
             if re.search(r"(\.py|\.xml|_)\Z", filename):
                 filepath = os.path.join(root, filename)
                 if os.path.getmtime(filepath) > baseTime:
-                    logger.error("wrong modification time of '%s'" % filepath)
+                    logger.error("'%s' 的修改时间不正确" % filepath)
                     retVal = False
 
     return retVal
@@ -3884,25 +3821,26 @@ def unhandledExceptionMessage():
     True
     """
 
-    errMsg = "unhandled exception occurred in %s. It is recommended to retry your " % VERSION_STRING
-    errMsg += "run with the latest development version from official GitHub "
-    errMsg += "repository at '%s'. If the exception persists, please open a new issue " % GIT_PAGE
-    errMsg += "at '%s' " % ISSUES_PAGE
-    errMsg += "with the following text and any other information required to "
-    errMsg += "reproduce the bug. Developers will try to reproduce the bug, fix it accordingly "
-    errMsg += "and get back to you\n"
-    errMsg += "Running version: %s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
-    errMsg += "Python version: %s\n" % PYVERSION
-    errMsg += "Operating system: %s\n" % platform.platform()
-    errMsg += "Command line: %s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
-    errMsg += "Technique: %s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
-    errMsg += "Back-end DBMS:"
+    errMsg = "在%s中发生未处理的异常。建议您使用官方GitHub存储库上的最新开发版本重新运行,地址为'%s'。如果异常仍然存在,请在'%s'上打开一个新的问题,提供以下文本和其他重现错误所需的信息。开发人员将尝试重现错误,相应修复并与您联系\n" % (VERSION_STRING, GIT_PAGE, ISSUES_PAGE)
+    errMsg += "运行版本:%s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
+    errMsg += "Python版本:%s\n" % PYVERSION
+    errMsg += "操作系统:%s\n" % platform.platform()
+    errMsg += "命令行:%s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
+    errMsg += "技术:%s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
+    errMsg += "后端DBMS:"
+    errMsg = "在%s中发生未处理的异常。建议您使用官方GitHub存储库上的最新开发版本重新运行,地址为'%s'。如果异常仍然存在,请在'%s'上打开一个新的问题,提供以下文本和其他重现错误所需的信息。开发人员将尝试重现错误,相应修复并与您联系\n" % (VERSION_STRING, GIT_PAGE, ISSUES_PAGE)
+    errMsg += "运行版本:%s\n" % VERSION_STRING[VERSION_STRING.find('/') + 1:]
+    errMsg += "Python版本:%s\n" % PYVERSION
+    errMsg += "操作系统:%s\n" % platform.platform()
+    errMsg += "命令行:%s\n" % re.sub(r".+?\bsqlmap\.py\b", "sqlmap.py", getUnicode(" ".join(sys.argv), encoding=getattr(sys.stdin, "encoding", None)))
+    errMsg += "技术:%s\n" % (enumValueToNameLookup(PAYLOAD.TECHNIQUE, getTechnique()) if getTechnique() is not None else ("DIRECT" if conf.get("direct") else None))
+    errMsg += "后端DBMS:"
 
     if Backend.getDbms() is not None:
-        errMsg += " %s (fingerprinted)" % Backend.getDbms()
+        errMsg += " %s (已识别)" % Backend.getDbms()
 
     if Backend.getIdentifiedDbms() is not None and (Backend.getDbms() is None or Backend.getIdentifiedDbms() != Backend.getDbms()):
-        errMsg += " %s (identified)" % Backend.getIdentifiedDbms()
+        errMsg += " %s (已鉴定)" % Backend.getIdentifiedDbms()
 
     if not errMsg.endswith(')'):
         errMsg += " None"
@@ -3934,15 +3872,13 @@ def fetchRandomAgent():
     """
 
     if not kb.userAgents:
-        debugMsg = "loading random HTTP User-Agent header(s) from "
-        debugMsg += "file '%s'" % paths.USER_AGENTS
+        debugMsg = "从文件'%s'加载随机的 HTTP User-Agent header(s)" % paths.USER_AGENTS
         logger.debug(debugMsg)
 
         try:
             kb.userAgents = getFileItems(paths.USER_AGENTS)
         except IOError:
-            errMsg = "unable to read HTTP User-Agent header "
-            errMsg += "file '%s'" % paths.USER_AGENTS
+            errMsg = "无法读取 HTTP User-Agent header 的'%s'" % paths.USER_AGENTS
             raise SqlmapSystemException(errMsg)
 
     return random.sample(kb.userAgents, 1)[0]
@@ -3971,9 +3907,7 @@ def createGithubIssue(errMsg, excMsg):
     if key in issues:
         return
 
-    msg = "\ndo you want to automatically create a new (anonymized) issue "
-    msg += "with the unhandled exception information at "
-    msg += "the official Github repository? [y/N] "
+    msg = "\n你想要自动在官方 Github 仓库上创建一个新的(匿名化的)问题,其中包含未处理的异常信息吗? [y/N] "
     try:
         choice = readInput(msg, default='N', checkBatch=False, boolean=True)
     except:
@@ -3991,10 +3925,9 @@ def createGithubIssue(errMsg, excMsg):
             duplicate = _["total_count"] > 0
             closed = duplicate and _["items"][0]["state"] == "closed"
             if duplicate:
-                warnMsg = "issue seems to be already reported"
+                warnMsg = "问题似乎已经报告过了"
                 if closed:
-                    warnMsg += " and resolved. Please update to the latest "
-                    warnMsg += "development version from official GitHub repository at '%s'" % GIT_PAGE
+                    warnMsg = "已经解决，请从官方 GitHub 代码库中的开发版本，网址为 '%s'" % GIT_PAGE
                 logger.warning(warnMsg)
                 return
         except:
@@ -4011,7 +3944,7 @@ def createGithubIssue(errMsg, excMsg):
 
         issueUrl = re.search(r"https://github.com/sqlmapproject/sqlmap/issues/\d+", content or "")
         if issueUrl:
-            infoMsg = "created Github issue can been found at the address '%s'" % issueUrl.group(0)
+            infoMsg = "创建的Github问题可以在地址'%s'找到" % issueUrl.group(0)
             logger.info(infoMsg)
 
             try:
@@ -4020,11 +3953,11 @@ def createGithubIssue(errMsg, excMsg):
             except:
                 pass
         else:
-            warnMsg = "something went wrong while creating a Github issue"
+            warnMsg = "创建Github问题时出现问题"
             if _excMsg:
                 warnMsg += " ('%s')" % _excMsg
             if "Unauthorized" in warnMsg:
-                warnMsg += ". Please update to the latest revision"
+                warnMsg += "。请更新到最新版本"
             logger.warning(warnMsg)
 
 def maskSensitiveData(msg):
@@ -4193,7 +4126,7 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                         kb.reflectiveMechanism = False
                         retVal = content
                         if not suppressWarning:
-                            debugMsg = "turning off reflection removal mechanism (because of timeouts)"
+                            debugMsg = "关闭反射删除机制(因为超时)"
                             logger.debug(debugMsg)
                     else:
                         retVal = _retVal[0]
@@ -4201,12 +4134,11 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                 if retVal != content:
                     kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT] += 1
                     if not suppressWarning:
-                        warnMsg = "reflective value(s) found and filtering out"
+                        warnMsg = "发现反射值,并进行过滤"
                         singleTimeWarnMessage(warnMsg)
 
                     if re.search(r"(?i)FRAME[^>]+src=[^>]*%s" % REFLECTED_VALUE_MARKER, retVal):
-                        warnMsg = "frames detected containing attacked parameter values. Please be sure to "
-                        warnMsg += "test those separately in case that attack on this page fails"
+                        warnMsg = "检测到包含受攻击参数值的帧。如果此页面的攻击失败,请确保单独测试这些值"
                         singleTimeWarnMessage(warnMsg)
 
                 elif not kb.testMode and not kb.reflectiveCounters[REFLECTIVE_COUNTER.HIT]:
@@ -4214,13 +4146,13 @@ def removeReflectiveValues(content, payload, suppressWarning=False):
                     if kb.reflectiveCounters[REFLECTIVE_COUNTER.MISS] > REFLECTIVE_MISS_THRESHOLD:
                         kb.reflectiveMechanism = False
                         if not suppressWarning:
-                            debugMsg = "turning off reflection removal mechanism (for optimization purposes)"
+                            debugMsg = "关闭反射删除机制(为了优化目的)"
                             logger.debug(debugMsg)
 
     except (MemoryError, SystemError):
         kb.reflectiveMechanism = False
         if not suppressWarning:
-            debugMsg = "turning off reflection removal mechanism"
+            debugMsg = "关闭反射删除机制"
             logger.debug(debugMsg)
 
     return retVal
@@ -4405,7 +4337,7 @@ def expandMnemonics(mnemonics, parser, args):
                 break
 
         if pointer in (None, head):
-            errMsg = "mnemonic '%s' can't be resolved to any parameter name" % name
+            errMsg = "助记符'%s'无法解析为任何参数名称" % name
             raise SqlmapSyntaxException(errMsg)
 
         elif len(pointer.current) > 1:
@@ -4418,23 +4350,23 @@ def expandMnemonics(mnemonics, parser, args):
                         options[opt] = option
 
             if not options:
-                warnMsg = "mnemonic '%s' can't be resolved" % name
+                warnMsg = "助记符'%s'无法解析" % name
                 logger.warning(warnMsg)
             elif name in options:
                 found = name
-                debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
+                debugMsg = "助记符'%s'解析为%s" % (name, found)
                 logger.debug(debugMsg)
             else:
                 found = sorted(options.keys(), key=len)[0]
-                warnMsg = "detected ambiguity (mnemonic '%s' can be resolved to any of: %s). " % (name, ", ".join("'%s'" % key for key in options))
-                warnMsg += "Resolved to shortest of those ('%s')" % found
+                warnMsg = "检测到歧义(助记符'%s'可以解析为以下任意一个:%s)。" % (name, ", ".join("'%s'" % key for key in options))
+                warnMsg += "解析为最短的那个('%s')" % found
                 logger.warning(warnMsg)
 
             if found:
                 found = options[found]
         else:
             found = pointer.current[0]
-            debugMsg = "mnemonic '%s' resolved to %s). " % (name, found)
+            debugMsg = "助记符'%s'解析为%s" % (name, found)
             logger.debug(debugMsg)
 
         if found:
@@ -4448,7 +4380,7 @@ def expandMnemonics(mnemonics, parser, args):
             elif not found.type:  # boolean
                 setattr(args, found.dest, True)
             else:
-                errMsg = "mnemonic '%s' requires value of type '%s'" % (name, found.type)
+                errMsg = "助记符'%s'需要类型为'%s'的值" % (name, found.type)
                 raise SqlmapSyntaxException(errMsg)
 
 def safeCSValue(value):
@@ -4660,7 +4592,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             return self._url
 
     if not content:
-        errMsg = "can't parse forms as the page content appears to be blank"
+        errMsg = "无法解析表单,因为页面内容似乎为空"
         if raise_:
             raise SqlmapGenericException(errMsg)
         else:
@@ -4674,7 +4606,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         forms = ParseResponse(response, backwards_compat=False)
     except ParseError:
         if re.search(r"(?i)<!DOCTYPE html|<html", content or "") and not re.search(r"(?i)\.js(\?|\Z)", url):
-            dbgMsg = "badly formed HTML at the given URL ('%s'). Going to filter it" % url
+            dbgMsg = "给定URL('%s')的HTML格式错误。将对其进行过滤" % url
             logger.debug(dbgMsg)
             filtered = _("".join(re.findall(FORM_SEARCH_REGEX, content)), url)
 
@@ -4682,7 +4614,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                 try:
                     forms = ParseResponse(filtered, backwards_compat=False)
                 except:
-                    errMsg = "no success"
+                    errMsg = "没有成功"
                     if raise_:
                         raise SqlmapGenericException(errMsg)
                     else:
@@ -4702,14 +4634,13 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
                             break
 
             if conf.crawlExclude and re.search(conf.crawlExclude, form.action or ""):
-                dbgMsg = "skipping '%s'" % form.action
+                dbgMsg = "跳过 '%s'" % form.action
                 logger.debug(dbgMsg)
                 continue
 
             request = form.click()
         except (ValueError, TypeError) as ex:
-            errMsg = "there has been a problem while "
-            errMsg += "processing page forms ('%s')" % getSafeExString(ex)
+            errMsg = "处理页面表单时出现问题 ('%s')" % getSafeExString(ex)
             if raise_:
                 raise SqlmapGenericException(errMsg)
             else:
@@ -4721,7 +4652,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
             data = urldecode(data, kb.pageEncoding, spaceplus=False)
 
             if not data and method and method.upper() == HTTPMETHOD.POST:
-                debugMsg = "invalid POST form with blank data detected"
+                debugMsg = "检测到无效的POST表单,数据为空"
                 logger.debug(debugMsg)
                 continue
 
@@ -4761,7 +4692,7 @@ def findPageForms(content, url, raise_=False, addToTargets=False):
         retVal.add((url, HTTPMETHOD.POST, data, conf.cookie, None))
 
     if not retVal and not conf.crawlDepth:
-        errMsg = "there were no forms found at the given target URL"
+        errMsg = "在给定的目标URL中找不到表单"
         if raise_:
             raise SqlmapGenericException(errMsg)
         else:
@@ -4826,14 +4757,14 @@ def checkOldOptions(args):
     for _ in args:
         _ = _.split('=')[0].strip()
         if _ in OBSOLETE_OPTIONS:
-            errMsg = "switch/option '%s' is obsolete" % _
+            errMsg = "开关/选项 '%s' is 已过时" % _
             if OBSOLETE_OPTIONS[_]:
-                errMsg += " (hint: %s)" % OBSOLETE_OPTIONS[_]
+                errMsg += " (提示: %s)" % OBSOLETE_OPTIONS[_]
             raise SqlmapSyntaxException(errMsg)
         elif _ in DEPRECATED_OPTIONS:
-            warnMsg = "switch/option '%s' is deprecated" % _
+            warnMsg = "开关/选项 '%s' 是已经弃用的" % _
             if DEPRECATED_OPTIONS[_]:
-                warnMsg += " (hint: %s)" % DEPRECATED_OPTIONS[_]
+                warnMsg += " (提示: %s)" % DEPRECATED_OPTIONS[_]
             logger.warning(warnMsg)
 
 def checkSystemEncoding():
@@ -4845,13 +4776,10 @@ def checkSystemEncoding():
         try:
             codecs.lookup("cp720")
         except LookupError:
-            errMsg = "there is a known Python issue (#1616979) related "
-            errMsg += "to support for charset 'cp720'. Please visit "
-            errMsg += "'http://blog.oneortheother.info/tip/python-fix-cp720-encoding/index.html' "
-            errMsg += "and follow the instructions to be able to fix it"
+            errMsg = "已知存在与字符集'cp720'相关的Python问题(#1616979)。请访问'http://blog.oneortheother.info/tip/python-fix-cp720-encoding/index.html'并按照说明进行修复"
             logger.critical(errMsg)
 
-            warnMsg = "temporary switching to charset 'cp1256'"
+            warnMsg = "临时切换到字符集'cp1256'"
             logger.warning(warnMsg)
 
             _reload_module(sys)
@@ -4870,7 +4798,7 @@ def evaluateCode(code, variables=None):
     except KeyboardInterrupt:
         raise
     except Exception as ex:
-        errMsg = "an error occurred while evaluating provided code ('%s') " % getSafeExString(ex)
+        errMsg = "在评估提供的代码时发生错误('%s')" % getSafeExString(ex)
         raise SqlmapGenericException(errMsg)
 
 def serializeObject(object_):
@@ -5062,7 +4990,7 @@ def resetCookieJar(cookieJar):
     else:
         try:
             if not cookieJar.filename:
-                infoMsg = "loading cookies from '%s'" % conf.loadCookies
+                infoMsg = "从'%s'加载cookies" % conf.loadCookies
                 logger.info(infoMsg)
 
                 content = readCachedFileContent(conf.loadCookies)
@@ -5085,18 +5013,17 @@ def resetCookieJar(cookieJar):
 
             for cookie in cookieJar:
                 if getattr(cookie, "expires", MAX_INT) < time.time():
-                    warnMsg = "cookie '%s' has expired" % cookie
+                    warnMsg = "cookie '%s'已过期" % cookie
                     singleTimeWarnMessage(warnMsg)
 
             cookieJar.clear_expired_cookies()
 
             if not cookieJar._cookies:
-                errMsg = "no valid cookies found"
+                errMsg = "未找到有效的cookie"
                 raise SqlmapGenericException(errMsg)
 
         except Exception as ex:
-            errMsg = "there was a problem loading "
-            errMsg += "cookies file ('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", getSafeExString(ex))
+            errMsg = "加载cookies文件时出现问题('%s')" % re.sub(r"(cookies) file '[^']+'", r"\g<1>", getSafeExString(ex))
             raise SqlmapGenericException(errMsg)
 
 def decloakToTemp(filename):
@@ -5269,13 +5196,11 @@ def parseRequestFile(reqFile, checkParams=True):
             cookie = extractRegexResult(r"COOKIE: (?P<result>.+?)\n", request, re.I)
 
             if not method or not url:
-                logger.debug("not a valid WebScarab log data")
+                logger.debug("不是有效的 WebScarab 日志数据")
                 continue
 
             if method.upper() == HTTPMETHOD.POST:
-                warnMsg = "POST requests from WebScarab logs aren't supported "
-                warnMsg += "as their body content is stored in separate files. "
-                warnMsg += "Nevertheless you can use -r to load them individually."
+                warnMsg = "不支持从WebScarab日志中的POST请求,因为它们的主体内容存储在单独的文件中。但是,您可以使用-r选项逐个加载它们。"
                 logger.warning(warnMsg)
                 continue
 
@@ -5416,7 +5341,7 @@ def parseRequestFile(reqFile, checkParams=True):
                     port = port or "443"
 
                 if not host:
-                    errMsg = "invalid format of a request file"
+                    errMsg = "无效的请求文件格式"
                     raise SqlmapSyntaxException(errMsg)
 
                 if not url.startswith("http"):
@@ -5430,12 +5355,12 @@ def parseRequestFile(reqFile, checkParams=True):
     content = readCachedFileContent(reqFile)
 
     if conf.scope:
-        logger.info("using regular expression '%s' for filtering targets" % conf.scope)
+        logger.info("使用正则表达式 '%s' 进行目标过滤" % conf.scope)
 
         try:
             re.compile(conf.scope)
         except Exception as ex:
-            errMsg = "invalid regular expression '%s' ('%s')" % (conf.scope, getSafeExString(ex))
+            errMsg = "无效的正则表达式 '%s' ('%s')" % (conf.scope, getSafeExString(ex))
             raise SqlmapSyntaxException(errMsg)
 
     for target in _parseBurpLog(content):

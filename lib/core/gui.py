@@ -76,7 +76,7 @@ def runGui(parser):
     try:
         window = _tkinter.Tk()
     except Exception as ex:
-        errMsg = "unable to create GUI window ('%s')" % getSafeExString(ex)
+        errMsg = "无法创建GUI窗口('%s')" % getSafeExString(ex)
         raise SqlmapSystemException(errMsg)
 
     window.title(VERSION_STRING)

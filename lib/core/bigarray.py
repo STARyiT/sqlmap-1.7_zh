@@ -117,8 +117,7 @@ class BigArray(list):
                 with open(self.chunks[-1], "rb") as f:
                     self.chunks[-1] = pickle.loads(zlib.decompress(f.read()))
             except IOError as ex:
-                errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg = "从临时文件('%s')检索数据时发生异常" % ex
                 raise SqlmapSystemException(errMsg)
 
         return self.chunks[-1].pop()
@@ -139,11 +138,7 @@ class BigArray(list):
                 f.write(zlib.compress(pickle.dumps(chunk, pickle.HIGHEST_PROTOCOL), BIGARRAY_COMPRESS_LEVEL))
             return filename
         except (OSError, IOError) as ex:
-            errMsg = "exception occurred while storing data "
-            errMsg += "to a temporary file ('%s'). Please " % ex
-            errMsg += "make sure that there is enough disk space left. If problem persists, "
-            errMsg += "try to set environment variable 'TEMP' to a location "
-            errMsg += "writeable by the current user"
+            errMsg = "将数据存储到临时文件('%s')时发生异常。请确保磁盘空间足够。如果问题仍然存在,请尝试将环境变量'TEMP'设置为当前用户可写入的位置" % ex
             raise SqlmapSystemException(errMsg)
 
     def _checkcache(self, index):
@@ -156,8 +151,7 @@ class BigArray(list):
                 with open(self.chunks[index], "rb") as f:
                     self.cache = Cache(index, pickle.loads(zlib.decompress(f.read())), False)
             except Exception as ex:
-                errMsg = "exception occurred while retrieving data "
-                errMsg += "from a temporary file ('%s')" % ex
+                errMsg = "从临时文件('%s')检索数据时发生异常" % ex
                 raise SqlmapSystemException(errMsg)
 
     def __getstate__(self):

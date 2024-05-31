@@ -78,7 +78,7 @@ def saveHistory(completion=None):
         try:
             readline.write_history_file(historyPath)
         except IOError as ex:
-            warnMsg = "there was a problem writing the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
+            warnMsg = "写入历史文件 '%s' 时出现问题 (%s)" % (historyPath, getSafeExString(ex))
             logger.warning(warnMsg)
     except KeyboardInterrupt:
         pass
@@ -102,12 +102,12 @@ def loadHistory(completion=None):
         try:
             readline.read_history_file(historyPath)
         except IOError as ex:
-            warnMsg = "there was a problem loading the history file '%s' (%s)" % (historyPath, getSafeExString(ex))
+            warnMsg = "加载历史文件 '%s' 时出现问题 (%s)" % (historyPath, getSafeExString(ex))
             logger.warning(warnMsg)
         except UnicodeError:
             if IS_WIN:
-                warnMsg = "there was a problem loading the history file '%s'. " % historyPath
-                warnMsg += "More info can be found at 'https://github.com/pyreadline/pyreadline/issues/30'"
+                warnMsg = "加载历史文件 '%s' 时出现问题。" % historyPath
+                warnMsg += "更多信息请参考 'https://github.com/pyreadline/pyreadline/issues/30'"
                 logger.warning(warnMsg)
 
 def autoCompletion(completion=None, os=None, commands=None):

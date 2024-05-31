@@ -123,10 +123,10 @@ def vulnTest():
         time.sleep(1)
 
     if not vulnserver._alive:
-        logger.error("problem occurred in vulnserver instantiation (address: 'http://%s:%s')" % (address, port))
+        logger.error("在 vulnserver 实例化过程中出现问题(地址:'http://%s:%s')" % (address, port))
         return False
     else:
-        logger.info("vulnserver running at 'http://%s:%s'..." % (address, port))
+        logger.info("vulnserver 在 'http://%s:%s' 上运行..." % (address, port))
 
     handle, config = tempfile.mkstemp(suffix=".conf")
     os.close(handle)
@@ -201,9 +201,9 @@ def vulnTest():
 
     clearConsoleLine()
     if retVal:
-        logger.info("vuln test final result: PASSED")
+        logger.info("漏洞测试最终结果:通过")
     else:
-        logger.error("vuln test final result: FAILED")
+        logger.error("漏洞测试最终结果:失败")
 
     return retVal
 
@@ -219,7 +219,7 @@ def smokeTest():
         try:
             re.compile(regex)
         except re.error:
-            errMsg = "smoke test failed at compiling '%s'" % regex
+            errMsg = "烟雾测试在编译'%s'时失败" % regex
             logger.error(errMsg)
             return False
 
@@ -249,7 +249,7 @@ def smokeTest():
                 except Exception as ex:
                     retVal = False
                     dataToStdout("\r")
-                    errMsg = "smoke test failed at importing module '%s' (%s):\n%s" % (path, os.path.join(root, filename), ex)
+                    errMsg = "烟雾测试在导入模块'%s'(%s)时失败:\n%s" % (path, os.path.join(root, filename), ex)
                     logger.error(errMsg)
                 else:
                     logger.setLevel(logging.CRITICAL)
@@ -276,7 +276,7 @@ def smokeTest():
                         try:
                             re.compile(candidate)
                         except:
-                            errMsg = "smoke test failed at compiling '%s'" % candidate
+                            errMsg = "烟雾测试在编译'%s'时失败" % candidate
                             logger.error(errMsg)
                             raise
                 else:
@@ -290,8 +290,8 @@ def smokeTest():
 
     clearConsoleLine()
     if retVal:
-        logger.info("smoke test final result: PASSED")
+        logger.info("烟雾测试最终结果:通过")
     else:
-        logger.error("smoke test final result: FAILED")
+        logger.error("烟雾测试最终结果:失败")
 
     return retVal

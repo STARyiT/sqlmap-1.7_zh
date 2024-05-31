@@ -50,8 +50,7 @@ def base64pickle(value):
     try:
         retVal = encodeBase64(pickle.dumps(value, PICKLE_PROTOCOL), binary=False)
     except:
-        warnMsg = "problem occurred while serializing "
-        warnMsg += "instance of a type '%s'" % type(value)
+        warnMsg = "在序列化类型为'%s'的实例时发生问题" % type(value)
         singleTimeWarnMessage(warnMsg)
 
         try:
@@ -423,12 +422,7 @@ def stdoutEncode(value):
             except UnicodeEncodeError as ex:
                 value = value[:ex.start] + "?" * (ex.end - ex.start) + value[ex.end:]
 
-                warnMsg = "cannot properly display (some) Unicode characters "
-                warnMsg += "inside your terminal ('%s') environment. All " % encoding
-                warnMsg += "unhandled occurrences will result in "
-                warnMsg += "replacement with '?' character. Please, find "
-                warnMsg += "proper character representation inside "
-                warnMsg += "corresponding output files"
+                warnMsg = "无法在您的终端('%s')环境中正确显示(某些)Unicode字符。所有未处理的字符将被替换为'?'字符。请在相应的输出文件中找到正确的字符表示" % encoding
                 singleTimeWarnMessage(warnMsg)
 
         if six.PY3:

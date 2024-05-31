@@ -29,8 +29,7 @@ class Replication(object):
             self.connection.isolation_level = None
             self.cursor = self.connection.cursor()
         except sqlite3.OperationalError as ex:
-            errMsg = "error occurred while opening a replication "
-            errMsg += "file '%s' ('%s')" % (dbpath, getSafeExString(ex))
+            errMsg = "打开复制文件 '%s' 时发生错误 ('%s')" % (dbpath, getSafeExString(ex))
             raise SqlmapConnectionException(errMsg)
 
     class DataType(object):
@@ -65,8 +64,7 @@ class Replication(object):
                     else:
                         self.execute('CREATE TABLE "%s" (%s)' % (self.name, ','.join('"%s"' % unsafeSQLIdentificatorNaming(colname) for colname in self.columns)))
                 except Exception as ex:
-                    errMsg = "problem occurred ('%s') while initializing the sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
-                    errMsg += "located at '%s'" % self.parent.dbpath
+                    errMsg = "在初始化位于 '%s' 的 SQLite 数据库时发生问题 ('%s')" % (self.parent.dbpath, getSafeExString(ex, UNICODE_ENCODING))
                     raise SqlmapGenericException(errMsg)
 
         def insert(self, values):
@@ -77,7 +75,7 @@ class Replication(object):
             if len(values) == len(self.columns):
                 self.execute('INSERT INTO "%s" VALUES (%s)' % (self.name, ','.join(['?'] * len(values))), safechardecode(values))
             else:
-                errMsg = "wrong number of columns used in replicating insert"
+                errMsg = "在复制插入操作中使用了错误的列数"
                 raise SqlmapValueException(errMsg)
 
         def execute(self, sql, parameters=None):
@@ -87,9 +85,7 @@ class Replication(object):
                 except UnicodeError:
                     self.parent.cursor.execute(sql, cleanReplaceUnicode(parameters or []))
             except sqlite3.OperationalError as ex:
-                errMsg = "problem occurred ('%s') while accessing sqlite database " % getSafeExString(ex, UNICODE_ENCODING)
-                errMsg += "located at '%s'. Please make sure that " % self.parent.dbpath
-                errMsg += "it's not used by some other program"
+                errMsg = "访问位于 '%s' 的 SQLite 数据库时发生问题 ('%s')。请确保它没有被其他程序使用" % (self.parent.dbpath, getSafeExString(ex, UNICODE_ENCODING))
                 raise SqlmapGenericException(errMsg)
 
         def beginTransaction(self):

@@ -24,8 +24,7 @@ if IS_WIN and _readline:
     try:
         _outputfile = _readline.GetOutputFile()
     except AttributeError:
-        debugMsg = "Failed GetOutputFile when using platform's "
-        debugMsg += "readline library"
+        debugMsg = "使用平台的 readline 库时获取输出文件失败"
         logger.debug(debugMsg)
 
         _readline = None
@@ -43,8 +42,7 @@ if PLATFORM == "mac" and _readline:
         # We are bound to libedit - new in Leopard
         _readline.parse_and_bind("bind ^I rl_complete")
 
-        debugMsg = "Leopard libedit detected when using platform's "
-        debugMsg += "readline library"
+        debugMsg = "检测到 Leopard libedit 当使用平台的 readline 库时"
         logger.debug(debugMsg)
 
         uses_libedit = True

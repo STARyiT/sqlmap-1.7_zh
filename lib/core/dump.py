@@ -87,7 +87,7 @@ class Dump(object):
             try:
                 self._outputFP.write(text)
             except IOError as ex:
-                errMsg = "error occurred while writing to log file ('%s')" % getSafeExString(ex)
+                errMsg = "写入日志文件时发生错误('%s')" % getSafeExString(ex)
                 raise SqlmapGenericException(errMsg)
 
             if multiThreadMode:
@@ -111,7 +111,7 @@ class Dump(object):
         try:
             self._outputFP = openFile(self._outputFile, "ab" if not conf.flushSession else "wb")
         except IOError as ex:
-            errMsg = "error occurred while opening log file ('%s')" % getSafeExString(ex)
+            errMsg = "打开日志文件时发生错误('%s')" % getSafeExString(ex)
             raise SqlmapGenericException(errMsg)
 
     def singleString(self, data, content_type=None):
@@ -171,27 +171,27 @@ class Dump(object):
         self.string("banner", data, content_type=CONTENT_TYPE.BANNER)
 
     def currentUser(self, data):
-        self.string("current user", data, content_type=CONTENT_TYPE.CURRENT_USER)
+        self.string("当前用户", data, content_type=CONTENT_TYPE.CURRENT_USER)
 
     def currentDb(self, data):
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE):
-            self.string("current database (equivalent to schema on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
+            self.string("当前数据库(等同于 %s 上的模式)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.DB2, DBMS.MIMERSQL, DBMS.MAXDB, DBMS.VIRTUOSO):
-            self.string("current database (equivalent to owner on %s)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
+            self.string("当前数据库(等同于 %s 上的所有者)" % Backend.getIdentifiedDbms(), data, content_type=CONTENT_TYPE.CURRENT_DB)
         else:
-            self.string("current database", data, content_type=CONTENT_TYPE.CURRENT_DB)
+            self.string("当前数据库", data, content_type=CONTENT_TYPE.CURRENT_DB)
 
     def hostname(self, data):
         self.string("hostname", data, content_type=CONTENT_TYPE.HOSTNAME)
 
     def dba(self, data):
-        self.string("current user is DBA", data, content_type=CONTENT_TYPE.IS_DBA)
+        self.string("当前用户为 DBA", data, content_type=CONTENT_TYPE.IS_DBA)
 
     def users(self, users):
-        self.lister("database management system users", users, content_type=CONTENT_TYPE.USERS)
+        self.lister("数据库管理系统用户", users, content_type=CONTENT_TYPE.USERS)
 
     def statements(self, statements):
-        self.lister("SQL statements", statements, content_type=CONTENT_TYPE.STATEMENTS)
+        self.lister("SQL语句", statements, content_type=CONTENT_TYPE.STATEMENTS)
 
     def userSettings(self, header, userSettings, subHeader, content_type=None):
         self._areAdmins = set()
@@ -232,7 +232,7 @@ class Dump(object):
             self.singleString("")
 
     def dbs(self, dbs):
-        self.lister("available databases", dbs, content_type=CONTENT_TYPE.DBS)
+        self.lister("可用数据库", dbs, content_type=CONTENT_TYPE.DBS)
 
     def dbTables(self, dbTables):
         if isinstance(dbTables, dict) and len(dbTables) > 0:
@@ -272,7 +272,7 @@ class Dump(object):
 
                 self._write("+%s+\n" % lines)
         elif dbTables is None or len(dbTables) == 0:
-            self.singleString("No tables found", content_type=CONTENT_TYPE.TABLES)
+            self.singleString("没有找到表", content_type=CONTENT_TYPE.TABLES)
         else:
             self.string("tables", dbTables, content_type=CONTENT_TYPE.TABLES)
 
@@ -392,7 +392,7 @@ class Dump(object):
 
                 self._write("+%s+%s+\n" % (lines1, lines2))
         else:
-            logger.error("unable to retrieve the number of entries for any table")
+            logger.error("无法检索任何表的条目数")
 
     def dbTableValues(self, tableValues):
         replication = None
@@ -419,8 +419,7 @@ class Dump(object):
                 dumpDbPath = os.path.join(conf.dumpPath, normalizeUnicode(unsafeSQLIdentificatorNaming(db)))
             except (UnicodeError, OSError):
                 tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
-                warnMsg = "currently unable to use regular dump directory. "
-                warnMsg += "Using temporary directory '%s' instead" % tempDir
+                warnMsg = "当前无法使用常规的转储目录。改为使用临时目录'%s'" % tempDir
                 logger.warning(warnMsg)
 
                 dumpDbPath = tempDir
@@ -442,9 +441,7 @@ class Dump(object):
                             os.makedirs(dumpDbPath)
                         except Exception as ex:
                             tempDir = tempfile.mkdtemp(prefix="sqlmapdb")
-                            warnMsg = "unable to create dump directory "
-                            warnMsg += "'%s' (%s). " % (dumpDbPath, getSafeExString(ex))
-                            warnMsg += "Using temporary directory '%s' instead" % tempDir
+                            warnMsg = "无法创建转储目录'%s'(%s)。改为使用临时目录'%s'" % (dumpDbPath, getSafeExString(ex), tempDir)
                             logger.warning(warnMsg)
 
                             dumpDbPath = tempDir
@@ -583,9 +580,7 @@ class Dump(object):
             rtable.beginTransaction()
 
         if count > TRIM_STDOUT_DUMP_SIZE:
-            warnMsg = "console output will be trimmed to "
-            warnMsg += "last %d rows due to " % TRIM_STDOUT_DUMP_SIZE
-            warnMsg += "large table size"
+            warnMsg = "由于表格大小较大,控制台输出将被截断为最后%d行" % TRIM_STDOUT_DUMP_SIZE
             logger.warning(warnMsg)
 
         for i in xrange(count):
@@ -659,7 +654,7 @@ class Dump(object):
 
         if conf.dumpFormat == DUMP_FORMAT.SQLITE:
             rtable.endTransaction()
-            logger.info("table '%s.%s' dumped to SQLITE database '%s'" % (db, table, replication.dbpath))
+            logger.info("表 '%s.%s' 已导出到SQLITE数据库 '%s'" % (db, table, replication.dbpath))
 
         elif conf.dumpFormat in (DUMP_FORMAT.CSV, DUMP_FORMAT.HTML):
             if conf.dumpFormat == DUMP_FORMAT.HTML:
@@ -668,7 +663,7 @@ class Dump(object):
                 dataToDumpFile(dumpFP, "\n")
             dumpFP.close()
 
-            msg = "table '%s.%s' dumped to %s file '%s'" % (db, table, conf.dumpFormat, dumpFileName)
+            msg = "表 '%s.%s' 已经导出到 %s 文件 '%s'" % (db, table, conf.dumpFormat, dumpFileName)
             if not warnFile:
                 logger.info(msg)
             else:
@@ -701,8 +696,7 @@ class Dump(object):
                             continue
 
             if found:
-                msg = "column%s found in the " % colConsiderStr
-                msg += "following databases:"
+                msg = "在以下数据库中找到列%s:" % colConsiderStr
                 self._write(msg)
 
                 self.dbTableColumns(found)
@@ -711,10 +705,10 @@ class Dump(object):
         self.string(query, queryRes, content_type=CONTENT_TYPE.SQL_QUERY)
 
     def rFile(self, fileData):
-        self.lister("files saved to", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
+        self.lister("文件保存到", fileData, sort=False, content_type=CONTENT_TYPE.FILE_READ)
 
     def registerValue(self, registerData):
-        self.string("Registry key value data", registerData, content_type=CONTENT_TYPE.REG_READ, sort=False)
+        self.string("注册表键值数据", registerData, content_type=CONTENT_TYPE.REG_READ, sort=False)
 
 # object to manage how to print the retrieved queries output to
 # standard output and sessions file
