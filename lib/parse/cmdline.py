@@ -112,671 +112,671 @@ def cmdLineParser(argv=None):
 
     try:
         parser.add_argument("--hh", dest="advancedHelp", action="store_true",
-            help="Show advanced help message and exit")
+            help="显示高级帮助消息并退出")
 
         parser.add_argument("--version", dest="showVersion", action="store_true",
-            help="Show program's version number and exit")
+            help="显示程序的版本号并退出")
 
         parser.add_argument("-v", dest="verbose", type=int,
-            help="Verbosity level: 0-6 (default %d)" % defaults.verbose)
+            help="详细级别: 0-6(defaults: %d)" % defaults.verbose)
+
 
         # Target options
-        target = parser.add_argument_group("Target", "At least one of these options has to be provided to define the target(s)")
+        target = parser.add_argument_group("目标", "至少需要提供其中一个选项来定义目标")
 
         target.add_argument("-u", "--url", dest="url",
-            help="Target URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
+            help="目标URL (e.g. \"http://www.site.com/vuln.php?id=1\")")
 
         target.add_argument("-d", dest="direct",
-            help="Connection string for direct database connection")
+            help="用于直接数据库连接的连接字符串")
 
         target.add_argument("-l", dest="logFile",
-            help="Parse target(s) from Burp or WebScarab proxy log file")
+            help="从Burp或WebScarab代理日志文件中解析目标")
 
         target.add_argument("-m", dest="bulkFile",
-            help="Scan multiple targets given in a textual file ")
+            help="从文本文件中扫描多个目标")
 
         target.add_argument("-r", dest="requestFile",
-            help="Load HTTP request from a file")
+            help="从文件中加载HTTP请求")
 
         target.add_argument("-g", dest="googleDork",
-            help="Process Google dork results as target URLs")
+            help="处理Google Dork搜索结果作为目标URL")
 
         target.add_argument("-c", dest="configFile",
-            help="Load options from a configuration INI file")
+            help="从配置INI文件中加载选项")
 
         # Request options
-        request = parser.add_argument_group("Request", "These options can be used to specify how to connect to the target URL")
+        request = parser.add_argument_group("请求", "这些选项可以用于指定如何连接到目标URL")
 
         request.add_argument("-A", "--user-agent", dest="agent",
-            help="HTTP User-Agent header value")
+            help="HTTP User-Agent Header值")
 
         request.add_argument("-H", "--header", dest="header",
-            help="Extra header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
+            help="额外的Header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
         request.add_argument("--method", dest="method",
-            help="Force usage of given HTTP method (e.g. PUT)")
+            help="强制使用给定的HTTP方法 (e.g. PUT)")
 
         request.add_argument("--data", dest="data",
-            help="Data string to be sent through POST (e.g. \"id=1\")")
+            help="通过POST发送的数据字符串 (e.g. \"id=1\")")
 
         request.add_argument("--param-del", dest="paramDel",
-            help="Character used for splitting parameter values (e.g. &)")
+            help="用于分割参数值的字符 (e.g. &)")
 
         request.add_argument("--cookie", dest="cookie",
-            help="HTTP Cookie header value (e.g. \"PHPSESSID=a8d127e..\")")
+            help="HTTP Cookie Header值 (e.g. \"PHPSESSID=a8d127e..\")")
 
         request.add_argument("--cookie-del", dest="cookieDel",
-            help="Character used for splitting cookie values (e.g. ;)")
+            help="用于分割cookie值的字符 (e.g. ;)")
 
         request.add_argument("--live-cookies", dest="liveCookies",
-            help="Live cookies file used for loading up-to-date values")
+            help="用于加载最新值的活动cookies文件")
 
         request.add_argument("--load-cookies", dest="loadCookies",
-            help="File containing cookies in Netscape/wget format")
+            help="包含Netscape/wget格式的cookies的文件")
 
         request.add_argument("--drop-set-cookie", dest="dropSetCookie", action="store_true",
-            help="Ignore Set-Cookie header from response")
+            help="忽略响应中的Set-Cookie头")
 
         request.add_argument("--mobile", dest="mobile", action="store_true",
-            help="Imitate smartphone through HTTP User-Agent header")
+            help="通过HTTP User-Agent Header模拟智能手机")
 
         request.add_argument("--random-agent", dest="randomAgent", action="store_true",
-            help="Use randomly selected HTTP User-Agent header value")
+            help="使用随机选择的HTTP User-Agent Header值")
 
         request.add_argument("--host", dest="host",
-            help="HTTP Host header value")
+            help="HTTP Host Header值")
 
         request.add_argument("--referer", dest="referer",
-            help="HTTP Referer header value")
+            help="HTTP Referer Header值")
 
         request.add_argument("--headers", dest="headers",
-            help="Extra headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
+            help="额外的Headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
         request.add_argument("--auth-type", dest="authType",
-            help="HTTP authentication type (Basic, Digest, Bearer, ...)")
+            help="HTTP认证类型 (Basic, Digest, Bearer, ...)")
 
         request.add_argument("--auth-cred", dest="authCred",
-            help="HTTP authentication credentials (name:password)")
+            help="HTTP认证凭证 (name:password)")
 
         request.add_argument("--auth-file", dest="authFile",
-            help="HTTP authentication PEM cert/private key file")
+            help="HTTP认证PEM证书/私钥文件")
 
         request.add_argument("--ignore-code", dest="ignoreCode",
-            help="Ignore (problematic) HTTP error code (e.g. 401)")
+            help="忽略(有问题的)HTTP错误代码 (e.g. 401)")
 
         request.add_argument("--ignore-proxy", dest="ignoreProxy", action="store_true",
-            help="Ignore system default proxy settings")
+            help="忽略系统默认的代理设置")
 
         request.add_argument("--ignore-redirects", dest="ignoreRedirects", action="store_true",
-            help="Ignore redirection attempts")
+            help="忽略重定向尝试")
 
         request.add_argument("--ignore-timeouts", dest="ignoreTimeouts", action="store_true",
-            help="Ignore connection timeouts")
+            help="忽略连接超时")
 
         request.add_argument("--proxy", dest="proxy",
-            help="Use a proxy to connect to the target URL")
+            help="使用代理连接到目标URL")
 
         request.add_argument("--proxy-cred", dest="proxyCred",
-            help="Proxy authentication credentials (name:password)")
+            help="代理认证凭证 (name:password)")
 
         request.add_argument("--proxy-file", dest="proxyFile",
-            help="Load proxy list from a file")
+            help="从文件中加载代理列表")
 
         request.add_argument("--proxy-freq", dest="proxyFreq", type=int,
-            help="Requests between change of proxy from a given list")
+            help="在给定列表中更改代理之间的请求次数")
 
         request.add_argument("--tor", dest="tor", action="store_true",
-            help="Use Tor anonymity network")
+            help="使用Tor匿名网络")
 
         request.add_argument("--tor-port", dest="torPort",
-            help="Set Tor proxy port other than default")
+            help="设置Tor代理端口, 而不是默认端口")
 
         request.add_argument("--tor-type", dest="torType",
-            help="Set Tor proxy type (HTTP, SOCKS4 or SOCKS5 (default))")
+            help="设置Tor代理类型 (HTTP, SOCKS4 or SOCKS5 (default))")
 
         request.add_argument("--check-tor", dest="checkTor", action="store_true",
-            help="Check to see if Tor is used properly")
+            help="检查是否正确使用了Tor匿名网络")
 
         request.add_argument("--delay", dest="delay", type=float,
-            help="Delay in seconds between each HTTP request")
+            help="设置HTTP请求延迟间隔时间")
 
         request.add_argument("--timeout", dest="timeout", type=float,
-            help="Seconds to wait before timeout connection (default %d)" % defaults.timeout)
+            help="等待超时连接的时间 (default %d)" % defaults.timeout)
 
         request.add_argument("--retries", dest="retries", type=int,
-            help="Retries when the connection timeouts (default %d)" % defaults.retries)
+            help="当连接超时的时候重试 (default %d)" % defaults.retries)
 
         request.add_argument("--retry-on", dest="retryOn",
-            help="Retry request on regexp matching content (e.g. \"drop\")")
+            help="在内容匹配正则表达式时重试请求 (e.g. \"drop\")")
 
         request.add_argument("--randomize", dest="rParam",
-            help="Randomly change value for given parameter(s)")
+            help="为给定参数(s)随机更改值")
 
         request.add_argument("--safe-url", dest="safeUrl",
-            help="URL address to visit frequently during testing")
+            help="测试期间访问的频繁的URL地址")
 
         request.add_argument("--safe-post", dest="safePost",
-            help="POST data to send to a safe URL")
+            help="发送到安全URL的POST数据")
 
         request.add_argument("--safe-req", dest="safeReqFile",
-            help="Load safe HTTP request from a file")
+            help="从文件中加载安全的HTTP请求")
 
         request.add_argument("--safe-freq", dest="safeFreq", type=int,
-            help="Regular requests between visits to a safe URL")
+            help="访问安全URL之间的普通请求")
 
         request.add_argument("--skip-urlencode", dest="skipUrlEncode", action="store_true",
-            help="Skip URL encoding of payload data")
+            help="跳过负载数据的URL编码")
 
         request.add_argument("--csrf-token", dest="csrfToken",
-            help="Parameter used to hold anti-CSRF token")
+            help="用于存储抗CSRF令牌的参数")
 
         request.add_argument("--csrf-url", dest="csrfUrl",
-            help="URL address to visit for extraction of anti-CSRF token")
+            help="用于提取抗CSRF令牌的URL地址")
 
         request.add_argument("--csrf-method", dest="csrfMethod",
-            help="HTTP method to use during anti-CSRF token page visit")
+            help="在提取抗CSRF令牌时使用的HTTP方法")
 
         request.add_argument("--csrf-data", dest="csrfData",
-            help="POST data to send during anti-CSRF token page visit")
+            help="在访问反CSRF令牌页面时发送的POST数据")
 
         request.add_argument("--csrf-retries", dest="csrfRetries", type=int,
-            help="Retries for anti-CSRF token retrieval (default %d)" % defaults.csrfRetries)
+            help="反CSRF令牌检索的重试次数 (default %d)" % defaults.csrfRetries)
 
         request.add_argument("--force-ssl", dest="forceSSL", action="store_true",
-            help="Force usage of SSL/HTTPS")
+            help="强制使用SSL/HTTPS")
 
         request.add_argument("--chunked", dest="chunked", action="store_true",
-            help="Use HTTP chunked transfer encoded (POST) requests")
+            help="使用HTTP分块传输编码(POST)请求")
 
         request.add_argument("--hpp", dest="hpp", action="store_true",
-            help="Use HTTP parameter pollution method")
+            help="使用HTTP参数污染方法")
 
         request.add_argument("--eval", dest="evalCode",
-            help="Evaluate provided Python code before the request (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
+            help="在请求之前评估提供的Python代码 (e.g. \"import hashlib;id2=hashlib.md5(id).hexdigest()\")")
 
         # Optimization options
-        optimization = parser.add_argument_group("Optimization", "These options can be used to optimize the performance of sqlmap")
+        optimization = parser.add_argument_group("优化", "这些选项可用于优化sqlmap的性能")
 
         optimization.add_argument("-o", dest="optimize", action="store_true",
-            help="Turn on all optimization switches")
+            help="打开所有优化开关")
 
         optimization.add_argument("--predict-output", dest="predictOutput", action="store_true",
-            help="Predict common queries output")
+            help="预测常见查询的输出")
 
         optimization.add_argument("--keep-alive", dest="keepAlive", action="store_true",
-            help="Use persistent HTTP(s) connections")
+            help="使用持久的HTTP(s)连接")
 
         optimization.add_argument("--null-connection", dest="nullConnection", action="store_true",
-            help="Retrieve page length without actual HTTP response body")
+            help="检索页面长度而不实际获取HTTP响应体")
 
         optimization.add_argument("--threads", dest="threads", type=int,
-            help="Max number of concurrent HTTP(s) requests (default %d)" % defaults.threads)
+            help="最大并发HTTP(s)请求数 (default %d)" % defaults.threads)
 
         # Injection options
-        injection = parser.add_argument_group("Injection", "These options can be used to specify which parameters to test for, provide custom injection payloads and optional tampering scripts")
+        injection = parser.add_argument_group("注入", "这些选项可用于指定要测试的参数，提供自定义的注入负载和可选的篡改脚本")
 
         injection.add_argument("-p", dest="testParameter",
-            help="Testable parameter(s)")
+            help="可测试的参数")
 
         injection.add_argument("--skip", dest="skip",
-            help="Skip testing for given parameter(s)")
+            help="跳过给定参数的测试")
 
         injection.add_argument("--skip-static", dest="skipStatic", action="store_true",
-            help="Skip testing parameters that not appear to be dynamic")
+            help="跳过不明显是动态的参数")
 
         injection.add_argument("--param-exclude", dest="paramExclude",
-            help="Regexp to exclude parameters from testing (e.g. \"ses\")")
+            help="用于排除参数测试的正则表达式 (e.g. \"ses\")")
 
         injection.add_argument("--param-filter", dest="paramFilter",
-            help="Select testable parameter(s) by place (e.g. \"POST\")")
+            help="通过位置选择可测试的参数 (e.g. \"POST\")")
 
         injection.add_argument("--dbms", dest="dbms",
-            help="Force back-end DBMS to provided value")
+            help="强制后端DBMS为提供的值")
 
         injection.add_argument("--dbms-cred", dest="dbmsCred",
-            help="DBMS authentication credentials (user:password)")
+            help="DBMS认证凭证 (user:password)")
 
         injection.add_argument("--os", dest="os",
-            help="Force back-end DBMS operating system to provided value")
+            help="强制后端DBMS操作系统为提供的值")
 
         injection.add_argument("--invalid-bignum", dest="invalidBignum", action="store_true",
-            help="Use big numbers for invalidating values")
+            help="使用大数值来使值失效")
 
         injection.add_argument("--invalid-logical", dest="invalidLogical", action="store_true",
-            help="Use logical operations for invalidating values")
+            help="使用逻辑操作来使值失效")
 
         injection.add_argument("--invalid-string", dest="invalidString", action="store_true",
-            help="Use random strings for invalidating values")
+            help="使用随机字符串来使值失效")
 
         injection.add_argument("--no-cast", dest="noCast", action="store_true",
-            help="Turn off payload casting mechanism")
+            help="关闭负载转换机制")
 
         injection.add_argument("--no-escape", dest="noEscape", action="store_true",
-            help="Turn off string escaping mechanism")
+            help="关闭字符串转义机制")
 
         injection.add_argument("--prefix", dest="prefix",
-            help="Injection payload prefix string")
+            help="注入负载前缀字符串")
 
         injection.add_argument("--suffix", dest="suffix",
-            help="Injection payload suffix string")
+            help="注入负载后缀字符串")
 
         injection.add_argument("--tamper", dest="tamper",
-            help="Use given script(s) for tampering injection data")
+            help="使用给定的脚本(s)篡改注入数据")
 
         # Detection options
-        detection = parser.add_argument_group("Detection", "These options can be used to customize the detection phase")
+        detection = parser.add_argument_group("检测", "这些选项可用于自定义检测阶段")
 
         detection.add_argument("--level", dest="level", type=int,
-            help="Level of tests to perform (1-5, default %d)" % defaults.level)
+            help="要执行的测试级别 (1-5, default %d)" % defaults.level)
 
         detection.add_argument("--risk", dest="risk", type=int,
-            help="Risk of tests to perform (1-3, default %d)" % defaults.risk)
+            help="要执行的测试风险 (1-3, default %d)" % defaults.risk)
 
         detection.add_argument("--string", dest="string",
-            help="String to match when query is evaluated to True")
+            help="当查询为True时匹配的字符串")
 
         detection.add_argument("--not-string", dest="notString",
-            help="String to match when query is evaluated to False")
+            help="当查询为False时匹配的字符串")
 
         detection.add_argument("--regexp", dest="regexp",
-            help="Regexp to match when query is evaluated to True")
+            help="当查询为True时匹配的正则表达式")
 
         detection.add_argument("--code", dest="code", type=int,
-            help="HTTP code to match when query is evaluated to True")
+            help="当查询为True时匹配的HTTP代码")
 
         detection.add_argument("--smart", dest="smart", action="store_true",
-            help="Perform thorough tests only if positive heuristic(s)")
+            help="仅在存在积极的启用条件时才进行深入测试")
 
         detection.add_argument("--text-only", dest="textOnly", action="store_true",
-            help="Compare pages based only on the textual content")
+            help="仅基于文本内容比较页面")
 
         detection.add_argument("--titles", dest="titles", action="store_true",
-            help="Compare pages based only on their titles")
+            help="仅基于标题比较页面")
 
         # Techniques options
-        techniques = parser.add_argument_group("Techniques", "These options can be used to tweak testing of specific SQL injection techniques")
+        techniques = parser.add_argument_group("技术", "这些选项可用于调整特定SQL注入技术的测试")
 
         techniques.add_argument("--technique", dest="technique",
-            help="SQL injection techniques to use (default \"%s\")" % defaults.technique)
+            help="要使用的SQL注入技术 (default \"%s\")" % defaults.technique)
 
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
-            help="Seconds to delay the DBMS response (default %d)" % defaults.timeSec)
+            help="延迟DBMS响应的秒数 (default %d)" % defaults.timeSec)
 
         techniques.add_argument("--union-cols", dest="uCols",
-            help="Range of columns to test for UNION query SQL injection")
+            help="UNION查询SQL注入的列数范围")
 
         techniques.add_argument("--union-char", dest="uChar",
-            help="Character to use for bruteforcing number of columns")
+            help="用于暴力破解列数的字符")
 
         techniques.add_argument("--union-from", dest="uFrom",
-            help="Table to use in FROM part of UNION query SQL injection")
+            help="UNION查询SQL注入中使用的表")
 
         techniques.add_argument("--dns-domain", dest="dnsDomain",
-            help="Domain name used for DNS exfiltration attack")
+            help="用于DNS泄露攻击的域名")
 
         techniques.add_argument("--second-url", dest="secondUrl",
-            help="Resulting page URL searched for second-order response")
+            help="第二响应的结果页面URL")
 
         techniques.add_argument("--second-req", dest="secondReq",
-            help="Load second-order HTTP request from file")
+            help="从文件加载第二响应的HTTP请求")
 
         # Fingerprint options
         fingerprint = parser.add_argument_group("Fingerprint")
 
         fingerprint.add_argument("-f", "--fingerprint", dest="extensiveFp", action="store_true",
-            help="Perform an extensive DBMS version fingerprint")
+            help="执行详细的DBMS版本指纹识别")
 
         # Enumeration options
-        enumeration = parser.add_argument_group("Enumeration", "These options can be used to enumerate the back-end database management system information, structure and data contained in the tables")
+        enumeration = parser.add_argument_group("枚举", "这些选项可用于枚举后端数据库管理系统的信息，结构和表中的数据")
 
         enumeration.add_argument("-a", "--all", dest="getAll", action="store_true",
-            help="Retrieve everything")
+            help="检索所有信息")
 
         enumeration.add_argument("-b", "--banner", dest="getBanner", action="store_true",
-            help="Retrieve DBMS banner")
+            help="检索DBMS的横幅")
 
         enumeration.add_argument("--current-user", dest="getCurrentUser", action="store_true",
-            help="Retrieve DBMS current user")
+            help="检索DBMS当前用户")
 
         enumeration.add_argument("--current-db", dest="getCurrentDb", action="store_true",
-            help="Retrieve DBMS current database")
+            help="检索DBMS当前数据库")
 
         enumeration.add_argument("--hostname", dest="getHostname", action="store_true",
-            help="Retrieve DBMS server hostname")
+            help="检索DBMS服务器主机名")
 
         enumeration.add_argument("--is-dba", dest="isDba", action="store_true",
-            help="Detect if the DBMS current user is DBA")
+            help="检测DBMS当前用户是否为DBA")
 
         enumeration.add_argument("--users", dest="getUsers", action="store_true",
-            help="Enumerate DBMS users")
+            help="枚举DBMS用户")
 
         enumeration.add_argument("--passwords", dest="getPasswordHashes", action="store_true",
-            help="Enumerate DBMS users password hashes")
+            help="枚举DBMS用户的密码哈希")
 
         enumeration.add_argument("--privileges", dest="getPrivileges", action="store_true",
-            help="Enumerate DBMS users privileges")
+            help="枚举DBMS用户的权限")
 
         enumeration.add_argument("--roles", dest="getRoles", action="store_true",
-            help="Enumerate DBMS users roles")
+            help="枚举DBMS用户的角色")
 
         enumeration.add_argument("--dbs", dest="getDbs", action="store_true",
-            help="Enumerate DBMS databases")
+            help="枚举DBMS数据库")
 
         enumeration.add_argument("--tables", dest="getTables", action="store_true",
-            help="Enumerate DBMS database tables")
+            help="枚举DBMS数据库表")
 
         enumeration.add_argument("--columns", dest="getColumns", action="store_true",
-            help="Enumerate DBMS database table columns")
+            help="枚举DBMS数据库表列")
 
         enumeration.add_argument("--schema", dest="getSchema", action="store_true",
-            help="Enumerate DBMS schema")
+            help="枚举DBMS模式")
 
         enumeration.add_argument("--count", dest="getCount", action="store_true",
-            help="Retrieve number of entries for table(s)")
+            help="检索表的条目数")
 
         enumeration.add_argument("--dump", dest="dumpTable", action="store_true",
-            help="Dump DBMS database table entries")
+            help="转储DBMS数据库表条目")
 
         enumeration.add_argument("--dump-all", dest="dumpAll", action="store_true",
-            help="Dump all DBMS databases tables entries")
+            help="转储所有DBMS数据库表条目")
 
         enumeration.add_argument("--search", dest="search", action="store_true",
-            help="Search column(s), table(s) and/or database name(s)")
+            help="搜索列、表和/或数据库名称")
 
         enumeration.add_argument("--comments", dest="getComments", action="store_true",
-            help="Check for DBMS comments during enumeration")
+            help="在枚举期间检查DBMS注释")
 
         enumeration.add_argument("--statements", dest="getStatements", action="store_true",
-            help="Retrieve SQL statements being run on DBMS")
+            help="检索在DBMS上运行的SQL语句")
 
         enumeration.add_argument("-D", dest="db",
-            help="DBMS database to enumerate")
+            help="要枚举的DBMS数据库")
 
         enumeration.add_argument("-T", dest="tbl",
-            help="DBMS database table(s) to enumerate")
+            help="要枚举的DBMS数据库表")
 
         enumeration.add_argument("-C", dest="col",
-            help="DBMS database table column(s) to enumerate")
+            help="要枚举的DBMS数据库表列")
 
         enumeration.add_argument("-X", dest="exclude",
-            help="DBMS database identifier(s) to not enumerate")
+            help="不进行枚举的DBMS数据库标识符")
 
         enumeration.add_argument("-U", dest="user",
-            help="DBMS user to enumerate")
+            help="要枚举的DBMS用户")
 
         enumeration.add_argument("--exclude-sysdbs", dest="excludeSysDbs", action="store_true",
-            help="Exclude DBMS system databases when enumerating tables")
+            help="枚举表时排除DBMS系统数据库")
 
         enumeration.add_argument("--pivot-column", dest="pivotColumn",
-            help="Pivot column name")
+            help="枢轴列名称")
 
         enumeration.add_argument("--where", dest="dumpWhere",
-            help="Use WHERE condition while table dumping")
+            help="转储表时使用WHERE条件")
 
         enumeration.add_argument("--start", dest="limitStart", type=int,
-            help="First dump table entry to retrieve")
+            help="检索的第一个转储表条目")
 
         enumeration.add_argument("--stop", dest="limitStop", type=int,
-            help="Last dump table entry to retrieve")
+            help="检索的最后一个转储表条目")
 
         enumeration.add_argument("--first", dest="firstChar", type=int,
-            help="First query output word character to retrieve")
+            help="检索的第一个查询输出字词字符")
 
         enumeration.add_argument("--last", dest="lastChar", type=int,
-            help="Last query output word character to retrieve")
+            help="检索的最后一个查询输出字词字符")
 
         enumeration.add_argument("--sql-query", dest="sqlQuery",
-            help="SQL statement to be executed")
+            help="要执行的SQL语句")
 
         enumeration.add_argument("--sql-shell", dest="sqlShell", action="store_true",
-            help="Prompt for an interactive SQL shell")
+            help="提示交互式SQL shell")
 
         enumeration.add_argument("--sql-file", dest="sqlFile",
-            help="Execute SQL statements from given file(s)")
+            help="从给定文件执行SQL语句")
 
         # Brute force options
-        brute = parser.add_argument_group("Brute force", "These options can be used to run brute force checks")
+        brute = parser.add_argument_group("Brute force", "这些选项可以用来进行暴力破解检查")
 
         brute.add_argument("--common-tables", dest="commonTables", action="store_true",
-            help="Check existence of common tables")
+            help="检查常见表的存在")
 
         brute.add_argument("--common-columns", dest="commonColumns", action="store_true",
-            help="Check existence of common columns")
+            help="检查常见列的存在")
 
         brute.add_argument("--common-files", dest="commonFiles", action="store_true",
-            help="Check existence of common files")
+            help="检查常见文件的存在")
 
         # User-defined function options
-        udf = parser.add_argument_group("User-defined function injection", "These options can be used to create custom user-defined functions")
+        udf = parser.add_argument_group("User-defined function injection", "这些选项可以用来创建自定义用户定义的函数")
 
         udf.add_argument("--udf-inject", dest="udfInject", action="store_true",
-            help="Inject custom user-defined functions")
+            help="注入自定义用户定义的函数")
 
         udf.add_argument("--shared-lib", dest="shLib",
-            help="Local path of the shared library")
+            help="共享库的本地路径")
 
         # File system options
-        filesystem = parser.add_argument_group("File system access", "These options can be used to access the back-end database management system underlying file system")
+        filesystem = parser.add_argument_group("File system access", "这些选项可以用来访问后端数据库管理系统的底层文件系统")
 
         filesystem.add_argument("--file-read", dest="fileRead",
-            help="Read a file from the back-end DBMS file system")
+            help="从后端DBMS文件系统读取文件")
 
         filesystem.add_argument("--file-write", dest="fileWrite",
-            help="Write a local file on the back-end DBMS file system")
+            help="在后端DBMS文件系统上写入本地文件")
 
         filesystem.add_argument("--file-dest", dest="fileDest",
-            help="Back-end DBMS absolute filepath to write to")
+            help="写入的后端DBMS绝对文件路径")
 
         # Takeover options
-        takeover = parser.add_argument_group("Operating system access", "These options can be used to access the back-end database management system underlying operating system")
+        takeover = parser.add_argument_group("Operating system access", "这些选项可以用来访问后端数据库管理系统底层的操作系统")
 
         takeover.add_argument("--os-cmd", dest="osCmd",
-            help="Execute an operating system command")
+            help="执行一个操作系统命令")
 
         takeover.add_argument("--os-shell", dest="osShell", action="store_true",
-            help="Prompt for an interactive operating system shell")
+            help="提示一个交互式的操作系统shell")
 
         takeover.add_argument("--os-pwn", dest="osPwn", action="store_true",
-            help="Prompt for an OOB shell, Meterpreter or VNC")
+            help="提示一个OOB shell，Meterpreter或VNC")
 
         takeover.add_argument("--os-smbrelay", dest="osSmb", action="store_true",
-            help="One click prompt for an OOB shell, Meterpreter or VNC")
+            help="一键提示一个OOB shell，Meterpreter或VNC")
 
         takeover.add_argument("--os-bof", dest="osBof", action="store_true",
-            help="Stored procedure buffer overflow "
-                                 "exploitation")
+            help="存储过程缓冲区溢出利用")
 
         takeover.add_argument("--priv-esc", dest="privEsc", action="store_true",
-            help="Database process user privilege escalation")
+            help="数据库进程用户权限提升")
 
         takeover.add_argument("--msf-path", dest="msfPath",
-            help="Local path where Metasploit Framework is installed")
+            help="Metasploit框架安装的本地路径")
 
         takeover.add_argument("--tmp-path", dest="tmpPath",
-            help="Remote absolute path of temporary files directory")
+            help="临时文件目录的远程绝对路径")
 
         # Windows registry options
-        windows = parser.add_argument_group("Windows registry access", "These options can be used to access the back-end database management system Windows registry")
+        windows = parser.add_argument_group("Windows registry access", "这些选项可以用来访问后端数据库管理系统的Windows注册表")
 
         windows.add_argument("--reg-read", dest="regRead", action="store_true",
-            help="Read a Windows registry key value")
+            help="读取一个Windows注册表键值")
 
         windows.add_argument("--reg-add", dest="regAdd", action="store_true",
-            help="Write a Windows registry key value data")
+            help="写入一个Windows注册表键值数据")
 
         windows.add_argument("--reg-del", dest="regDel", action="store_true",
-            help="Delete a Windows registry key value")
+            help="删除一个Windows注册表键值")
 
         windows.add_argument("--reg-key", dest="regKey",
-            help="Windows registry key")
+            help="Windows注册表键")
 
         windows.add_argument("--reg-value", dest="regVal",
-            help="Windows registry key value")
+            help="Windows注册表键值")
 
         windows.add_argument("--reg-data", dest="regData",
-            help="Windows registry key value data")
+            help="Windows注册表键值数据")
 
         windows.add_argument("--reg-type", dest="regType",
-            help="Windows registry key value type")
+            help="Windows注册表键值类型")
 
         # General options
-        general = parser.add_argument_group("General", "These options can be used to set some general working parameters")
+        general = parser.add_argument_group("General", "这些选项可以用于设置一些通用的工作参数")
 
         general.add_argument("-s", dest="sessionFile",
-            help="Load session from a stored (.sqlite) file")
+                    help="从存储的(.sqlite)文件中加载会话")
 
         general.add_argument("-t", dest="trafficFile",
-            help="Log all HTTP traffic into a textual file")
+            help="将所有HTTP流量记录到文本文件中")
 
         general.add_argument("--answers", dest="answers",
-            help="Set predefined answers (e.g. \"quit=N,follow=N\")")
+            help="设置预定义的答案 (e.g. \"quit=N,follow=N\")")
 
         general.add_argument("--base64", dest="base64Parameter",
-            help="Parameter(s) containing Base64 encoded data")
+            help="包含Base64编码数据的参数")
 
         general.add_argument("--base64-safe", dest="base64Safe", action="store_true",
-            help="Use URL and filename safe Base64 alphabet (RFC 4648)")
+            help="使用URL和文件名安全的Base64字母表 (RFC 4648)")
 
         general.add_argument("--batch", dest="batch", action="store_true",
-            help="Never ask for user input, use the default behavior")
+            help="从不询问用户输入，使用默认行为")
 
         general.add_argument("--binary-fields", dest="binaryFields",
-            help="Result fields having binary values (e.g. \"digest\")")
+            help="具有二进制值的结果字段 (e.g. \"digest\")")
 
         general.add_argument("--check-internet", dest="checkInternet", action="store_true",
-            help="Check Internet connection before assessing the target")
+            help="在评估目标之前检查互联网连接")
 
         general.add_argument("--cleanup", dest="cleanup", action="store_true",
-            help="Clean up the DBMS from sqlmap specific UDF and tables")
+            help="清理DBMS特定的UDF和表")
 
         general.add_argument("--crawl", dest="crawlDepth", type=int,
-            help="Crawl the website starting from the target URL")
+            help="从目标URL开始爬取网站")
 
         general.add_argument("--crawl-exclude", dest="crawlExclude",
-            help="Regexp to exclude pages from crawling (e.g. \"logout\")")
+            help="爬取时排除页面的正则表达式 (e.g. \"logout\")")
 
         general.add_argument("--csv-del", dest="csvDel",
-            help="Delimiting character used in CSV output (default \"%s\")" % defaults.csvDel)
+            help="CSV输出中使用的分隔字符 (default \"%s\")" % defaults.csvDel)
 
         general.add_argument("--charset", dest="charset",
-            help="Blind SQL injection charset (e.g. \"0123456789abcdef\")")
+            help="盲SQL注入字符集 (e.g. \"0123456789abcdef\")")
 
         general.add_argument("--dump-file", dest="dumpFile",
-            help="Store dumped data to a custom file")
+            help="将转储的数据存储到自定义文件中")
 
         general.add_argument("--dump-format", dest="dumpFormat",
-            help="Format of dumped data (CSV (default), HTML or SQLITE)")
+            help="转储的数据格式 (CSV (default), HTML或SQLITE)")
 
         general.add_argument("--encoding", dest="encoding",
-            help="Character encoding used for data retrieval (e.g. GBK)")
+                    help="用于数据检索的字符编码(e.g. GBK)")
 
         general.add_argument("--eta", dest="eta", action="store_true",
-            help="Display for each output the estimated time of arrival")
+            help="显示每个输出估计的到达时间")
 
         general.add_argument("--flush-session", dest="flushSession", action="store_true",
             help="Flush session files for current target")
 
         general.add_argument("--forms", dest="forms", action="store_true",
-            help="Parse and test forms on target URL")
+            help="在目标URL上解析和测试表单")
 
         general.add_argument("--fresh-queries", dest="freshQueries", action="store_true",
-            help="Ignore query results stored in session file")
+            help="忽略存储在会话文件中的查询结果")
 
         general.add_argument("--gpage", dest="googlePage", type=int,
-            help="Use Google dork results from specified page number")
+            help="使用指定页码的Google Dork 搜索结果")
 
         general.add_argument("--har", dest="harFile",
-            help="Log all HTTP traffic into a HAR file")
+            help="将所有HTTP流量记录到HAR文件中")
 
         general.add_argument("--hex", dest="hexConvert", action="store_true",
-            help="Use hex conversion during data retrieval")
+            help="在数据检索过程中使用十六进制转换")
 
         general.add_argument("--output-dir", dest="outputDir", action="store",
-            help="Custom output directory path")
+            help="自定义输出目录路径")
 
         general.add_argument("--parse-errors", dest="parseErrors", action="store_true",
-            help="Parse and display DBMS error messages from responses")
+            help="解析并显示DBMS错误消息")
 
         general.add_argument("--preprocess", dest="preprocess",
-            help="Use given script(s) for preprocessing (request)")
+            help="使用给定的脚本(s)进行预处理 (请求)")
 
         general.add_argument("--postprocess", dest="postprocess",
-            help="Use given script(s) for postprocessing (response)")
+            help="使用给定的脚本(s)进行后处理 (响应)")
 
         general.add_argument("--repair", dest="repair", action="store_true",
             help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
 
         general.add_argument("--save", dest="saveConfig",
-            help="Save options to a configuration INI file")
+            help="将选项保存到配置INI文件中")
 
         general.add_argument("--scope", dest="scope",
-            help="Regexp for filtering targets")
+            help="用于过滤目标的正则表达式")
 
         general.add_argument("--skip-heuristics", dest="skipHeuristics", action="store_true",
-            help="Skip heuristic detection of vulnerabilities")
+            help="跳过对漏洞的启用检测")
 
         general.add_argument("--skip-waf", dest="skipWaf", action="store_true",
-            help="Skip heuristic detection of WAF/IPS protection")
+            help="跳过对WAF/IPS保护的启用检测")
 
         general.add_argument("--table-prefix", dest="tablePrefix",
-            help="Prefix used for temporary tables (default: \"%s\")" % defaults.tablePrefix)
+            help="用于临时表的前缀 (default: \"%s\")" % defaults.tablePrefix)
 
         general.add_argument("--test-filter", dest="testFilter",
             help="Select tests by payloads and/or titles (e.g. ROW)")
 
         general.add_argument("--test-skip", dest="testSkip",
-            help="Skip tests by payloads and/or titles (e.g. BENCHMARK)")
+            help="通过载荷和/或标题跳过测试 (e.g. BENCHMARK)")
 
         general.add_argument("--web-root", dest="webRoot",
-            help="Web server document root directory (e.g. \"/var/www\")")
+            help="Web服务器文档根目录 (e.g. \"/var/www\")")
 
         # Miscellaneous options
-        miscellaneous = parser.add_argument_group("Miscellaneous", "These options do not fit into any other category")
+        miscellaneous = parser.add_argument_group("杂项", "这些选项不属于任何其他类别")
 
         miscellaneous.add_argument("-z", dest="mnemonics",
-            help="Use short mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
+            help="使用短mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
 
         miscellaneous.add_argument("--alert", dest="alert",
-            help="Run host OS command(s) when SQL injection is found")
+            help="当发现SQL注入时运行主机OS命令")
 
         miscellaneous.add_argument("--beep", dest="beep", action="store_true",
-            help="Beep on question and/or when vulnerability is found")
+            help="当问题或漏洞被发现时发出蜂鸣声")
 
         miscellaneous.add_argument("--dependencies", dest="dependencies", action="store_true",
-            help="Check for missing (optional) sqlmap dependencies")
+            help="检查是否有缺失的 (可选) sqlmap依赖")
 
         miscellaneous.add_argument("--disable-coloring", dest="disableColoring", action="store_true",
-            help="Disable console output coloring")
+            help="禁用控制台输出颜色")
 
         miscellaneous.add_argument("--list-tampers", dest="listTampers", action="store_true",
-            help="Display list of available tamper scripts")
+            help="显示可用的tamper脚本列表")
 
         miscellaneous.add_argument("--no-logging", dest="noLogging", action="store_true",
-            help="Disable logging to a file")
+            help="禁用记录到文件")
 
         miscellaneous.add_argument("--offline", dest="offline", action="store_true",
-            help="Work in offline mode (only use session data)")
+            help="工作在离线模式 (仅使用会话数据)")
 
         miscellaneous.add_argument("--purge", dest="purge", action="store_true",
-            help="Safely remove all content from sqlmap data directory")
+            help="安全删除sqlmap数据目录中的所有内容")
 
         miscellaneous.add_argument("--results-file", dest="resultsFile",
-            help="Location of CSV results file in multiple targets mode")
+            help="在多目标模式下, 指定CSV结果文件的位置")
 
         miscellaneous.add_argument("--shell", dest="shell", action="store_true",
-            help="Prompt for an interactive sqlmap shell")
+            help="提示交互式sqlmap shell")
 
         miscellaneous.add_argument("--tmp-dir", dest="tmpDir",
-            help="Local directory for storing temporary files")
+            help="本地目录用于存储临时文件")
 
         miscellaneous.add_argument("--unstable", dest="unstable", action="store_true",
-            help="Adjust options for unstable connections")
+            help="调整不稳定连接的选项")
 
         miscellaneous.add_argument("--update", dest="updateAll", action="store_true",
-            help="Update sqlmap")
+            help="更新sqlmap")
 
         miscellaneous.add_argument("--wizard", dest="wizard", action="store_true",
-            help="Simple wizard interface for beginner users")
+            help="初级用户的简单向导界面")
 
         # Hidden and/or experimental options
         parser.add_argument("--crack", dest="hashFile",
@@ -940,14 +940,14 @@ def cmdLineParser(argv=None):
                     continue
                 elif command.lower() == "clear":
                     clearHistory()
-                    dataToStdout("[i] history cleared\n")
+                    dataToStdout("[i] 历史记录已清除\n")
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                 elif command.lower() in ("x", "q", "exit", "quit"):
                     raise SqlmapShellQuitException
                 elif command[0] != '-':
                     if not re.search(r"(?i)\A(\?|help)\Z", command):
-                        dataToStdout("[!] invalid option(s) provided\n")
-                    dataToStdout("[i] valid example: '-u http://www.site.com/vuln.php?id=1 --banner'\n")
+                        dataToStdout("[!] 提供的选项无效\n")
+                    dataToStdout("[i] 有效示例: '-u http://www.site.com/vuln.php?id=1 --banner'\n")
                 else:
                     saveHistory(AUTOCOMPLETE_TYPE.SQLMAP)
                     loadHistory(AUTOCOMPLETE_TYPE.SQLMAP)
@@ -957,7 +957,7 @@ def cmdLineParser(argv=None):
                 for arg in shlex.split(command):
                     argv.append(getUnicode(arg, encoding=sys.stdin.encoding))
             except ValueError as ex:
-                raise SqlmapSyntaxException("something went wrong during command line parsing ('%s')" % getSafeExString(ex))
+                raise SqlmapSyntaxException("命令行解析过程中出现错误 ('%s')" % getSafeExString(ex))
 
         longOptions = set(re.findall(r"\-\-([^= ]+?)=", parser.format_help()))
         longSwitches = set(re.findall(r"\-\-([^= ]+?)\s", parser.format_help()))
@@ -974,13 +974,13 @@ def cmdLineParser(argv=None):
             elif i == 1 and re.search(r"\A(http|www\.|\w[\w.-]+\.\w{2,})", argv[i]) is not None:
                 argv[i] = "--url=%s" % argv[i]
             elif len(argv[i]) > 1 and all(ord(_) in xrange(0x2018, 0x2020) for _ in ((argv[i].split('=', 1)[-1].strip() or ' ')[0], argv[i][-1])):
-                dataToStdout("[!] copy-pasting illegal (non-console) quote characters from Internet is illegal (%s)\n" % argv[i])
+                dataToStdout("[!] 复制非法 (非控制台) 引号字符 (%s)\n" % argv[i])
                 raise SystemExit
             elif len(argv[i]) > 1 and u"\uff0c" in argv[i].split('=', 1)[-1]:
-                dataToStdout("[!] copy-pasting illegal (non-console) comma characters from Internet is illegal (%s)\n" % argv[i])
+                dataToStdout("[!] 复制非法 (非控制台) 逗号字符 (%s)\n" % argv[i])
                 raise SystemExit
             elif re.search(r"\A-\w=.+", argv[i]):
-                dataToStdout("[!] potentially miswritten (illegal '=') short option detected ('%s')\n" % argv[i])
+                dataToStdout("[!] 可能存在误写的 (非法 '=') 短选项 ('%s')\n" % argv[i])
                 raise SystemExit
             elif re.search(r"\A-\w{3,}", argv[i]):
                 if argv[i].strip('-').split('=')[0] in (longOptions | longSwitches):
@@ -1040,7 +1040,7 @@ def cmdLineParser(argv=None):
                     if not found:
                         get_groups(parser).remove(group)
             elif '=' in argv[i] and not argv[i].startswith('-') and argv[i].split('=')[0] in longOptions and re.search(r"\A-{1,2}\w", argv[i - 1]) is None:
-                dataToStdout("[!] detected usage of long-option without a starting hyphen ('%s')\n" % argv[i])
+                dataToStdout("[!] 检测到长选项的使用, 但没有以 '-' 开头 ('%s')\n" % argv[i])
                 raise SystemExit
 
         for verbosity in (_ for _ in argv if re.search(r"\A\-v+\Z", _)):
@@ -1058,7 +1058,7 @@ def cmdLineParser(argv=None):
             raise SystemExit
         except SystemExit:
             if "-h" in argv and not advancedHelp:
-                dataToStdout("\n[!] to see full list of options run with '-hh'\n")
+                dataToStdout("\n[!] 查看选项的完整列表 '-hh'\n")
             raise
 
         if extraHeaders:
@@ -1081,8 +1081,8 @@ def cmdLineParser(argv=None):
             args.stdinPipe = None
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, args.requestFile, args.updateAll, args.smokeTest, args.vulnTest, args.wizard, args.dependencies, args.purge, args.listTampers, args.hashFile, args.stdinPipe)):
-            errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
-            errMsg += "Use -h for basic and -hh for advanced help\n"
+            errMsg = "缺少必选选项 (-d, -u, -l, -m, -r, -g, -c, --wizard, --shell, --update, --purge, --list-tampers or --dependencies). "
+            errMsg += "使用 -h 查看基本帮助, 使用 -hh 查看高级帮助\n"
             parser.error(errMsg)
 
         return args
@@ -1093,9 +1093,9 @@ def cmdLineParser(argv=None):
     except SystemExit:
         # Protection against Windows dummy double clicking
         if IS_WIN and "--non-interactive" not in sys.argv:
-            dataToStdout("\nPress Enter to continue...")
+            dataToStdout("\n按Enter键继续...")
             _input()
         raise
 
-    debugMsg = "parsing command line"
+    debugMsg = "解析命令行参数"
     logger.debug(debugMsg)

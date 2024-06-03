@@ -89,9 +89,7 @@ def loadBoundaries():
     try:
         doc = et.parse(paths.BOUNDARIES_XML)
     except Exception as ex:
-        errMsg = "something appears to be wrong with "
-        errMsg += "the file '%s' ('%s'). Please make " % (paths.BOUNDARIES_XML, getSafeExString(ex))
-        errMsg += "sure that you haven't made any changes to it"
+        errMsg = "似乎文件'%s'存在问题('%s')。请确保您没有对其进行任何更改" % (paths.BOUNDARIES_XML, getSafeExString(ex))
         raise SqlmapInstallationException(errMsg)
 
     root = doc.getroot()
@@ -113,9 +111,7 @@ def loadPayloads():
         try:
             doc = et.parse(payloadFilePath)
         except Exception as ex:
-            errMsg = "something appears to be wrong with "
-            errMsg += "the file '%s' ('%s'). Please make " % (payloadFilePath, getSafeExString(ex))
-            errMsg += "sure that you haven't made any changes to it"
+            errMsg = "似乎文件'%s'存在问题('%s')。请确保您没有对其进行任何更改" % (payloadFilePath, getSafeExString(ex))
             raise SqlmapInstallationException(errMsg)
 
         root = doc.getroot()

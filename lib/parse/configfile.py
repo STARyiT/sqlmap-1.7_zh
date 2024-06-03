@@ -38,8 +38,7 @@ def configFileProxy(section, option, datatype):
             else:
                 value = config.get(section, option)
         except ValueError as ex:
-            errMsg = "error occurred while processing the option "
-            errMsg += "'%s' in provided configuration file ('%s')" % (option, getUnicode(ex))
+            errMsg = "处理提供的配置文件中的选项'%s'时发生错误('%s')" % (option, getUnicode(ex))
             raise SqlmapSyntaxException(errMsg)
 
         if value:
@@ -47,9 +46,7 @@ def configFileProxy(section, option, datatype):
         else:
             conf[option] = None
     else:
-        debugMsg = "missing requested option '%s' (section " % option
-        debugMsg += "'%s') into the configuration file, " % section
-        debugMsg += "ignoring. Skipping to next."
+        debugMsg = "配置文件中缺少请求的选项'%s'(部分'%s'),忽略该选项。跳过到下一个选项。" % (option, section)
         logger.debug(debugMsg)
 
 def configFileParser(configFile):
@@ -60,7 +57,7 @@ def configFileParser(configFile):
 
     global config
 
-    debugMsg = "parsing configuration file"
+    debugMsg = "解析配置文件"
     logger.debug(debugMsg)
 
     checkFile(configFile)
@@ -70,11 +67,11 @@ def configFileParser(configFile):
         config = UnicodeRawConfigParser()
         config.readfp(configFP)
     except Exception as ex:
-        errMsg = "you have provided an invalid and/or unreadable configuration file ('%s')" % getSafeExString(ex)
+        errMsg = "你提供了一个无效或不可读的配置文件 ('%s')" % getSafeExString(ex)
         raise SqlmapSyntaxException(errMsg)
 
     if not config.has_section("Target"):
-        errMsg = "missing a mandatory section 'Target' in the configuration file"
+        errMsg = "配置文件中缺少必需的 'Target' 部分"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     mandatory = False
@@ -85,7 +82,7 @@ def configFileParser(configFile):
             break
 
     if not mandatory:
-        errMsg = "missing a mandatory option in the configuration file "
+        errMsg = "配置文件中缺少必需的选项"
         errMsg += "(direct, url, logFile, bulkFile, googleDork, requestFile or wizard)"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
