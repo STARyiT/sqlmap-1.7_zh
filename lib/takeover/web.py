@@ -135,14 +135,13 @@ class Web(object):
             page, _, _ = Request.getPage(url=self.webStagerUrl, multipart=multipartParams, raise404=False)
 
             if "File uploaded" not in (page or ""):
-                warnMsg = "unable to upload the file through the web file "
-                warnMsg += "stager to '%s'" % directory
+                warnMsg = "无法通过Web文件分段器将文件上传到'%s'" % directory
                 logger.warning(warnMsg)
                 return False
             else:
                 return True
         else:
-            logger.error("sqlmap hasn't got a web backdoor nor a web file stager for %s" % self.webPlatform)
+            logger.error("sqlmap没有针对%s的Web后门或Web文件分段器" % self.webPlatform)
             return False
 
     def _webFileInject(self, fileContent, fileName, directory):
@@ -186,8 +185,7 @@ class Web(object):
         if not default:
             default = WEB_PLATFORM.ASP if Backend.isOs(OS.WINDOWS) else WEB_PLATFORM.PHP
 
-        message = "which web application language does the web server "
-        message += "support?\n"
+        message = "哪个Web应用程序语言支持？\n"
 
         for count in xrange(len(choices)):
             ext = choices[count]
@@ -202,18 +200,17 @@ class Web(object):
             choice = readInput(message, default=str(default))
 
             if not isDigit(choice):
-                logger.warning("invalid value, only digits are allowed")
+                logger.warning("无效的值，只允许输入数字")
 
             elif int(choice) < 1 or int(choice) > len(choices):
-                logger.warning("invalid value, it must be between 1 and %d" % len(choices))
+                logger.warning("无效的值，必须在1和%d之间" % len(choices))
 
             else:
                 self.webPlatform = choices[int(choice) - 1]
                 break
 
         if not kb.absFilePaths:
-            message = "do you want sqlmap to further try to "
-            message += "provoke the full path disclosure? [Y/n] "
+            message = "您是否希望sqlmap进一步尝试以探测全路径泄露？[Y/n] "
 
             if readInput(message, default='Y', boolean=True):
                 headers = {}
@@ -300,15 +297,14 @@ class Web(object):
                 directory += '/'
 
             # Upload the file stager with the LIMIT 0, 1 INTO DUMPFILE method
-            infoMsg = "trying to upload the file stager on '%s' " % directory
-            infoMsg += "via LIMIT 'LINES TERMINATED BY' method"
+            infoMsg = "尝试通过LIMIT 'LINES TERMINATED BY'方法上传文件分段器到'%s'" % directory
             logger.info(infoMsg)
             self._webFileInject(stagerContent, stagerName, directory)
 
             for match in re.finditer('/', directory):
                 self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                 self.webStagerUrl = _urllib.parse.urljoin(self.webBaseUrl, stagerName)
-                debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
+                debugMsg = "尝试查看文件是否可访问'%s'" % self.webStagerUrl
                 logger.debug(debugMsg)
 
                 uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
@@ -320,13 +316,11 @@ class Web(object):
 
             # Fall-back to UNION queries file upload method
             if not uploaded:
-                warnMsg = "unable to upload the file stager "
-                warnMsg += "on '%s'" % directory
+                warnMsg = "无法上传文件分段器到'%s'" % directory
                 singleTimeWarnMessage(warnMsg)
 
                 if isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
-                    infoMsg = "trying to upload the file stager on '%s' " % directory
-                    infoMsg += "via UNION method"
+                    infoMsg = "尝试通过UNION方法上传文件分段器到'%s'" % directory
                     logger.info(infoMsg)
 
                     stagerName = "tmpu%s.%s" % (randomStr(lowercase=True), self.webPlatform)
@@ -346,7 +340,7 @@ class Web(object):
                         self.webBaseUrl = "%s://%s:%d%s/" % (conf.scheme, conf.hostname, conf.port, directory[match.start():].rstrip('/'))
                         self.webStagerUrl = _urllib.parse.urljoin(self.webBaseUrl, stagerName)
 
-                        debugMsg = "trying to see if the file is accessible from '%s'" % self.webStagerUrl
+                        debugMsg = "尝试查看文件是否可访问'%s'" % self.webStagerUrl
                         logger.debug(debugMsg)
 
                         uplPage, _, _ = Request.getPage(url=self.webStagerUrl, direct=True, raise404=False)
@@ -360,8 +354,7 @@ class Web(object):
                 continue
 
             if "<%" in uplPage or "<?" in uplPage:
-                warnMsg = "file stager uploaded on '%s', " % directory
-                warnMsg += "but not dynamically interpreted"
+                warnMsg = "文件分段器上传到'%s'，但没有动态解释" % directory
                 logger.warning(warnMsg)
                 continue
 
@@ -369,8 +362,7 @@ class Web(object):
                 kb.data.__EVENTVALIDATION = extractRegexResult(EVENTVALIDATION_REGEX, uplPage)
                 kb.data.__VIEWSTATE = extractRegexResult(VIEWSTATE_REGEX, uplPage)
 
-            infoMsg = "the file stager has been successfully uploaded "
-            infoMsg += "on '%s' - %s" % (directory, self.webStagerUrl)
+            infoMsg = "文件分段器成功上传到'%s' - %s" % (directory, self.webStagerUrl)
             logger.info(infoMsg)
 
             if self.webPlatform == WEB_PLATFORM.ASP:
@@ -391,18 +383,11 @@ class Web(object):
 
             else:
                 if not self.webUpload(backdoorName, posixToNtSlashes(directory) if Backend.isOs(OS.WINDOWS) else directory, content=backdoorContent):
-                    warnMsg = "backdoor has not been successfully uploaded "
-                    warnMsg += "through the file stager possibly because "
-                    warnMsg += "the user running the web server process "
-                    warnMsg += "has not write privileges over the folder "
-                    warnMsg += "where the user running the DBMS process "
-                    warnMsg += "was able to upload the file stager or "
-                    warnMsg += "because the DBMS and web server sit on "
-                    warnMsg += "different servers"
+                    warnMsg = "后门可能未能通过文件分段器成功上传,可能是因为运行Web服务器进程的用户对用户运行的DBMS进程能够上传文件分段器的文件夹没有写权限,或者因为DBMS和Web服务器位于不同的服务器上"
+
                     logger.warning(warnMsg)
 
-                    message = "do you want to try the same method used "
-                    message += "for the file stager? [Y/n] "
+                    message = "您是否希望尝试使用与文件分段器相同的方法？[Y/n] "
 
                     if readInput(message, default='Y', boolean=True):
                         self._webFileInject(backdoorContent, backdoorName, directory)
@@ -418,13 +403,12 @@ class Web(object):
             output = self.webBackdoorRunCmd("echo %s" % testStr)
 
             if output == "0":
-                warnMsg = "the backdoor has been uploaded but required privileges "
-                warnMsg += "for running the system commands are missing"
+                warnMsg = "后门已上传，但需要运行系统命令的权限"
                 raise SqlmapNoneDataException(warnMsg)
             elif output and testStr in output:
-                infoMsg = "the backdoor has been successfully "
+                infoMsg = "后门已成功上传"
             else:
-                infoMsg = "the backdoor has probably been successfully "
+                infoMsg = "后门可能已成功上传"
 
             infoMsg += "uploaded on '%s' - " % self.webDirectory
             infoMsg += self.webBackdoorUrl

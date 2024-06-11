@@ -105,9 +105,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
 
     if kb.nullConnection and pageLength:
         if not seqMatcher.a:
-            errMsg = "problem occurred while retrieving original page content "
-            errMsg += "which prevents sqlmap from continuation. Please rerun, "
-            errMsg += "and if the problem persists turn off any optimization switches"
+            errMsg = "在检索原始页面内容时出现问题,导致sqlmap无法继续执行。请重新运行,并且如果问题仍然存在,请关闭任何优化开关"
             raise SqlmapNoneDataException(errMsg)
 
         ratio = 1. * pageLength / len(seqMatcher.a)
@@ -173,7 +171,7 @@ def _comparison(page, headers, code, getRatioValue, pageLength):
     if kb.matchRatio is None:
         if ratio >= LOWER_RATIO_BOUND and ratio <= UPPER_RATIO_BOUND:
             kb.matchRatio = ratio
-            logger.debug("setting match ratio for current parameter to %.3f" % kb.matchRatio)
+            logger.debug("将当前参数的匹配比例设置为 %.3f" % kb.matchRatio)
 
     if kb.testMode:
         threadData.lastComparisonRatio = ratio

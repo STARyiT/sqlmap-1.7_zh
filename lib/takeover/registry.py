@@ -64,7 +64,7 @@ class Registry(object):
         self._batPathFp.close()
 
     def _createRemoteBatchFile(self):
-        logger.debug("creating batch file '%s'" % self._batPathRemote)
+        logger.debug("正在创建批处理文件 '%s'" % self._batPathRemote)
 
         self._createLocalBatchFile()
         self.writeFile(self._batPathLocal, self._batPathRemote, "text", forceCheck=True)
@@ -77,7 +77,7 @@ class Registry(object):
         Registry._initVars(self, regKey, regValue, parse=parse)
         self._createRemoteBatchFile()
 
-        logger.debug("reading registry key '%s' value '%s'" % (regKey, regValue))
+        logger.debug("读取注册表键 '%s' 的值 '%s'" % (regKey, regValue))
 
         data = self.evalCmd(self._batPathRemote)
 
@@ -97,8 +97,7 @@ class Registry(object):
         Registry._initVars(self, regKey, regValue, regType, regData)
         self._createRemoteBatchFile()
 
-        debugMsg = "adding registry key value '%s' " % self._regValue
-        debugMsg += "to registry key '%s'" % self._regKey
+        debugMsg = "将注册表键值 '%s' 添加到注册表键 '%s'" % (self._regValue, self._regKey)
         logger.debug(debugMsg)
 
         self.execCmd(cmd=self._batPathRemote)
@@ -110,8 +109,7 @@ class Registry(object):
         Registry._initVars(self, regKey, regValue)
         self._createRemoteBatchFile()
 
-        debugMsg = "deleting registry key value '%s' " % self._regValue
-        debugMsg += "from registry key '%s'" % self._regKey
+        debugMsg = "从注册表键 '%s' 中删除注册表键值 '%s'" % (self._regKey, self._regValue)
         logger.debug(debugMsg)
 
         self.execCmd(cmd=self._batPathRemote)

@@ -24,6 +24,5 @@ class HTTPRangeHandler(_urllib.request.BaseHandler):
 
     def http_error_416(self, req, fp, code, msg, hdrs):
         # HTTP's Range Not Satisfiable error
-        errMsg = "there was a problem while connecting "
-        errMsg += "target ('406 - Range Not Satisfiable')"
+        errMsg = "连接目标时出现问题 ('406 - 范围不可满足')"
         raise SqlmapConnectionException(errMsg)

@@ -96,9 +96,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     timeBasedCompare = (getTechnique() in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if timeBasedCompare and conf.threads > 1 and kb.forceThreads is None:
-        msg = "multi-threading is considered unsafe in "
-        msg += "time-based data retrieval. Are you sure "
-        msg += "of your choice (breaking warranty) [y/N] "
+        msg = "在基于时间的数据检索中,多线程被认为是不安全的。你确定你的选择吗(违反保修)[y/N] "
 
         kb.forceThreads = readInput(msg, default='N', boolean=True)
 
@@ -127,7 +125,7 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
         kb.inferenceMode = False
 
         if not kb.bruteMode:
-            debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
+            debugMsg = "在%.2f秒内执行了%d个查询" % (calculateDeltaSeconds(start), count)
             logger.debug(debugMsg)
 
     return value
@@ -187,10 +185,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
         expressionFieldsList = [expressionFields]
 
     if len(expressionFieldsList) > 1:
-        infoMsg = "the SQL query provided has more than one field. "
-        infoMsg += "sqlmap will now unpack it into distinct queries "
-        infoMsg += "to be able to retrieve the output even if we "
-        infoMsg += "are going blind"
+        infoMsg = "提供的SQL查询有多个字段。sqlmap现在将将其拆分为不同的查询,以便能够检索输出,即使我们是盲目的"
         logger.info(infoMsg)
 
     # If we have been here from SQL query/shell we have to check if
@@ -226,11 +221,9 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                         if batch or count == 1:
                             stopLimit = count
                         else:
-                            message = "the SQL query provided can return "
-                            message += "%d entries. How many " % count
-                            message += "entries do you want to retrieve?\n"
-                            message += "[a] All (default)\n[#] Specific number\n"
-                            message += "[q] Quit"
+                            message = "提供的 SQL 查询可以返回 %d 条结果。你想要检索多少条结果？\n" % count
+                            message += "[a] 全部(默认)\n[#] 指定数量\n"
+                            message += "[q] 退出"
                             choice = readInput(message, default='A').upper()
 
                             if choice == 'A':
@@ -242,16 +235,15 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             elif isDigit(choice) and int(choice) > 0 and int(choice) <= count:
                                 stopLimit = int(choice)
 
-                                infoMsg = "sqlmap is now going to retrieve the "
-                                infoMsg += "first %d query output entries" % stopLimit
+                                infoMsg = "sqlmap现在将检索前%d个查询输出条目" % stopLimit
                                 logger.info(infoMsg)
 
                             elif choice in ('#', 'S'):
-                                message = "how many? "
+                                message = "数量多少? "
                                 stopLimit = readInput(message, default="10")
 
                                 if not isDigit(stopLimit):
-                                    errMsg = "invalid choice"
+                                    errMsg = "无效的选择"
                                     logger.error(errMsg)
 
                                     return None
@@ -260,24 +252,20 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                                     stopLimit = int(stopLimit)
 
                             else:
-                                errMsg = "invalid choice"
+                                errMsg = "无效的选择"
                                 logger.error(errMsg)
 
                                 return None
 
                     elif count and not isDigit(count):
-                        warnMsg = "it was not possible to count the number "
-                        warnMsg += "of entries for the SQL query provided. "
-                        warnMsg += "sqlmap will assume that it returns only "
-                        warnMsg += "one entry"
+                        warnMsg = "无法计算提供的SQL查询的条目数量。sqlmap将假设它只返回一个条目"
                         logger.warning(warnMsg)
 
                         stopLimit = 1
 
                     elif (not count or int(count) == 0):
                         if not count:
-                            warnMsg = "the SQL query provided does not "
-                            warnMsg += "return any output"
+                            warnMsg = "提供的SQL查询没有返回任何输出"
                             logger.warning(warnMsg)
 
                         return None
@@ -291,13 +279,12 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             output = _goInferenceFields(expression, expressionFields, expressionFieldsList, payload, num=num, charsetType=charsetType, firstChar=firstChar, lastChar=lastChar, dump=dump)
                             outputs.append(output)
                     except OverflowError:
-                        errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
-                        errMsg += "with switch '--fresh-queries'"
+                        errMsg = "边界限制(%d,%d)过大。请使用'--fresh-queries'开关重新运行。"
                         raise SqlmapDataException(errMsg)
 
                 except KeyboardInterrupt:
                     print()
-                    warnMsg = "user aborted during dumping phase"
+                    warnMsg = "用户在转储阶段中中止了操作"
                     logger.warning(warnMsg)
 
                 return outputs
@@ -366,7 +353,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
     if conf.hexConvert and expected != EXPECTED.BOOL and Backend.getIdentifiedDbms():
         if not hasattr(queries[Backend.getIdentifiedDbms()], "hex"):
-            warnMsg = "switch '--hex' is currently not supported on DBMS %s" % Backend.getIdentifiedDbms()
+            warnMsg = "在DBMS %s上,当前不支持'--hex'开关" % Backend.getIdentifiedDbms()
             singleTimeWarnMessage(warnMsg)
             conf.hexConvert = False
         else:
@@ -429,11 +416,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
                     if not found and fallback:
-                        warnMsg = "something went wrong with full UNION "
-                        warnMsg += "technique (could be because of "
-                        warnMsg += "limitation on retrieved number of entries)"
+                        warnMsg = "完整UNION技术出现问题(可能是由于检索到的条目数量限制引起的)"
                         if " FROM " in query.upper():
-                            warnMsg += ". Falling back to partial UNION technique"
+                            warnMsg += ".回退到部分UNION技术"
                             singleTimeWarnMessage(warnMsg)
 
                             try:
@@ -454,9 +439,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
 
                 if found and conf.dnsDomain:
                     _ = "".join(filterNone(key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items()))
-                    warnMsg = "option '--dns-domain' will be ignored "
-                    warnMsg += "as faster techniques are usable "
-                    warnMsg += "(%s) " % _
+                    warnMsg = "选项'--dns-domain'将被忽略,因为存在更快的可用技术(%s)" % _
                     singleTimeWarnMessage(warnMsg)
 
             if blind and isTechniqueAvailable(PAYLOAD.TECHNIQUE.BOOLEAN) and not found:
@@ -484,8 +467,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                 else:
                     value = _goInferenceProxy(query, fromUser, batch, unpack, charsetType, firstChar, lastChar, dump)
         else:
-            errMsg = "none of the injection types identified can be "
-            errMsg += "leveraged to retrieve queries output"
+            errMsg = "无法利用已识别的任何注入类型来检索查询输出"
             raise SqlmapNotVulnerableException(errMsg)
 
     finally:
@@ -501,9 +483,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.safeCharEncode = False
 
     if not any((kb.testMode, conf.dummy, conf.offline, conf.noCast, conf.hexConvert)) and value is None and Backend.getDbms() and conf.dbmsHandler and kb.fingerprinted:
-        warnMsg = "in case of continuous data retrieval problems you are advised to try "
-        warnMsg += "a switch '--no-cast' "
-        warnMsg += "or switch '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""
+        warnMsg = "如果持续遇到数据检索问题，建议尝试使用开关 '--no-cast' 或开关 '--hex'" if hasattr(queries[Backend.getIdentifiedDbms()], "hex") else ""
         singleTimeWarnMessage(warnMsg)
 
     # Dirty patch (MSSQL --binary-fields with 0x31003200...)

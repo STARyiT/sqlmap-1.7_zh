@@ -42,13 +42,13 @@ class UDF(object):
         self.udfToCreate = set()
 
     def _askOverwriteUdf(self, udf):
-        message = "UDF '%s' already exists, do you " % udf
-        message += "want to overwrite it? [y/N] "
+        message = "UDF '%s' 已经存在,你想要覆盖它吗？[y/N] " % udf
+
 
         return readInput(message, default='N', boolean=True)
 
     def _checkExistUdf(self, udf):
-        logger.info("checking if UDF '%s' already exist" % udf)
+        logger.info("检查 UDF '%s' 是否已经存在" % udf)
 
         query = agent.forgeCaseStatement(queries[Backend.getIdentifiedDbms()].check_udf.query % (udf, udf))
         return inject.getValue(query, resumeValue=False, expected=EXPECTED.BOOL, charsetType=CHARSET_TYPE.BINARY)
@@ -64,7 +64,7 @@ class UDF(object):
             self.udfToCreate.add(udf)
 
     def udfCreateSupportTbl(self, dataType):
-        debugMsg = "creating a support table for user-defined functions"
+        debugMsg = "正在创建支持用户定义函数的表"
         logger.debug(debugMsg)
 
         self.createSupportTbl(self.cmdTblName, self.tblField, dataType)
@@ -123,15 +123,15 @@ class UDF(object):
                 self.sysUdfs.pop("sys_exec")
 
     def udfSetRemotePath(self):
-        errMsg = "udfSetRemotePath() method must be defined within the plugin"
+        errMsg = "在插件中必须定义udfSetRemotePath()方法"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfSetLocalPaths(self):
-        errMsg = "udfSetLocalPaths() method must be defined within the plugin"
+        errMsg = "在插件中必须定义udfSetLocalPaths()方法"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfCreateFromSharedLib(self, udf, inpRet):
-        errMsg = "udfCreateFromSharedLib() method must be defined within the plugin"
+        errMsg = "在插件中必须定义udfCreateFromSharedLib()方法"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfInjectCore(self, udfDict):
@@ -149,13 +149,10 @@ class UDF(object):
             written = self.writeFile(self.udfLocalFile, self.udfRemoteFile, "binary", forceCheck=True)
 
             if written is not True:
-                errMsg = "there has been a problem uploading the shared library, "
-                errMsg += "it looks like the binary file has not been written "
-                errMsg += "on the database underlying file system"
+                errMsg = "上传共享库时出现问题,似乎二进制文件未写入数据库底层文件系统"
                 logger.error(errMsg)
 
-                message = "do you want to proceed anyway? Beware that the "
-                message += "operating system takeover will fail [y/N] "
+                message = "您是否仍要继续？请注意,操作系统接管将失败 [y/N] "
 
                 if readInput(message, default='N', boolean=True):
                     written = True
@@ -184,24 +181,23 @@ class UDF(object):
 
     def udfInjectCustom(self):
         if Backend.getIdentifiedDbms() not in (DBMS.MYSQL, DBMS.PGSQL):
-            errMsg = "UDF injection feature only works on MySQL and PostgreSQL"
+            errMsg = "UDF注入功能仅适用于MySQL和PostgreSQL"
             logger.error(errMsg)
             return
 
         if not isStackingAvailable() and not conf.direct:
-            errMsg = "UDF injection feature requires stacked queries SQL injection"
+            errMsg = "UDF注入功能需要堆叠查询SQL注入"
             logger.error(errMsg)
             return
 
         self.checkDbmsOs()
 
         if not self.isDba():
-            warnMsg = "functionality requested probably does not work because "
-            warnMsg += "the current session user is not a database administrator"
+            warnMsg = "由于当前会话用户不是数据库管理员,所以请求的功能可能无法正常工作"
             logger.warning(warnMsg)
 
         if not conf.shLib:
-            msg = "what is the local path of the shared library? "
+            msg = "共享库的本地路径是什么？"
 
             while True:
                 self.udfLocalFile = readInput(msg)
@@ -209,33 +205,30 @@ class UDF(object):
                 if self.udfLocalFile:
                     break
                 else:
-                    logger.warning("you need to specify the local path of the shared library")
+                    logger.warning("您需要指定共享库的本地路径")
         else:
             self.udfLocalFile = conf.shLib
 
         if not os.path.exists(self.udfLocalFile):
-            errMsg = "the specified shared library file does not exist"
+            errMsg = "指定的共享库文件不存在"
             raise SqlmapFilePathException(errMsg)
 
         if not self.udfLocalFile.endswith(".dll") and not self.udfLocalFile.endswith(".so"):
-            errMsg = "shared library file must end with '.dll' or '.so'"
+            errMsg = "共享库文件必须以'.dll'或'.so'结尾"
             raise SqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".so") and Backend.isOs(OS.WINDOWS):
-            errMsg = "you provided a shared object as shared library, but "
-            errMsg += "the database underlying operating system is Windows"
+            errMsg = "您提供的共享对象作为共享库,但数据库底层操作系统是Windows"
             raise SqlmapMissingMandatoryOptionException(errMsg)
 
         elif self.udfLocalFile.endswith(".dll") and Backend.isOs(OS.LINUX):
-            errMsg = "you provided a dynamic-link library as shared library, "
-            errMsg += "but the database underlying operating system is Linux"
+            errMsg = "您提供的动态链接库作为共享库,但数据库底层操作系统是Linux"
             raise SqlmapMissingMandatoryOptionException(errMsg)
 
         self.udfSharedLibName = os.path.basename(self.udfLocalFile).split(".")[0]
         self.udfSharedLibExt = os.path.basename(self.udfLocalFile).split(".")[1]
 
-        msg = "how many user-defined functions do you want to create "
-        msg += "from the shared library? "
+        msg = "您想从共享库中创建多少个用户定义函数？"
 
         while True:
             udfCount = readInput(msg, default='1')
@@ -244,23 +237,23 @@ class UDF(object):
                 udfCount = int(udfCount)
 
                 if udfCount <= 0:
-                    logger.info("nothing to inject then")
+                    logger.info("没有能注入的内容")
                     return
                 else:
                     break
             else:
-                logger.warning("invalid value, only digits are allowed")
+                logger.warning("无效值,仅允许数字")
 
         for x in xrange(0, udfCount):
             while True:
-                msg = "what is the name of the UDF number %d? " % (x + 1)
+                msg = "第%d个用户定义函数的名称是什么？" % (x + 1)
                 udfName = readInput(msg)
 
                 if udfName:
                     self.udfs[udfName] = {}
                     break
                 else:
-                    logger.warning("you need to specify the name of the UDF")
+                    logger.warning("您需要指定UDF的名称")
 
             if Backend.isDbms(DBMS.MYSQL):
                 defaultType = "string"
@@ -269,8 +262,7 @@ class UDF(object):
 
             self.udfs[udfName]["input"] = []
 
-            msg = "how many input parameters takes UDF "
-            msg += "'%s'? (default: 1) " % udfName
+            msg = "UDF '%s'接受多少个输入参数？(default:1)" % udfName
 
             while True:
                 parCount = readInput(msg, default='1')
@@ -280,30 +272,28 @@ class UDF(object):
                     break
 
                 else:
-                    logger.warning("invalid value, only digits >= 0 are allowed")
+                    logger.warning("无效值,仅允许大于等于0的数字")
 
             for y in xrange(0, parCount):
-                msg = "what is the data-type of input parameter "
-                msg += "number %d? (default: %s) " % ((y + 1), defaultType)
+                msg = "输入参数%d的数据类型是什么? (default:%s)" % ((y + 1), defaultType)
 
                 while True:
                     parType = readInput(msg, default=defaultType).strip()
 
                     if parType.isdigit():
-                        logger.warning("you need to specify the data-type of the parameter")
+                        logger.warning("您需要指定参数的数据类型")
 
                     else:
                         self.udfs[udfName]["input"].append(parType)
                         break
 
-            msg = "what is the data-type of the return "
-            msg += "value? (default: %s) " % defaultType
+            msg = "返回值的数据类型是什么？(default:%s)" % defaultType
 
             while True:
                 retType = readInput(msg, default=defaultType)
 
                 if hasattr(retType, "isdigit") and retType.isdigit():
-                    logger.warning("you need to specify the data-type of the return value")
+                    logger.warning("您需要指定返回值的数据类型")
                 else:
                     self.udfs[udfName]["return"] = retType
                     break
@@ -314,8 +304,7 @@ class UDF(object):
             self.cleanup(udfDict=self.udfs)
             return False
 
-        msg = "do you want to call your injected user-defined "
-        msg += "functions now? [Y/n/q] "
+        msg = "您是否要立即调用您注入的用户定义函数？[Y/n/q] "
         choice = readInput(msg, default='Y').upper()
 
         if choice == 'N':
@@ -327,7 +316,7 @@ class UDF(object):
 
         while True:
             udfList = []
-            msg = "which UDF do you want to call?"
+            msg = "你想调用哪个 UDF 函数？"
 
             for udf in self.udfs.keys():
                 udfList.append(udf)
@@ -344,8 +333,7 @@ class UDF(object):
                     choice = int(choice)
                     break
                 else:
-                    warnMsg = "invalid value, only digits >= 1 and "
-                    warnMsg += "<= %d are allowed" % len(udfList)
+                    warnMsg = "无效的值,只允许输入大于等于1且小于等于%d的数字" % len(udfList)
                     logger.warning(warnMsg)
 
             if not isinstance(choice, int):
@@ -356,8 +344,7 @@ class UDF(object):
             udfToCall = udfList[choice - 1]
 
             for inp in self.udfs[udfToCall]["input"]:
-                msg = "what is the value of the parameter number "
-                msg += "%d (data-type: %s)? " % (count, inp)
+                msg = "参数%d的值是多少(数据类型:%s)？" % (count, inp)
 
                 while True:
                     parValue = readInput(msg)
@@ -370,25 +357,24 @@ class UDF(object):
 
                         break
                     else:
-                        logger.warning("you need to specify the value of the parameter")
+                        logger.warning("您需要指定参数的值")
 
                 count += 1
 
             cmd = cmd[:-1]
-            msg = "do you want to retrieve the return value of the "
-            msg += "UDF? [Y/n] "
+            msg = "你想要获取 UDF 的返回值吗？[Y/n] "
 
             if readInput(msg, default='Y', boolean=True):
                 output = self.udfEvalCmd(cmd, udfName=udfToCall)
 
                 if output:
-                    conf.dumper.string("return value", output)
+                    conf.dumper.string("返回值", output)
                 else:
-                    dataToStdout("No return value\n")
+                    dataToStdout("无返回值\n")
             else:
                 self.udfExecCmd(cmd, udfName=udfToCall, silent=True)
 
-            msg = "do you want to call this or another injected UDF? [Y/n] "
+            msg = "你想要调用这个注入的 UDF 还是另一个 UDF？[Y/n] "
 
             if not readInput(msg, default='Y', boolean=True):
                 break

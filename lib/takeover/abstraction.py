@@ -59,7 +59,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
             self.xpCmdshellExecCmd(cmd, silent=silent)
 
         else:
-            errMsg = "Feature not yet implemented for the back-end DBMS"
+            errMsg = "后端数据库管理系统尚未实现此功能"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
     def evalCmd(self, cmd, first=None, last=None):
@@ -78,7 +78,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
             retVal = self.xpCmdshellEvalCmd(cmd, first, last)
 
         else:
-            errMsg = "Feature not yet implemented for the back-end DBMS"
+            errMsg = "后端数据库管理系统尚未实现此功能"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
         return safechardecode(retVal)
@@ -87,8 +87,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
         choice = None
 
         if not self.alwaysRetrieveCmdOutput:
-            message = "do you want to retrieve the command standard "
-            message += "output? [Y/n/a] "
+            message = "您是否要检索命令的标准输出？[Y/n/a] "
             choice = readInput(message, default='Y').upper()
 
             if choice == 'A':
@@ -106,33 +105,27 @@ class Abstraction(Web, UDF, XP_cmdshell):
 
     def shell(self):
         if self.webBackdoorUrl and (not isStackingAvailable() or kb.udfFail):
-            infoMsg = "calling OS shell. To quit type "
-            infoMsg += "'x' or 'q' and press ENTER"
+            infoMsg = "正在调用操作系统shell。要退出,请输入'x'或'q'并按下回车键"
             logger.info(infoMsg)
 
         else:
             if Backend.isDbms(DBMS.PGSQL) and self.checkCopyExec():
-                infoMsg = "going to use 'COPY ... FROM PROGRAM ...' "
-                infoMsg += "command execution"
+                infoMsg = "将使用 'COPY ... FROM PROGRAM ...' 命令执行"
                 logger.info(infoMsg)
 
             elif Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                infoMsg = "going to use injected user-defined functions "
-                infoMsg += "'sys_eval' and 'sys_exec' for operating system "
-                infoMsg += "command execution"
+                infoMsg = "将使用注入的用户定义函数 'sys_eval' 和 'sys_exec' 进行操作系统命令执行"
                 logger.info(infoMsg)
 
             elif Backend.isDbms(DBMS.MSSQL):
-                infoMsg = "going to use extended procedure 'xp_cmdshell' for "
-                infoMsg += "operating system command execution"
+                infoMsg = "将使用扩展过程 'xp_cmdshell' 进行操作系统命令执行"
                 logger.info(infoMsg)
 
             else:
-                errMsg = "feature not yet implemented for the back-end DBMS"
+                errMsg = "后端数据库管理系统尚未实现此功能"
                 raise SqlmapUnsupportedFeatureException(errMsg)
 
-            infoMsg = "calling %s OS shell. To quit type " % (Backend.getOs() or "Windows")
-            infoMsg += "'x' or 'q' and press ENTER"
+            infoMsg = "正在调用 %s 操作系统shell。要退出，请输入'x'或'q'并按下回车键" % (Backend.getOs() or "Windows")
             logger.info(infoMsg)
 
         autoCompletion(AUTOCOMPLETE_TYPE.OS, OS.WINDOWS if Backend.isOs(OS.WINDOWS) else OS.LINUX)
@@ -145,7 +138,7 @@ class Abstraction(Web, UDF, XP_cmdshell):
                 command = getUnicode(command, encoding=sys.stdin.encoding)
             except KeyboardInterrupt:
                 print()
-                errMsg = "user aborted"
+                errMsg = "用户中止"
                 logger.error(errMsg)
             except EOFError:
                 print()
@@ -166,20 +159,13 @@ class Abstraction(Web, UDF, XP_cmdshell):
             return
 
         if not conf.direct and not isStackingAvailable():
-            errMsg = "stacked queries are not supported hence sqlmap cannot "
-            errMsg += "execute statements as another user. The execution "
-            errMsg += "will continue and the DBMS credentials provided "
-            errMsg += "will simply be ignored"
+            errMsg = "不支持堆叠查询,因此sqlmap无法将语句作为另一个用户执行。执行将继续进行,提供的DBMS凭据将被忽略"
             logger.error(errMsg)
 
             return
 
         if Backend.isDbms(DBMS.MSSQL):
-            msg = "on Microsoft SQL Server 2005 and 2008, OPENROWSET function "
-            msg += "is disabled by default. This function is needed to execute "
-            msg += "statements as another DBMS user since you provided the "
-            msg += "option '--dbms-creds'. If you are DBA, you can enable it. "
-            msg += "Do you want to enable it? [Y/n] "
+            msg = "在Microsoft SQL Server 2005和2008上,默认情况下禁用了OPENROWSET函数。由于您提供了'--dbms-creds'选项,此函数需要用于以另一个DBMS用户身份执行语句。如果您是DBA,可以启用它。您是否要启用它？[Y/n] "
 
             if readInput(msg, default='Y', boolean=True):
                 expression = getSQLSnippet(DBMS.MSSQL, "configure_openrowset", ENABLE="1")
@@ -202,14 +188,10 @@ class Abstraction(Web, UDF, XP_cmdshell):
             self.checkDbmsOs(detailed)
 
             if mandatory and not self.isDba():
-                warnMsg = "functionality requested probably does not work because "
-                warnMsg += "the current session user is not a database administrator"
+                warnMsg = "由于当前会话用户不是数据库管理员,所以请求的功能可能无法正常工作"
 
                 if not conf.dbmsCred and Backend.getIdentifiedDbms() in (DBMS.MSSQL, DBMS.PGSQL):
-                    warnMsg += ". You can try to use option '--dbms-cred' "
-                    warnMsg += "to execute statements as a DBA user if you "
-                    warnMsg += "were able to extract and crack a DBA "
-                    warnMsg += "password by any mean"
+                    warnMsg += "。如果您能够通过任何方式提取和破解DBA密码,您可以尝试使用'--dbms-cred'选项以DBA用户的身份执行语句"
 
                 logger.warning(warnMsg)
 
@@ -219,13 +201,13 @@ class Abstraction(Web, UDF, XP_cmdshell):
                 success = self.udfInjectSys()
 
                 if success is not True:
-                    msg = "unable to mount the operating system takeover"
+                    msg = "无法进行操作系统接管"
                     raise SqlmapFilePathException(msg)
             elif Backend.isDbms(DBMS.MSSQL):
                 if mandatory:
                     self.xpCmdshellInit()
             else:
-                errMsg = "feature not yet implemented for the back-end DBMS"
+                errMsg = "后端数据库管理系统尚未实现此功能"
                 raise SqlmapUnsupportedFeatureException(errMsg)
 
         self.envInitialized = True

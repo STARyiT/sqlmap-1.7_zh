@@ -49,16 +49,12 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
     def _ask_redirect_choice(self, redcode, redurl, method):
         with kb.locks.redirect:
             if kb.choices.redirect is None:
-                msg = "got a %d redirect to " % redcode
-                msg += "'%s'. Do you want to follow? [Y/n] " % redurl
+                msg = "收到 %d 的重定向到 '%s'。你想要跟随吗？[Y/n] " % (redcode, redurl)
 
                 kb.choices.redirect = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO
 
             if kb.choices.redirect == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
-                msg = "redirect is a result of a "
-                msg += "POST request. Do you want to "
-                msg += "resend original POST data to a new "
-                msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
+                msg = "重定向是由于 POST 请求的结果。你想要将原始的 POST 数据重新发送到新的位置吗？[%s] " % ("Y/n" if not kb.originalPage else "y/N")
 
                 kb.resendPostOnRedirect = readInput(msg, default=('Y' if not kb.originalPage else 'N'), boolean=True)
 
@@ -90,7 +86,7 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
         threadData = getCurrentThreadData()
         threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
 
-        redirectMsg = "HTTP redirect "
+        redirectMsg = "HTTP重定向 "
         redirectMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
@@ -190,6 +186,5 @@ class SmartRedirectHandler(_urllib.request.HTTPRedirectHandler):
 
     def _infinite_loop_check(self, req):
         if hasattr(req, 'redirect_dict') and (req.redirect_dict.get(req.get_full_url(), 0) >= MAX_SINGLE_URL_REDIRECTIONS or len(req.redirect_dict) >= MAX_TOTAL_REDIRECTIONS):
-            errMsg = "infinite redirect loop detected (%s). " % ", ".join(item for item in req.redirect_dict.keys())
-            errMsg += "Please check all provided parameters and/or provide missing ones"
+            errMsg = "检测到无限重定向循环(%s)。请检查所有提供的参数并/或提供缺失的参数 " % ", ".join(item for item in req.redirect_dict.keys())
             raise SqlmapConnectionException(errMsg)

@@ -48,7 +48,7 @@ class XP_cmdshell(object):
         cmd = ""
 
         if not Backend.isVersionWithin(("2000",)):
-            logger.debug("activating sp_OACreate")
+            logger.debug("激活sp_OACreate")
 
             cmd = getSQLSnippet(DBMS.MSSQL, "activate_sp_oacreate")
             inject.goStacked(agent.runAsDBMSUser(cmd))
@@ -64,8 +64,7 @@ class XP_cmdshell(object):
         inject.goStacked(agent.runAsDBMSUser(cmd))
 
     def _xpCmdshellConfigure2005(self, mode):
-        debugMsg = "configuring xp_cmdshell using sp_configure "
-        debugMsg += "stored procedure"
+        debugMsg = "配置xp_cmdshell使用sp_configure存储过程"
         logger.debug(debugMsg)
 
         cmd = getSQLSnippet(DBMS.MSSQL, "configure_xp_cmdshell", ENABLE=str(mode))
@@ -73,8 +72,7 @@ class XP_cmdshell(object):
         return cmd
 
     def _xpCmdshellConfigure2000(self, mode):
-        debugMsg = "configuring xp_cmdshell using sp_addextendedproc "
-        debugMsg += "stored procedure"
+        debugMsg = "配置xp_cmdshell使用sp_addextendedproc存储过程"
         logger.debug(debugMsg)
 
         if mode == 1:
@@ -104,23 +102,18 @@ class XP_cmdshell(object):
         pushValue(threadData.disableStdOut)
         threadData.disableStdOut = True
 
-        logger.info("testing if xp_cmdshell extended procedure is usable")
+        logger.info("测试xp_cmdshell扩展存储过程是否可用")
         output = self.xpCmdshellEvalCmd("echo 1")
 
         if output == "1":
-            logger.info("xp_cmdshell extended procedure is usable")
+            logger.info("xp_cmdshell扩展存储过程可用")
         elif isNoneValue(output) and conf.dbmsCred:
-            errMsg = "it seems that the temporary directory ('%s') used for " % self.getRemoteTempPath()
-            errMsg += "storing console output within the back-end file system "
-            errMsg += "does not have writing permissions for the DBMS process. "
-            errMsg += "You are advised to manually adjust it with option "
-            errMsg += "'--tmp-path' or you won't be able to retrieve "
-            errMsg += "the command(s) output"
+            errMsg = "似乎用于在后端文件系统中存储控制台输出的临时目录('%s')对于DBMS进程没有写入权限。建议您使用'--tmp-path'选项手动调整它,否则您将无法检索到命令的输出" % self.getRemoteTempPath()
             logger.error(errMsg)
         elif isNoneValue(output):
-            logger.error("unable to retrieve xp_cmdshell output")
+            logger.error("无法检索xp_cmdshell输出")
         else:
-            logger.info("xp_cmdshell extended procedure is usable")
+            logger.info("xp_cmdshell扩展存储过程可用")
 
         threadData.disableStdOut = popValue()
 
@@ -247,52 +240,47 @@ class XP_cmdshell(object):
 
     def xpCmdshellInit(self):
         if not kb.xpCmdshellAvailable:
-            infoMsg = "checking if xp_cmdshell extended procedure is "
-            infoMsg += "available, please wait.."
+            infoMsg = "检查xp_cmdshell扩展存储过程是否可用，请稍等片刻..."
             logger.info(infoMsg)
 
             result = self._xpCmdshellCheck()
 
             if result:
-                logger.info("xp_cmdshell extended procedure is available")
+                logger.info("xp_cmdshell扩展存储过程可用")
                 kb.xpCmdshellAvailable = True
 
             else:
-                message = "xp_cmdshell extended procedure does not seem to "
-                message += "be available. Do you want sqlmap to try to "
-                message += "re-enable it? [Y/n] "
+                message = "xp_cmdshell扩展存储过程似乎不可用。您是否希望sqlmap尝试重新启用它？[Y/n] "
 
                 if readInput(message, default='Y', boolean=True):
                     self._xpCmdshellConfigure(1)
 
                     if self._xpCmdshellCheck():
-                        logger.info("xp_cmdshell re-enabled successfully")
+                        logger.info("xp_cmdshell重新启用成功")
                         kb.xpCmdshellAvailable = True
 
                     else:
-                        logger.warning("xp_cmdshell re-enabling failed")
+                        logger.warning("xp_cmdshell重新启用失败")
 
-                        logger.info("creating xp_cmdshell with sp_OACreate")
+                        logger.info("使用sp_OACreate创建xp_cmdshell")
                         self._xpCmdshellConfigure(0)
                         self._xpCmdshellCreate()
 
                         if self._xpCmdshellCheck():
-                            logger.info("xp_cmdshell created successfully")
+                            logger.info("xp_cmdshell创建成功")
                             kb.xpCmdshellAvailable = True
 
                         else:
-                            warnMsg = "xp_cmdshell creation failed, probably "
-                            warnMsg += "because sp_OACreate is disabled"
+                            warnMsg = "xp_cmdshell创建失败，可能是因为sp_OACreate被禁用"
                             logger.warning(warnMsg)
 
             hashDBWrite(HASHDB_KEYS.KB_XP_CMDSHELL_AVAILABLE, kb.xpCmdshellAvailable)
 
             if not kb.xpCmdshellAvailable:
-                errMsg = "unable to proceed without xp_cmdshell"
+                errMsg = "无法继续，没有xp_cmdshell"
                 raise SqlmapUnsupportedFeatureException(errMsg)
 
-        debugMsg = "creating a support table to write commands standard "
-        debugMsg += "output to"
+        debugMsg = "创建支持表以写入命令标准输出"
         logger.debug(debugMsg)
 
         # TEXT can't be used here because in error technique you get:

@@ -152,7 +152,7 @@ class Connect(object):
     def _getPageProxy(**kwargs):
         try:
             if (len(inspect.stack()) > sys.getrecursionlimit() // 2):   # Note: https://github.com/sqlmapproject/sqlmap/issues/4525
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标URL"
                 raise SqlmapConnectionException(warnMsg)
         except (TypeError, UnicodeError):
             pass
@@ -168,7 +168,7 @@ class Connect(object):
         threadData.retriesCount += 1
 
         if conf.proxyList and threadData.retriesCount >= conf.retries and not kb.locks.handlers.locked():
-            warnMsg = "changing proxy"
+            warnMsg = "正在更改代理"
             logger.warning(warnMsg)
 
             conf.proxy = None
@@ -179,43 +179,31 @@ class Connect(object):
         if kb.testMode and kb.previousMethod == PAYLOAD.METHOD.TIME:
             # timed based payloads can cause web server unresponsiveness
             # if the injectable piece of code is some kind of JOIN-like query
-            warnMsg = "most likely web server instance hasn't recovered yet "
-            warnMsg += "from previous timed based payload. If the problem "
-            warnMsg += "persists please wait for a few minutes and rerun "
-            warnMsg += "without flag 'T' in option '--technique' "
-            warnMsg += "(e.g. '--flush-session --technique=BEUS') or try to "
-            warnMsg += "lower the value of option '--time-sec' (e.g. '--time-sec=2')"
+            warnMsg = "很可能Web服务器实例尚未从先前的基于时间的负载恢复。如果问题仍然存在,请等待几分钟后重新运行,不要在选项'--technique'中使用标志'T'(e.g. '--flush-session --technique=BEUS'),或尝试降低选项'--time-sec'的值(e.g. '--time-sec=2')"
             singleTimeWarnMessage(warnMsg)
 
         elif kb.originalPage is None:
             if conf.tor:
-                warnMsg = "please make sure that you have "
-                warnMsg += "Tor installed and running so "
-                warnMsg += "you could successfully use "
-                warnMsg += "switch '--tor' "
+                warnMsg = "请确保您已安装并运行Tor,以便成功使用'--tor'开关"
                 if IS_WIN:
                     warnMsg += "(e.g. 'https://www.torproject.org/download/')"
                 else:
                     warnMsg += "(e.g. 'https://help.ubuntu.com/community/Tor')"
             else:
-                warnMsg = "if the problem persists please check that the provided "
-                warnMsg += "target URL is reachable"
+                warnMsg = "如果问题仍然存在,请检查提供的目标URL是否可访问"
 
                 items = []
                 if not conf.randomAgent:
-                    items.append("switch '--random-agent'")
+                    items.append("开关 '--random-agent'")
                 if not any((conf.proxy, conf.proxyFile, conf.tor)):
-                    items.append("proxy switches ('--proxy', '--proxy-file'...)")
+                    items.append("代理开关 ('--proxy', '--proxy-file'...)")
                 if items:
-                    warnMsg += ". In case that it is, "
-                    warnMsg += "you can try to rerun with "
-                    warnMsg += " and/or ".join(items)
+                    warnMsg += "。如果是这样,请尝试使用" + "和/或".join(items) + "重新运行"
 
             singleTimeWarnMessage(warnMsg)
 
         elif conf.threads > 1:
-            warnMsg = "if the problem persists please try to lower "
-            warnMsg += "the number of used threads (option '--threads')"
+            warnMsg = "如果问题仍然存在,请尝试降低使用的线程数(option '--threads')"
             singleTimeWarnMessage(warnMsg)
 
         kwargs['retrying'] = True
@@ -230,7 +218,7 @@ class Connect(object):
             if kb.pageCompress and headers and hasattr(headers, "getheader") and (headers.getheader(HTTP_HEADER.CONTENT_ENCODING, "").lower() in ("gzip", "deflate") or "text" not in headers.getheader(HTTP_HEADER.CONTENT_TYPE, "").lower()):
                 retVal = conn.read(MAX_CONNECTION_TOTAL_SIZE)
                 if len(retVal) == MAX_CONNECTION_TOTAL_SIZE:
-                    warnMsg = "large compressed response detected. Disabling compression"
+                    warnMsg = "检测到大压缩响应。关闭压缩"
                     singleTimeWarnMessage(warnMsg)
                     kb.pageCompress = False
                     raise SqlmapCompressionException
@@ -245,7 +233,7 @@ class Connect(object):
                             part = b""
 
                     if len(part) == MAX_CONNECTION_READ_SIZE:
-                        warnMsg = "large response detected. This could take a while"
+                        warnMsg = "检测到大响应。这可能需要一些时间"
                         singleTimeWarnMessage(warnMsg)
                         part = re.sub(getBytes(r"(?si)%s.+?%s" % (kb.chars.stop, kb.chars.start)), getBytes("%s%s%s" % (kb.chars.stop, LARGE_READ_TRIM_MARKER, kb.chars.start)), part)
                         retVal += part
@@ -254,7 +242,7 @@ class Connect(object):
                         break
 
                     if len(retVal) > MAX_CONNECTION_TOTAL_SIZE:
-                        warnMsg = "too large response detected. Automatically trimming it"
+                        warnMsg = "检测到大响应。自动截断"
                         singleTimeWarnMessage(warnMsg)
                         break
 
@@ -311,7 +299,7 @@ class Connect(object):
                 if kb.requestCounter % conf.proxyFreq == 0:
                     conf.proxy = None
 
-                    warnMsg = "changing proxy"
+                    warnMsg = "正在更改代理"
                     logger.warning(warnMsg)
 
                     setHTTPHandlers()
@@ -330,7 +318,7 @@ class Connect(object):
         if conf.liveCookies:
             with kb.locks.liveCookies:
                 if not checkFile(conf.liveCookies, raiseOnError=False) or os.path.getsize(conf.liveCookies) == 0:
-                    warnMsg = "[%s] [WARNING] live cookies file '%s' is empty or non-existent. Waiting for timeout (%d seconds)" % (time.strftime("%X"), conf.liveCookies, LIVE_COOKIES_TIMEOUT)
+                    warnMsg = "[%s] [WARNING] 存活cookies文件 '%s' 为空或不存在。等待超时(%d秒)" % (time.strftime("%X"), conf.liveCookies, LIVE_COOKIES_TIMEOUT)
                     dataToStdout(warnMsg)
 
                     valid = False
@@ -345,7 +333,7 @@ class Connect(object):
                     dataToStdout("\n")
 
                     if not valid:
-                        errMsg = "problem occurred while loading cookies from file '%s'" % conf.liveCookies
+                        errMsg = "从文件 '%s' 加载cookies时出现问题" % conf.liveCookies
                         raise SqlmapValueException(errMsg)
 
                 cookie = openFile(conf.liveCookies).read().strip()
@@ -472,8 +460,8 @@ class Connect(object):
                 headers[HTTP_HEADER.CONTENT_TYPE] = POST_HINT_CONTENT_TYPES.get(kb.postHint, DEFAULT_CONTENT_TYPE if unArrayizeValue(conf.base64Parameter) != HTTPMETHOD.POST else PLAIN_TEXT_CONTENT_TYPE)
 
             if headers.get(HTTP_HEADER.CONTENT_TYPE) == POST_HINT_CONTENT_TYPES[POST_HINT.MULTIPART]:
-                warnMsg = "missing 'boundary parameter' in '%s' header. " % HTTP_HEADER.CONTENT_TYPE
-                warnMsg += "Will try to reconstruct"
+                warnMsg = "在 '%s' 头部中缺少 'boundary参数'。" % HTTP_HEADER.CONTENT_TYPE
+                warnMsg += "尝试重新构造"
                 singleTimeWarnMessage(warnMsg)
 
                 boundary = findMultipartPostBoundary(conf.data)
@@ -577,8 +565,7 @@ class Connect(object):
                     try:
                         function(req)
                     except Exception as ex:
-                        errMsg = "error occurred while running preprocess "
-                        errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                        errMsg = "运行预处理函数'%s'时发生错误('%s')" % (function.__name__, getSafeExString(ex))
                         raise SqlmapGenericException(errMsg)
                     else:
                         post, headers = req.data, req.headers
@@ -664,21 +651,19 @@ class Connect(object):
                 if extractRegexResult(META_REFRESH_REGEX, page):
                     refresh = extractRegexResult(META_REFRESH_REGEX, page)
 
-                    debugMsg = "got HTML meta refresh header"
+                    debugMsg = "获取到HTML的meta refresh头部"
                     logger.debug(debugMsg)
 
                 if not refresh:
                     refresh = extractRegexResult(JAVASCRIPT_HREF_REGEX, page)
 
                     if refresh:
-                        debugMsg = "got Javascript redirect logic"
+                        debugMsg = "获取到Javascript重定向逻辑"
                         logger.debug(debugMsg)
 
                 if refresh:
                     if kb.alwaysRefresh is None:
-                        msg = "got a refresh intent "
-                        msg += "(redirect like response common to login pages) to '%s'. " % refresh
-                        msg += "Do you want to apply it from now on? [Y/n]"
+                        msg = "检测到刷新意图(类似于登录页面的重定向)到'%s'。您是否希望从现在开始应用它？[Y/n]"
 
                         kb.alwaysRefresh = readInput(msg, default='Y', boolean=True)
 
@@ -706,12 +691,12 @@ class Connect(object):
                         conn.fp._sock.close()
                     conn.close()
                 except Exception as ex:
-                    warnMsg = "problem occurred during connection closing ('%s')" % getSafeExString(ex)
+                    warnMsg = "连接关闭时发生问题('%s')" % getSafeExString(ex)
                     logger.warning(warnMsg)
 
         except SqlmapConnectionException as ex:
             if conf.proxyList and not kb.threadException:
-                warnMsg = "unable to connect to the target URL ('%s')" % getSafeExString(ex)
+                warnMsg = "无法连接到目标URL('%s')" % getSafeExString(ex)
                 logger.critical(warnMsg)
                 threadData.retriesCount = conf.retries
                 return Connect._retryProxy(**kwargs)
@@ -732,8 +717,7 @@ class Connect(object):
                 responseHeaders = patchHeaders(responseHeaders)
                 page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE), percentDecode=not crawling)
             except socket.timeout:
-                warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % ex.code
+                warnMsg = "在尝试获取错误页面信息时连接超时(%d)" % ex.code
                 logger.warning(warnMsg)
                 return None, None, None
             except KeyboardInterrupt:
@@ -769,35 +753,32 @@ class Connect(object):
 
             if ex.code not in (conf.ignoreCode or []):
                 if ex.code == _http_client.UNAUTHORIZED:
-                    errMsg = "not authorized, try to provide right HTTP "
-                    errMsg += "authentication type and valid credentials (%d). " % code
-                    errMsg += "If this is intended, try to rerun by providing "
-                    errMsg += "a valid value for option '--ignore-code'"
+                    errMsg = "未经授权,尝试提供正确的HTTP身份验证类型和凭证(%d). " % code
+                    errMsg += "如果这意味着您想要重新运行,请提供一个有效的值给选项'--ignore-code'"
                     raise SqlmapConnectionException(errMsg)
                 elif chunked and ex.code in (_http_client.METHOD_NOT_ALLOWED, _http_client.LENGTH_REQUIRED):
-                    warnMsg = "turning off HTTP chunked transfer encoding "
-                    warnMsg += "as it seems that the target site doesn't support it (%d)" % code
+                    warnMsg = "关闭HTTP块传输编码,因为目标站点不支持它(%d)" % code
                     singleTimeWarnMessage(warnMsg)
                     conf.chunked = kwargs["chunked"] = False
                     return Connect.getPage(**kwargs)
                 elif ex.code == _http_client.REQUEST_URI_TOO_LONG:
-                    warnMsg = "request URI is marked as too long by the target. "
-                    warnMsg += "you are advised to try a switch '--no-cast' and/or '--no-escape'"
+                    warnMsg = "请求URI被目标标记为太长。"
+                    warnMsg += "建议尝试开关'--no-cast'和/或'--no-escape'"
                     singleTimeWarnMessage(warnMsg)
                 elif ex.code == _http_client.NOT_FOUND:
                     if raise404:
-                        errMsg = "page not found (%d)" % code
+                        errMsg = "页面未找到(%d)" % code
                         raise SqlmapConnectionException(errMsg)
                     else:
-                        debugMsg = "page not found (%d)" % code
+                        debugMsg = "页面未找到(%d)" % code
                         singleTimeLogMessage(debugMsg, logging.DEBUG)
                 elif ex.code == _http_client.GATEWAY_TIMEOUT:
                     if ignoreTimeout:
                         return None if not conf.ignoreTimeouts else "", None, None
                     else:
-                        warnMsg = "unable to connect to the target URL (%d - %s)" % (ex.code, _http_client.responses[ex.code])
+                        warnMsg = "无法连接到目标URL(%d - %s)" % (ex.code, _http_client.responses[ex.code])
                         if threadData.retriesCount < conf.retries and not kb.threadException:
-                            warnMsg += ". sqlmap is going to retry the request"
+                            warnMsg += ".sqlmap将重新尝试请求"
                             logger.critical(warnMsg)
                             return Connect._retryProxy(**kwargs)
                         elif kb.testMode:
@@ -806,7 +787,7 @@ class Connect(object):
                         else:
                             raise SqlmapConnectionException(warnMsg)
                 else:
-                    debugMsg = "got HTTP error code: %d ('%s')" % (code, status)
+                    debugMsg = "获取到HTTP错误代码: %d ('%s')" % (code, status)
                     logger.debug(debugMsg)
 
         except (_urllib.error.URLError, socket.error, socket.timeout, _http_client.HTTPException, struct.error, binascii.Error, ProxyError, SqlmapCompressionException, WebSocketException, TypeError, ValueError, OverflowError, AttributeError, OSError):
@@ -823,54 +804,51 @@ class Connect(object):
                 else:
                     raise
             elif "no host given" in tbMsg:
-                warnMsg = "invalid URL address used (%s)" % repr(url)
+                warnMsg = "使用了无效的URL地址(%s)" % repr(url)
                 raise SqlmapSyntaxException(warnMsg)
             elif any(_ in tbMsg for _ in ("forcibly closed", "Connection is already closed", "ConnectionAbortedError")):
-                warnMsg = "connection was forcibly closed by the target URL"
+                warnMsg = "连接被目标URL强制关闭"
             elif "timed out" in tbMsg:
                 if kb.testMode and kb.testType not in (None, PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED):
-                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is dropping 'suspicious' requests")
+                    singleTimeWarnMessage("目标(或WAF/IPS)可能正在丢弃可疑的请求")
                     kb.droppingRequests = True
-                warnMsg = "connection timed out to the target URL"
+                warnMsg = "连接超时到目标URL"
             elif "Connection reset" in tbMsg:
                 if not conf.disablePrecon:
-                    singleTimeWarnMessage("turning off pre-connect mechanism because of connection reset(s)")
+                    singleTimeWarnMessage("关闭预连接机制,因为连接重置(s)")
                     conf.disablePrecon = True
 
                 if kb.testMode:
-                    singleTimeWarnMessage("there is a possibility that the target (or WAF/IPS) is resetting 'suspicious' requests")
+                    singleTimeWarnMessage("目标(或WAF/IPS)可能正在重置可疑的请求")
                     kb.droppingRequests = True
-                warnMsg = "connection reset to the target URL"
+                warnMsg = "连接重置到目标URL"
             elif "URLError" in tbMsg or "error" in tbMsg:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标URL"
                 match = re.search(r"Errno \d+\] ([^>\n]+)", tbMsg)
                 if match:
                     warnMsg += " ('%s')" % match.group(1).strip()
             elif "NTLM" in tbMsg:
-                warnMsg = "there has been a problem with NTLM authentication"
+                warnMsg = "NTLM身份验证出现问题"
             elif "Invalid header name" in tbMsg:  # (e.g. PostgreSQL ::Text payload)
                 return None, None, None
             elif "BadStatusLine" in tbMsg:
-                warnMsg = "connection dropped or unknown HTTP "
-                warnMsg += "status code received"
+                warnMsg = "连接丢失或收到未知的HTTP状态码"
                 if not conf.agent and not conf.randomAgent:
-                    warnMsg += ". Try to force the HTTP User-Agent "
-                    warnMsg += "header with option '--user-agent' or switch '--random-agent'"
+                    warnMsg += ".尝试使用选项'--user-agent'或开关'--random-agent'强制HTTP User-Agent头部"
             elif "IncompleteRead" in tbMsg:
-                warnMsg = "there was an incomplete read error while retrieving data "
-                warnMsg += "from the target URL"
+                warnMsg = "在从目标URL获取数据时发生不完整读取错误"
             elif "Handshake status" in tbMsg:
                 status = re.search(r"Handshake status ([\d]{3})", tbMsg)
-                errMsg = "websocket handshake status %s" % status.group(1) if status else "unknown"
+                errMsg = "websocket握手状态%s" % status.group(1) if status else "unknown"
                 raise SqlmapConnectionException(errMsg)
             elif "SqlmapCompressionException" in tbMsg:
-                warnMsg = "problems with response (de)compression"
+                warnMsg = "响应(解压)出现问题"
                 retrying = True
             else:
-                warnMsg = "unable to connect to the target URL"
+                warnMsg = "无法连接到目标URL"
 
             if "BadStatusLine" not in tbMsg and any((conf.proxy, conf.tor)):
-                warnMsg += " or proxy"
+                warnMsg += "或代理"
 
             if silent:
                 return None, None, None
@@ -879,8 +857,7 @@ class Connect(object):
                 kb.connErrorCounter += 1
 
                 if kb.connErrorCounter >= MAX_CONSECUTIVE_CONNECTION_ERRORS and kb.choices.connError is None:
-                    message = "there seems to be a continuous problem with connection to the target. "
-                    message += "Are you sure that you want to continue? [y/N] "
+                    message = "似乎目标URL的连接出现了连续问题,您确定要继续吗？[y/N] "
 
                     kb.choices.connError = readInput(message, default='N', boolean=True)
 
@@ -893,7 +870,7 @@ class Connect(object):
             elif ignoreTimeout and any(_ in tbMsg for _ in ("timed out", "IncompleteRead", "Interrupted system call")):
                 return None if not conf.ignoreTimeouts else "", None, None
             elif threadData.retriesCount < conf.retries and not kb.threadException:
-                warnMsg += ". sqlmap is going to retry the request"
+                warnMsg += ".sqlmap将重新尝试请求"
                 if not retrying:
                     warnMsg += "(s)"
                     logger.critical(warnMsg)
@@ -917,8 +894,7 @@ class Connect(object):
                 try:
                     page, responseHeaders, code = function(page, responseHeaders, code)
                 except Exception as ex:
-                    errMsg = "error occurred while running postprocess "
-                    errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                    errMsg = "运行后处理函数'%s'时发生错误('%s')" % (function.__name__, getSafeExString(ex))
                     raise SqlmapGenericException(errMsg)
 
             threadData.lastPage = page
@@ -930,7 +906,7 @@ class Connect(object):
         if not sys.version.startswith("3.11."):
             if conf.retryOn and re.search(conf.retryOn, page, re.I):
                 if threadData.retriesCount < conf.retries:
-                    warnMsg = "forced retry of the request because of undesired page content"
+                    warnMsg = "由于不希望的页面内容,强制重试请求"
                     logger.warning(warnMsg)
                     return Connect._retryProxy(**kwargs)
 
@@ -1027,13 +1003,11 @@ class Connect(object):
                     try:
                         payload = function(payload=payload, headers=auxHeaders, delimiter=delimiter, hints=hints)
                     except Exception as ex:
-                        errMsg = "error occurred while running tamper "
-                        errMsg += "function '%s' ('%s')" % (function.__name__, getSafeExString(ex))
+                        errMsg = "运行篡改函数'%s'时发生错误('%s')" % (function.__name__, getSafeExString(ex)) 
                         raise SqlmapGenericException(errMsg)
 
                     if not isinstance(payload, six.string_types):
-                        errMsg = "tamper function '%s' returns " % function.__name__
-                        errMsg += "invalid payload type ('%s')" % type(payload)
+                        errMsg = "篡改函数'%s'返回无效的负载类型('%s')" % (function.__name__, type(payload))
                         raise SqlmapValueException(errMsg)
 
                 value = agent.replacePayload(value, payload)
@@ -1071,7 +1045,7 @@ class Connect(object):
 
                     if place == PLACE.COOKIE or place == PLACE.CUSTOM_HEADER and value.split(',')[0].upper() == HTTP_HEADER.COOKIE.upper():
                         if kb.choices.cookieEncode is None:
-                            msg = "do you want to URL encode cookie values (implementation specific)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
+                            msg = "您是否要对cookie值进行URL编码(特定实现)? %s" % ("[Y/n]" if not conf.url.endswith(".aspx") else "[y/N]")  # Reference: https://support.microsoft.com/en-us/kb/313282
                             kb.choices.cookieEncode = readInput(msg, default='Y' if not conf.url.endswith(".aspx") else 'N', boolean=True)
                         if not kb.choices.cookieEncode:
                             skip = True
@@ -1085,8 +1059,7 @@ class Connect(object):
 
             if conf.hpp:
                 if not any(conf.url.lower().endswith(_.lower()) for _ in (WEB_PLATFORM.ASP, WEB_PLATFORM.ASPX)):
-                    warnMsg = "HTTP parameter pollution should work only against "
-                    warnMsg += "ASP(.NET) targets"
+                    warnMsg = "HTTP参数污染只能对ASP(.NET)目标进行"
                     singleTimeWarnMessage(warnMsg)
                 if place in (PLACE.GET, PLACE.POST):
                     _ = re.escape(PAYLOAD_DELIMITER)
@@ -1109,8 +1082,7 @@ class Connect(object):
 
                         value = agent.replacePayload(value, payload)
                 else:
-                    warnMsg = "HTTP parameter pollution works only with regular "
-                    warnMsg += "GET and POST parameters"
+                    warnMsg = "HTTP参数污染仅适用于常规的GET和POST参数"
                     singleTimeWarnMessage(warnMsg)
 
         if place:
@@ -1177,8 +1149,8 @@ class Connect(object):
                     break
 
                 if attempt > 0:
-                    warnMsg = "unable to find anti-CSRF token '%s' at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
-                    warnMsg += ". sqlmap is going to retry the request"
+                    warnMsg = "无法在'%s'中找到反CSRF令牌'%s'" % (conf.csrfUrl or conf.url, conf.csrfToken._original)
+                    warnMsg += ".sqlmap将重试该请求"
                     logger.warning(warnMsg)
 
                 page, headers, code = Connect.getPage(url=conf.csrfUrl or conf.url, data=conf.csrfData or (conf.data if conf.csrfUrl == conf.url else None), method=conf.csrfMethod or (conf.method if conf.csrfUrl == conf.url else None), cookie=conf.parameters.get(PLACE.COOKIE), direct=True, silent=True, ua=conf.parameters.get(PLACE.USER_AGENT), referer=conf.parameters.get(PLACE.REFERER), host=conf.parameters.get(PLACE.HOST))
@@ -1228,10 +1200,9 @@ class Connect(object):
                                 break
 
             if not token:
-                errMsg = "anti-CSRF token '%s' can't be found at '%s'" % (conf.csrfToken._original, conf.csrfUrl or conf.url)
+                errMsg = "无法在'%s'中找到反CSRF令牌'%s'" % (conf.csrfUrl or conf.url, conf.csrfToken._original)
                 if not conf.csrfUrl:
-                    errMsg += ". You can try to rerun by providing "
-                    errMsg += "a valid value for option '--csrf-url'"
+                    errMsg += "。您可以尝试通过为选项'--csrf-url'提供有效值重新运行"
                 raise SqlmapTokenException(errMsg)
 
             if token:
@@ -1456,12 +1427,10 @@ class Connect(object):
                 kb.responseTimes.setdefault(kb.responseTimeMode, [])
 
                 if conf.tor:
-                    warnMsg = "it's highly recommended to avoid usage of switch '--tor' for "
-                    warnMsg += "time-based injections because of inherent high latency time"
+                    warnMsg = "强烈建议在基于时间的注入中避免使用'--tor'开关,因为它具有固有的高延迟时间"
                     singleTimeWarnMessage(warnMsg)
 
-                warnMsg = "[%s] [WARNING] %stime-based comparison requires " % (time.strftime("%X"), "(case) " if kb.responseTimeMode else "")
-                warnMsg += "%s statistical model, please wait" % ("larger" if len(kb.responseTimes) == 1 else "reset of")
+                warnMsg = "[%s] [WARNING] %s基于时间的比较需要%s统计模型,请等待" % (time.strftime("%X"), "(区分大小写) " if kb.responseTimeMode else "", "更大的" if len(kb.responseTimes) == 1 else "重置")
                 dataToStdout(warnMsg)
 
                 while len(kb.responseTimes[kb.responseTimeMode]) < MIN_TIME_RESPONSES:
@@ -1472,9 +1441,7 @@ class Connect(object):
                 dataToStdout(" (done)\n")
 
             elif not kb.testMode:
-                warnMsg = "it is very important to not stress the network connection "
-                warnMsg += "during usage of time-based payloads to prevent potential "
-                warnMsg += "disruptions "
+                warnMsg = "非常重要的是,在使用基于时间的负载时不要过度使用网络连接,以防止潜在的中断。"
                 singleTimeWarnMessage(warnMsg)
 
             if not kb.laggingChecked:
@@ -1485,10 +1452,7 @@ class Connect(object):
                 if deviation is not None and deviation > WARN_TIME_STDEV:
                     kb.adjustTimeDelay = ADJUST_TIME_DELAY.DISABLE
 
-                    warnMsg = "considerable lagging has been detected "
-                    warnMsg += "in connection response(s). Please use as high "
-                    warnMsg += "value for option '--time-sec' as possible (e.g. "
-                    warnMsg += "10 or more)"
+                    warnMsg = "检测到连接响应的延迟较大。请尽可能使用较高的'--time-sec'选项值(例如10或更高)。"
                     logger.critical(warnMsg)
 
         if (conf.safeFreq or 0) > 0:
@@ -1531,10 +1495,9 @@ class Connect(object):
                 page, headers, code = Connect.getPage(url=uri, get=get, post=post, method=method, cookie=cookie, ua=ua, referer=referer, host=host, silent=silent, auxHeaders=auxHeaders, response=response, raise404=raise404, ignoreTimeout=timeBasedCompare)
             except MemoryError:
                 page, headers, code = None, None, None
-                warnMsg = "site returned insanely large response"
+                warnMsg = "网站返回了异常大的响应"
                 if kb.testMode:
-                    warnMsg += " in testing phase. This is a common "
-                    warnMsg += "behavior in custom WAF/IPS solutions"
+                    warnMsg += "在测试阶段中,这是自定义WAF/IPS解决方案中的常见行为。"
                 singleTimeWarnMessage(warnMsg)
 
         if not ignoreSecondOrder:
