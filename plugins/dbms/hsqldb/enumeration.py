@@ -21,7 +21,7 @@ class Enumeration(GenericEnumeration):
             return
 
         if kb.data.banner is None:
-            infoMsg = "fetching banner"
+            infoMsg = "获取 banner"
             logger.info(infoMsg)
 
             query = queries[DBMS.HSQLDB].banner.query
@@ -30,20 +30,20 @@ class Enumeration(GenericEnumeration):
         return kb.data.banner
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on HSQLDB it is not possible to enumerate the user privileges"
+        warnMsg = "在 HSQLDB 上无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
-        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        warnMsg = "在 HSQLDB 上无法枚举主机名"
         logger.warning(warnMsg)
 
     def getCurrentDb(self):
         return HSQLDB_DEFAULT_SCHEMA
 
     def getStatements(self):
-        warnMsg = "on HSQLDB it is not possible to enumerate the SQL statements"
+        warnMsg = "在 HSQLDB 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

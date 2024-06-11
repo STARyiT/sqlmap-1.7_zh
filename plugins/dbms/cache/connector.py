@@ -33,7 +33,7 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         try:
-            msg = "please enter the location of 'cachejdbc.jar'? "
+            msg = "请输入以下位置 'cachejdbc.jar'? "
             jar = readInput(msg)
             checkFile(jar)
             args = "-Djava.class.path=%s" % jar

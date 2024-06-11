@@ -10,23 +10,23 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getBanner(self):
-        warnMsg = "on FrontBase it is not possible to get the banner"
+        warnMsg = "在 FrontBase 上无法获取 banner"
         logger.warning(warnMsg)
 
         return None
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on FrontBase it is not possible to enumerate the user privileges"
+        warnMsg = "在 FrontBase 上无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
-        warnMsg = "on FrontBase it is not possible to enumerate the hostname"
+        warnMsg = "在 FrontBase 上无法枚举主机名"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on FrontBase it is not possible to enumerate the SQL statements"
+        warnMsg = "在 FrontBase 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

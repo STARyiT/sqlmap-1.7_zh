@@ -25,7 +25,7 @@ class Filesystem(GenericFilesystem):
 
     def stackedReadFile(self, remoteFile):
         if not kb.bruteMode:
-            infoMsg = "fetching file: '%s'" % remoteFile
+            infoMsg = "检索文件: '%s'" % remoteFile
             logger.info(infoMsg)
 
         self.initEnv()
@@ -33,8 +33,7 @@ class Filesystem(GenericFilesystem):
         return self.udfEvalCmd(cmd=remoteFile, udfName="sys_fileread")
 
     def unionWriteFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "PostgreSQL does not support file upload with UNION "
-        errMsg += "query SQL injection technique"
+        errMsg = "PostgreSQL 不支持 UNION 查询 SQL 注入技术"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
@@ -46,8 +45,7 @@ class Filesystem(GenericFilesystem):
 
         self.createSupportTbl(self.fileTblName, self.tblField, "text")
 
-        debugMsg = "create a new OID for a large object, it implicitly "
-        debugMsg += "adds an entry in the large objects system table"
+        debugMsg = "创建一个新的 OID 用于大对象，它会隐式地在大对象系统表中添加一个条目"
         logger.debug(debugMsg)
 
         # References:
@@ -70,8 +68,7 @@ class Filesystem(GenericFilesystem):
 
             self.page += 1
 
-        debugMsg = "exporting the OID %s file content to " % fileType
-        debugMsg += "file '%s'" % remoteFile
+        debugMsg = "导出 OID %s 文件内容到文件 '%s'" % (fileType, remoteFile)
         logger.debug(debugMsg)
 
         inject.goStacked("SELECT lo_export(%d, '%s')" % (self.oid, remoteFile), silent=True)

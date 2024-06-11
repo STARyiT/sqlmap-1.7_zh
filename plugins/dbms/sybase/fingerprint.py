@@ -25,18 +25,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.SYBASE
@@ -44,19 +44,19 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -70,7 +70,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.SYBASE
+        infoMsg = "测试 %s" % DBMS.SYBASE
         logger.info(infoMsg)
 
         if conf.direct:
@@ -85,7 +85,7 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("suser_id()=suser_id()")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.SYBASE
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.SYBASE
                 logger.warning(warnMsg)
 
                 return False
@@ -97,7 +97,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            infoMsg = "actively fingerprinting %s" % DBMS.SYBASE
+            infoMsg = "活跃指纹 %s" % DBMS.SYBASE
             logger.info(infoMsg)
 
             result = unArrayizeValue(inject.getValue("SUBSTRING(@@VERSION,1,1)"))
@@ -114,7 +114,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.SYBASE
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.SYBASE
             logger.warning(warnMsg)
 
             return False

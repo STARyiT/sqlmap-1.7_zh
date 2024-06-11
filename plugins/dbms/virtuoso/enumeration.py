@@ -10,47 +10,47 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
-        warnMsg = "on Virtuoso it is not possible to enumerate the user password hashes"
+        warnMsg = "在 Virtuoso 中，无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Virtuoso it is not possible to enumerate the user privileges"
+        warnMsg = "在 Virtuoso 中，无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getRoles(self, *args, **kwargs):
-        warnMsg = "on Virtuoso it is not possible to enumerate the user roles"
+        warnMsg = "在 Virtuoso 中，无法枚举用户角色"
         logger.warning(warnMsg)
 
         return {}
 
     def searchDb(self):
-        warnMsg = "on Virtuoso it is not possible to search databases"
+        warnMsg = "在 Virtuoso 中，无法搜索数据库"
         logger.warning(warnMsg)
 
         return []
 
     def searchTable(self):
-        warnMsg = "on Virtuoso it is not possible to search tables"
+        warnMsg = "在 Virtuoso 中，无法搜索表"
         logger.warning(warnMsg)
 
         return []
 
     def searchColumn(self):
-        warnMsg = "on Virtuoso it is not possible to search columns"
+        warnMsg = "在 Virtuoso 中，无法搜索列"
         logger.warning(warnMsg)
 
         return []
 
     def search(self):
-        warnMsg = "on Virtuoso search option is not available"
+        warnMsg = "在 Virtuoso 中，无法搜索"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on Virtuoso it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Virtuoso 中，无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

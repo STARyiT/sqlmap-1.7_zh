@@ -23,18 +23,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.SQLITE
@@ -42,19 +42,19 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -73,24 +73,24 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.SQLITE
+        infoMsg = "测试 %s" % DBMS.SQLITE
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("LAST_INSERT_ROWID()=LAST_INSERT_ROWID()")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.SQLITE
+            infoMsg = "确认 %s" % DBMS.SQLITE
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("SQLITE_VERSION()=SQLITE_VERSION()")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.SQLITE
                 logger.warning(warnMsg)
 
                 return False
             else:
-                infoMsg = "actively fingerprinting %s" % DBMS.SQLITE
+                infoMsg = "活跃指纹 %s" % DBMS.SQLITE
                 logger.info(infoMsg)
 
                 result = inject.checkBooleanExpression("RANDOMBLOB(-1)>0")
@@ -103,7 +103,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.SQLITE
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.SQLITE
             logger.warning(warnMsg)
 
             return False

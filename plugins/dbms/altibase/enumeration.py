@@ -10,11 +10,11 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getStatements(self):
-        warnMsg = "on Altibase it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Altibase 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []
 
     def getHostname(self):
-        warnMsg = "on Altibase it is not possible to enumerate the hostname"
+        warnMsg = "在 Altibase 上无法枚举主机名"
         logger.warning(warnMsg)

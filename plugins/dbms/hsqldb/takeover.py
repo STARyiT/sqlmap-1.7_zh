@@ -10,19 +10,17 @@ from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
     def osCmd(self):
-        errMsg = "on HSQLDB it is not possible to execute commands"
+        errMsg = "在 HSQLDB 上无法执行命令"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osShell(self):
-        errMsg = "on HSQLDB it is not possible to execute commands"
+        errMsg = "在 HSQLDB 上无法执行命令"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osPwn(self):
-        errMsg = "on HSQLDB it is not possible to establish an "
-        errMsg += "out-of-band connection"
+        errMsg = "在 HSQLDB 上无法建立出站连接"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osSmb(self):
-        errMsg = "on HSQLDB it is not possible to establish an "
-        errMsg += "out-of-band connection"
+        errMsg = "在 HSQLDB 上无法建立出站连接"
         raise SqlmapUnsupportedFeatureException(errMsg)

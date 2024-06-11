@@ -43,7 +43,7 @@ class Fingerprint(GenericFingerprint):
         return retVal
 
     def _sysTablesCheck(self):
-        infoMsg = "executing system table(s) existence fingerprint"
+        infoMsg = "执行系统表存在指纹"
         logger.info(infoMsg)
 
         # Microsoft Access table reference updated on 01/2010
@@ -87,7 +87,7 @@ class Fingerprint(GenericFingerprint):
     def _getDatabaseDir(self):
         retVal = None
 
-        infoMsg = "searching for database directory"
+        infoMsg = "搜索数据库目录"
         logger.info(infoMsg)
 
         randStr = randomStr()
@@ -165,7 +165,7 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("IIF(ATN(2)>0,1,0) BETWEEN 2 AND 0")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.ACCESS
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.ACCESS
                 logger.warning(warnMsg)
                 return False
 
@@ -174,7 +174,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            infoMsg = "actively fingerprinting %s" % DBMS.ACCESS
+            infoMsg = "正在主动指纹识别 %s" % DBMS.ACCESS
             logger.info(infoMsg)
 
             version = self._sysTablesCheck()
@@ -184,7 +184,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.ACCESS
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.ACCESS
             logger.warning(warnMsg)
 
             return False

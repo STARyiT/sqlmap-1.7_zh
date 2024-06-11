@@ -25,18 +25,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务", kb.headersFp)
 
         if wsOsFp and not conf.api:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp and not conf.api:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
         actVer = Format.getDbms()
 
         if not conf.extensiveFp:
@@ -44,22 +44,22 @@ class Fingerprint(GenericFingerprint):
             return value
 
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 if re.search(r"-log$", kb.data.banner or ""):
-                    banVer += ", logging enabled"
+                    banVer += ", 启用日志记录"
 
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -90,26 +90,26 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.HSQLDB
+        infoMsg = "测试 %s" % DBMS.HSQLDB
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("CASEWHEN(1=1,1,0)=1")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.HSQLDB
+            infoMsg = "确认 %s" % DBMS.HSQLDB
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.HSQLDB
                 logger.warning(warnMsg)
 
                 return False
             else:
                 result = inject.checkBooleanExpression("ZERO() IS 0")   # Note: check for H2 DBMS (sharing majority of same functions)
                 if result:
-                    warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB
+                    warnMsg = "后端 DBMS 不是 %s" % DBMS.HSQLDB
                     logger.warning(warnMsg)
 
                     return False
@@ -133,21 +133,21 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.HSQLDB
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.HSQLDB
             logger.warning(warnMsg)
 
-            dbgMsg = "...or version is < 1.7.2"
+            dbgMsg = "...或版本低于 1.7.2"
             logger.debug(dbgMsg)
 
             return False
 
     def getHostname(self):
-        warnMsg = "on HSQLDB it is not possible to enumerate the hostname"
+        warnMsg = "在 HSQLDB 上无法枚举主机名"
         logger.warning(warnMsg)
 
     def checkDbmsOs(self, detailed=False):
         if Backend.getOs():
-            infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+            infoMsg = "后端 DBMS 操作系统是 %s" % Backend.getOs()
             logger.info(infoMsg)
         else:
             self.userChooseDbmsOs()

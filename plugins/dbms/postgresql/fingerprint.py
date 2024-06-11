@@ -49,18 +49,18 @@ class Fingerprint(GenericFingerprint):
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
 
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.PGSQL
@@ -70,22 +70,22 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         if fork:
-            value += "\n%sfork fingerprint: %s" % (blank, fork)
+            value += "\n%sfork 指纹: %s" % (blank, fork)
 
         return value
 
@@ -103,20 +103,20 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.PGSQL
+        infoMsg = "测试 %s" % DBMS.PGSQL
         logger.info(infoMsg)
 
         # NOTE: Vertica works too without the CONVERT_TO()
         result = inject.checkBooleanExpression("CONVERT_TO('[RANDSTR]', QUOTE_IDENT(NULL)) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.PGSQL
+            infoMsg = "确认 %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("COALESCE([RANDNUM], NULL)=[RANDNUM]")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.PGSQL
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.PGSQL
                 logger.warning(warnMsg)
 
                 return False
@@ -128,7 +128,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            infoMsg = "actively fingerprinting %s" % DBMS.PGSQL
+            infoMsg = "活跃指纹 %s" % DBMS.PGSQL
             logger.info(infoMsg)
 
             if inject.checkBooleanExpression("BIT_COUNT(NULL) IS NULL"):
@@ -188,7 +188,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.PGSQL
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.PGSQL
             logger.warning(warnMsg)
 
             return False
@@ -197,7 +197,7 @@ class Fingerprint(GenericFingerprint):
         if Backend.getOs():
             return
 
-        infoMsg = "fingerprinting the back-end DBMS operating system"
+        infoMsg = "指纹后端 DBMS 操作系统"
         logger.info(infoMsg)
 
         self.createSupportTbl(self.fileTblName, self.tblField, "character(10000)")
@@ -219,7 +219,7 @@ class Fingerprint(GenericFingerprint):
         if Backend.getOs() is None:
             Backend.setOs(OS.LINUX)
 
-        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+        infoMsg = "后端 DBMS 操作系统是 %s" % Backend.getOs()
         logger.info(infoMsg)
 
         self.cleanup(onlyFileTbl=True)

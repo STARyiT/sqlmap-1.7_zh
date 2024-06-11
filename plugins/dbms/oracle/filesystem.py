@@ -33,7 +33,7 @@ class Filesystem(GenericFilesystem):
 
         for remoteFile in remoteFile.split(','):
             if not kb.bruteMode:
-                infoMsg = "fetching file: '%s'" % remoteFile
+                infoMsg = "检索文件: '%s'" % remoteFile
                 logger.info(infoMsg)
 
             kb.fileReadMode = True
@@ -54,6 +54,5 @@ class Filesystem(GenericFilesystem):
         return localFilePaths
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "File system write access not yet implemented for "
-        errMsg += "Oracle"
+        errMsg = "Oracle文件系统写入访问不支持"
         raise SqlmapUnsupportedFeatureException(errMsg)

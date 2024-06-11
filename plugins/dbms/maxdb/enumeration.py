@@ -36,7 +36,7 @@ class Enumeration(GenericEnumeration):
         kb.data.processChar = lambda x: x.replace('_', ' ') if x else x
 
     def getPasswordHashes(self):
-        warnMsg = "on SAP MaxDB it is not possible to enumerate the user password hashes"
+        warnMsg = "在 SAP MaxDB 上无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
@@ -45,7 +45,7 @@ class Enumeration(GenericEnumeration):
         if len(kb.data.cachedDbs) > 0:
             return kb.data.cachedDbs
 
-        infoMsg = "fetching database names"
+        infoMsg = "获取数据库名称"
         logger.info(infoMsg)
 
         rootQuery = queries[DBMS.MAXDB].dbs
@@ -77,7 +77,7 @@ class Enumeration(GenericEnumeration):
         for db in (_ for _ in dbs if _):
             dbs[dbs.index(db)] = safeSQLIdentificatorNaming(db)
 
-        infoMsg = "fetching tables for database"
+        infoMsg = "获取数据库表"
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
@@ -105,17 +105,14 @@ class Enumeration(GenericEnumeration):
 
         if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
-                warnMsg = "missing database parameter. sqlmap is going "
-                warnMsg += "to use the current database to enumerate "
-                warnMsg += "table(s) columns"
+                warnMsg = "缺少数据库参数。sqlmap 将使用当前数据库枚举表列"
                 logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
         elif conf.db is not None:
             if ',' in conf.db:
-                errMsg = "only one database name is allowed when enumerating "
-                errMsg += "the tables' columns"
+                errMsg = "在枚举表列时，只允许指定一个数据库名称"
                 raise SqlmapMissingMandatoryOptionException(errMsg)
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
@@ -142,8 +139,7 @@ class Enumeration(GenericEnumeration):
                 if tblList and isListLike(tblList[0]):
                     tblList = tblList[0]
             else:
-                errMsg = "unable to retrieve the tables "
-                errMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                errMsg = "无法从数据库 '%s' 获取表" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
 
         for tbl in tblList:
@@ -176,7 +172,7 @@ class Enumeration(GenericEnumeration):
 
                 return kb.data.cachedColumns
 
-            message = "do you want to use common column existence check? [y/N/q] "
+            message = "您想使用通用列存在性检查吗？[y/N/q] "
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -190,8 +186,7 @@ class Enumeration(GenericEnumeration):
 
         for tbl in tblList:
             if conf.db is not None and len(kb.data.cachedColumns) > 0 and conf.db in kb.data.cachedColumns and tbl in kb.data.cachedColumns[conf.db]:
-                infoMsg = "fetched tables' columns on "
-                infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                infoMsg = "在数据库 '%s' 中获取数据库表列" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 return {conf.db: kb.data.cachedColumns[conf.db]}
@@ -202,9 +197,8 @@ class Enumeration(GenericEnumeration):
                 kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
                 continue
 
-            infoMsg = "fetching columns "
-            infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-            infoMsg += "on database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+            infoMsg = "获取表 '%s' 的列" % unsafeSQLIdentificatorNaming(tbl)
+            infoMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.info(infoMsg)
 
             blind = not isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION)
@@ -225,21 +219,21 @@ class Enumeration(GenericEnumeration):
         return kb.data.cachedColumns
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on SAP MaxDB it is not possible to enumerate the user privileges"
+        warnMsg = "在 SAP MaxDB 上无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def search(self):
-        warnMsg = "on SAP MaxDB search option is not available"
+        warnMsg = "在 SAP MaxDB 上无法搜索"
         logger.warning(warnMsg)
 
     def getHostname(self):
-        warnMsg = "on SAP MaxDB it is not possible to enumerate the hostname"
+        warnMsg = "在 SAP MaxDB 上无法枚举主机名"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on SAP MaxDB it is not possible to enumerate the SQL statements"
+        warnMsg = "在 SAP MaxDB 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

@@ -29,18 +29,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
         actVer = Format.getDbms()
 
         if not conf.extensiveFp:
@@ -49,22 +49,22 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms() + " (%s)" % (self._dialectCheck())
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 if re.search(r"-log$", kb.data.banner or ""):
-                    banVer += ", logging enabled"
+                    banVer += ", 启用日志记录"
 
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -113,26 +113,26 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.FIREBIRD
+        infoMsg = "测试 %s" % DBMS.FIREBIRD
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("(SELECT COUNT(*) FROM RDB$DATABASE WHERE [RANDNUM]=[RANDNUM])>0")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.FIREBIRD
+            infoMsg = "确认 %s" % DBMS.FIREBIRD
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("EXISTS(SELECT CURRENT_USER FROM RDB$DATABASE)")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.FIREBIRD
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.FIREBIRD
                 logger.warning(warnMsg)
 
                 return False
 
             setDbms(DBMS.FIREBIRD)
 
-            infoMsg = "actively fingerprinting %s" % DBMS.FIREBIRD
+            infoMsg = "活跃指纹 %s" % DBMS.FIREBIRD
             logger.info(infoMsg)
 
             version = self._sysTablesCheck()
@@ -145,7 +145,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.FIREBIRD
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.FIREBIRD
             logger.warning(warnMsg)
 
             return False

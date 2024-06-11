@@ -10,7 +10,7 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getRoles(self, *args, **kwargs):
-        warnMsg = "on Vertica it is not possible to enumerate the user roles"
+        warnMsg = "在 Vertica 中，无法枚举用户角色"
         logger.warning(warnMsg)
 
         return {}

@@ -11,59 +11,59 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getCurrentUser(self):
-        warnMsg = "on SQLite it is not possible to enumerate the current user"
+        warnMsg = "在 SQLite 中，无法枚举当前用户"
         logger.warning(warnMsg)
 
     def getCurrentDb(self):
-        warnMsg = "on SQLite it is not possible to get name of the current database"
+        warnMsg = "在 SQLite 中，无法获取当前数据库名称"
         logger.warning(warnMsg)
 
     def isDba(self, user=None):
-        warnMsg = "on SQLite the current user has all privileges"
+        warnMsg = "在 SQLite 中，当前用户具有所有权限"
         logger.warning(warnMsg)
 
         return True
 
     def getUsers(self):
-        warnMsg = "on SQLite it is not possible to enumerate the users"
+        warnMsg = "在 SQLite 中，无法枚举用户"
         logger.warning(warnMsg)
 
         return []
 
     def getPasswordHashes(self):
-        warnMsg = "on SQLite it is not possible to enumerate the user password hashes"
+        warnMsg = "在 SQLite 中，无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on SQLite it is not possible to enumerate the user privileges"
+        warnMsg = "在 SQLite 中，无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getDbs(self):
-        warnMsg = "on SQLite it is not possible to enumerate databases (use only '--tables')"
+        warnMsg = "在 SQLite 中，无法枚举数据库 (使用 '--tables' 参数)"
         logger.warning(warnMsg)
 
         return []
 
     def searchDb(self):
-        warnMsg = "on SQLite it is not possible to search databases"
+        warnMsg = "在 SQLite 中，无法搜索数据库"
         logger.warning(warnMsg)
 
         return []
 
     def searchColumn(self):
-        errMsg = "on SQLite it is not possible to search columns"
+        errMsg = "在 SQLite 中，无法搜索列"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def getHostname(self):
-        warnMsg = "on SQLite it is not possible to enumerate the hostname"
+        warnMsg = "在 SQLite 中，无法枚举主机名"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on SQLite it is not possible to enumerate the SQL statements"
+        warnMsg = "在 SQLite 中，无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

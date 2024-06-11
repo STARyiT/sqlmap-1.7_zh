@@ -10,19 +10,18 @@ from plugins.generic.takeover import Takeover as GenericTakeover
 
 class Takeover(GenericTakeover):
     def osCmd(self):
-        errMsg = "on Microsoft Access it is not possible to execute commands"
+        errMsg = "在 Microsoft Access 上无法执行命令"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osShell(self):
-        errMsg = "on Microsoft Access it is not possible to execute commands"
+        errMsg = "在 Microsoft Access 上无法执行命令"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osPwn(self):
-        errMsg = "on Microsoft Access it is not possible to establish an "
-        errMsg += "out-of-band connection"
+        errMsg = "在 Microsoft Access 上无法建立带外连接"
+
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def osSmb(self):
-        errMsg = "on Microsoft Access it is not possible to establish an "
-        errMsg += "out-of-band connection"
+        errMsg = "在 Microsoft Access 上无法建立带外连接"
         raise SqlmapUnsupportedFeatureException(errMsg)

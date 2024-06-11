@@ -22,18 +22,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.PRESTO
@@ -41,19 +41,19 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -65,19 +65,19 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.PRESTO
+        infoMsg = "测试 %s" % DBMS.PRESTO
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("TO_BASE64URL(NULL) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.PRESTO
+            infoMsg = "确认 %s" % DBMS.PRESTO
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("TO_HEX(FROM_HEX(NULL)) IS NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.PRESTO
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.PRESTO
                 logger.warning(warnMsg)
 
                 return False
@@ -87,7 +87,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            infoMsg = "actively fingerprinting %s" % DBMS.PRESTO
+            infoMsg = "活跃指纹 %s" % DBMS.PRESTO
             logger.info(infoMsg)
 
             # Reference: https://prestodb.io/docs/current/release/release-0.200.html
@@ -131,7 +131,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.PRESTO
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.PRESTO
             logger.warning(warnMsg)
 
             return False

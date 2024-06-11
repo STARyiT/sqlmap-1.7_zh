@@ -10,6 +10,5 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     def connect(self):
-        errMsg = "on H2 it is not (currently) possible to establish a "
-        errMsg += "direct connection"
+        errMsg = "在 H2 上无法建立直接连接"
         raise SqlmapUnsupportedFeatureException(errMsg)

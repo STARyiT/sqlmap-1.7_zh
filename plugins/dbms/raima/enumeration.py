@@ -10,75 +10,75 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getBanner(self):
-        warnMsg = "on Raima Database Manager it is not possible to get the banner"
+        warnMsg = "在 Raima Database Manager 中，无法获取 banner"
         logger.warning(warnMsg)
 
         return None
 
     def getCurrentUser(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the current user"
+        warnMsg = "在 Raima Database Manager 中，无法枚举当前用户"
         logger.warning(warnMsg)
 
     def getCurrentDb(self):
-        warnMsg = "on Raima Database Manager it is not possible to get name of the current database"
+        warnMsg = "在 Raima Database Manager 中，无法获取当前数据库名称"
         logger.warning(warnMsg)
 
     def isDba(self, user=None):
-        warnMsg = "on Raima Database Manager it is not possible to test if current user is DBA"
+        warnMsg = "在 Raima Database Manager 中，无法测试当前用户是否为 DBA"
         logger.warning(warnMsg)
 
     def getUsers(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the users"
+        warnMsg = "在 Raima Database Manager 中，无法枚举用户"
         logger.warning(warnMsg)
 
         return []
 
     def getPasswordHashes(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the user password hashes"
+        warnMsg = "在 Raima Database Manager 中，无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the user privileges"
+        warnMsg = "在 Raima Database Manager 中，无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getDbs(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate databases (use only '--tables')"
+        warnMsg = "在 Raima Database Manager 中，无法枚举数据库（仅限 '--tables'）"
         logger.warning(warnMsg)
 
         return []
 
     def searchDb(self):
-        warnMsg = "on Raima Database Manager it is not possible to search databases"
+        warnMsg = "在 Raima Database Manager 中，无法搜索数据库"
         logger.warning(warnMsg)
 
         return []
 
     def searchTable(self):
-        warnMsg = "on Raima Database Manager it is not possible to search tables"
+        warnMsg = "在 Raima Database Manager 中，无法搜索表"
         logger.warning(warnMsg)
 
         return []
 
     def searchColumn(self):
-        warnMsg = "on Raima Database Manager it is not possible to search columns"
+        warnMsg = "在 Raima Database Manager 中，无法搜索列"
         logger.warning(warnMsg)
 
         return []
 
     def search(self):
-        warnMsg = "on Raima Database Manager search option is not available"
+        warnMsg = "在 Raima Database Manager 中，无法搜索"
         logger.warning(warnMsg)
 
     def getHostname(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the hostname"
+        warnMsg = "在 Raima Database Manager 中，无法枚举主机名"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on Raima Database Manager it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Raima Database Manager 中，无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

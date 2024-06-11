@@ -36,9 +36,7 @@ from thirdparty import six
 
 class Enumeration(GenericEnumeration):
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Microsoft SQL Server it is not possible to fetch "
-        warnMsg += "database users privileges, sqlmap will check whether "
-        warnMsg += "or not the database users are database administrators"
+        warnMsg = "在 Microsoft SQL Server 上无法获取数据库用户权限，sqlmap 会检查是否为数据库管理员"
         logger.warning(warnMsg)
 
         users = []
@@ -85,7 +83,7 @@ class Enumeration(GenericEnumeration):
 
         dbs = [_ for _ in dbs if _]
 
-        infoMsg = "fetching tables for database"
+        infoMsg = "获取数据库表"
         infoMsg += "%s: %s" % ("s" if len(dbs) > 1 else "", ", ".join(db if isinstance(db, six.string_types) else db[0] for db in sorted(dbs)))
         logger.info(infoMsg)
 
@@ -94,12 +92,12 @@ class Enumeration(GenericEnumeration):
         if any(isTechniqueAvailable(_) for _ in (PAYLOAD.TECHNIQUE.UNION, PAYLOAD.TECHNIQUE.ERROR, PAYLOAD.TECHNIQUE.QUERY)) or conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % db
+                    infoMsg = "跳过系统数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
-                    infoMsg = "skipping database '%s'" % db
+                    infoMsg = "跳过数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
@@ -117,17 +115,16 @@ class Enumeration(GenericEnumeration):
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % db
+                    infoMsg = "跳过系统数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
-                    infoMsg = "skipping database '%s'" % db
+                    infoMsg = "跳过数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
-                infoMsg = "fetching number of tables for "
-                infoMsg += "database '%s'" % db
+                infoMsg = "获取数据库 '%s' 的表数量" % db
                 logger.info(infoMsg)
 
                 for query in (rootQuery.blind.count, rootQuery.blind.count2, rootQuery.blind.count3):
@@ -138,8 +135,7 @@ class Enumeration(GenericEnumeration):
 
                 if not isNumPosStrValue(count):
                     if count != 0:
-                        warnMsg = "unable to retrieve the number of "
-                        warnMsg += "tables for database '%s'" % db
+                        warnMsg = "无法获取数据库 '%s' 的表数量" % db
                         logger.warning(warnMsg)
                     continue
 
@@ -157,12 +153,11 @@ class Enumeration(GenericEnumeration):
                 if tables:
                     kb.data.cachedTables[db] = tables
                 else:
-                    warnMsg = "unable to retrieve the tables "
-                    warnMsg += "for database '%s'" % db
+                    warnMsg = "无法获取数据库 '%s' 的表" % db
                     logger.warning(warnMsg)
 
         if not kb.data.cachedTables and not conf.search:
-            errMsg = "unable to retrieve the tables for any database"
+            errMsg = "无法获取任何数据库的表"
             raise SqlmapNoneDataException(errMsg)
         else:
             for db, tables in kb.data.cachedTables.items():
@@ -194,7 +189,7 @@ class Enumeration(GenericEnumeration):
         for tbl in tblList:
             tbl = safeSQLIdentificatorNaming(tbl, True)
 
-            infoMsg = "searching table"
+            infoMsg = "搜索表"
             if tblConsider == "1":
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -207,12 +202,12 @@ class Enumeration(GenericEnumeration):
                 db = safeSQLIdentificatorNaming(db)
 
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % db
+                    infoMsg = "跳过系统数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
-                    infoMsg = "skipping database '%s'" % db
+                    infoMsg = "跳过数据库 '%s'" % db
                     singleTimeLogMessage(infoMsg)
                     continue
 
@@ -231,7 +226,7 @@ class Enumeration(GenericEnumeration):
 
                             foundTbls[db].append(foundTbl)
                 else:
-                    infoMsg = "fetching number of table"
+                    infoMsg = "获取数据库 '%s' 的表数量" % db
                     if tblConsider == "1":
                         infoMsg += "s LIKE"
                     infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
@@ -243,7 +238,7 @@ class Enumeration(GenericEnumeration):
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
-                        warnMsg = "no table"
+                        warnMsg = "没有表"
                         if tblConsider == "1":
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
@@ -268,7 +263,7 @@ class Enumeration(GenericEnumeration):
                 foundTbls.pop(db)
 
         if not foundTbls:
-            warnMsg = "no databases contain any of the provided tables"
+            warnMsg = "没有数据库包含提供的表"
             logger.warning(warnMsg)
             return
 
@@ -312,7 +307,7 @@ class Enumeration(GenericEnumeration):
             conf.db = origDb
             conf.tbl = origTbl
 
-            infoMsg = "searching column"
+            infoMsg = "搜索列"
             if colConsider == "1":
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
@@ -329,11 +324,11 @@ class Enumeration(GenericEnumeration):
 
             if conf.db:
                 _ = conf.db.split(',')
-                infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                infoMsgDb = "在数据库%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
-                infoMsgDb = " not in system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                infoMsgDb = "不在系统数据库%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
             else:
-                infoMsgDb = " across all databases"
+                infoMsgDb = "在所有数据库中"
 
             logger.info("%s%s%s" % (infoMsg, infoMsgTbl, infoMsgDb))
 
@@ -389,7 +384,7 @@ class Enumeration(GenericEnumeration):
                 else:
                     foundCols[column][db] = []
 
-                    infoMsg = "fetching number of tables containing column"
+                    infoMsg = "获取包含列的表数量"
                     if colConsider == "1":
                         infoMsg += "s LIKE"
                     infoMsg += " '%s' in database '%s'" % (column, db)
@@ -402,7 +397,7 @@ class Enumeration(GenericEnumeration):
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
-                        warnMsg = "no tables contain column"
+                        warnMsg = "没有包含列的表"
                         if colConsider == "1":
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % column

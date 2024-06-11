@@ -24,18 +24,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
         actVer = Format.getDbms()
 
         if not conf.extensiveFp:
@@ -43,7 +43,7 @@ class Fingerprint(GenericFingerprint):
             return value
 
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             release = kb.bannerFp.get("dbmsRelease")
@@ -55,12 +55,12 @@ class Fingerprint(GenericFingerprint):
                 banVer += "Service Pack %s " % servicepack
                 banVer += "version %s" % version
 
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -74,7 +74,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.MSSQL
+        infoMsg = "测试 %s" % DBMS.MSSQL
         logger.info(infoMsg)
 
         # NOTE: SELECT LEN(@@VERSION)=LEN(@@VERSION) FROM DUAL does not
@@ -85,7 +85,7 @@ class Fingerprint(GenericFingerprint):
             result = inject.checkBooleanExpression("UNICODE(SQUARE(NULL)) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.MSSQL
+            infoMsg = "确认 %s" % DBMS.MSSQL
             logger.info(infoMsg)
 
             for version, check in (
@@ -117,7 +117,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.MSSQL
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.MSSQL
             logger.warning(warnMsg)
 
             return False
@@ -132,11 +132,10 @@ class Fingerprint(GenericFingerprint):
         if not detailed:
             return
 
-        infoMsg = "fingerprinting the back-end DBMS operating system "
-        infoMsg += "version and service pack"
+        infoMsg = "指纹后端 DBMS 操作系统版本和服务包"
         logger.info(infoMsg)
 
-        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+        infoMsg = "后端 DBMS 操作系统是 %s" % Backend.getOs()
 
         self.createSupportTbl(self.fileTblName, self.tblField, "varchar(1000)")
         inject.goStacked("INSERT INTO %s(%s) VALUES (%s)" % (self.fileTblName, self.tblField, "@@VERSION"))
@@ -170,9 +169,7 @@ class Fingerprint(GenericFingerprint):
             Backend.setOsVersion("2003")
             Backend.setOsServicePack(2)
 
-            warnMsg = "unable to fingerprint the underlying operating "
-            warnMsg += "system version, assuming it is Windows "
-            warnMsg += "%s Service Pack %d" % (Backend.getOsVersion(), Backend.getOsServicePack())
+            warnMsg = "无法指纹后端 DBMS 操作系统版本,假设为 Windows %s Service Pack %d" % (Backend.getOsVersion(), Backend.getOsServicePack())
             logger.warning(warnMsg)
 
             self.cleanup(onlyFileTbl=True)
@@ -191,13 +188,13 @@ class Fingerprint(GenericFingerprint):
                 break
 
         if not Backend.getOsServicePack():
-            debugMsg = "assuming the operating system has no service pack"
+            debugMsg = "假设操作系统没有服务包"
             logger.debug(debugMsg)
 
             Backend.setOsServicePack(0)
 
         if Backend.getOsVersion():
-            infoMsg += " Service Pack %d" % Backend.getOsServicePack()
+            infoMsg += " 服务包 %d" % Backend.getOsServicePack()
 
         logger.info(infoMsg)
 

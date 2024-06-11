@@ -61,10 +61,7 @@ class Takeover(GenericTakeover):
                 break
 
         if not addrs:
-            errMsg = "sqlmap can not exploit the stored procedure buffer "
-            errMsg += "overflow because it does not have a valid return "
-            errMsg += "code for the underlying operating system (Windows "
-            errMsg += "%s Service Pack %d)" % (Backend.getOsVersion(), Backend.getOsServicePack())
+            errMsg = "sqlmap 无法利用存储过程缓冲区溢出，因为它不支持该操作系统（Windows %s Service Pack %d）" % (Backend.getOsVersion(), Backend.getOsServicePack())
             raise SqlmapUnsupportedFeatureException(errMsg)
 
         shellcodeChar = ""
@@ -142,5 +139,5 @@ class Takeover(GenericTakeover):
 
         self.spExploit = self.spExploit.replace("    ", "").replace("\n", " ")
 
-        logger.info("triggering the buffer overflow vulnerability, please wait..")
+        logger.info("触发缓冲区溢出漏洞，请稍候..")
         inject.goStacked(self.spExploit, silent=True)

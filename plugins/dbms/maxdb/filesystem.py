@@ -10,9 +10,9 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
-        errMsg = "on SAP MaxDB reading of files is not supported"
+        errMsg = "在 SAP MaxDB 上无法读取文件"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "on SAP MaxDB writing of files is not supported"
+        errMsg = "在 SAP MaxDB 上无法写入文件"
         raise SqlmapUnsupportedFeatureException(errMsg)

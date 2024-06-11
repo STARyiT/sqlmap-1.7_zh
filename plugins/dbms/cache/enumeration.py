@@ -14,35 +14,35 @@ class Enumeration(GenericEnumeration):
         return CACHE_DEFAULT_SCHEMA
 
     def getUsers(self):
-        warnMsg = "on Cache it is not possible to enumerate the users"
+        warnMsg = "在 Cache 上无法枚举用户"
         logger.warning(warnMsg)
 
         return []
 
     def getPasswordHashes(self):
-        warnMsg = "on Cache it is not possible to enumerate password hashes"
+        warnMsg = "在 Cache 上无法枚举密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Cache it is not possible to enumerate the user privileges"
+        warnMsg = "在 Cache 上无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getStatements(self):
-        warnMsg = "on Cache it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Cache 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []
 
     def getRoles(self, *args, **kwargs):
-        warnMsg = "on Cache it is not possible to enumerate the user roles"
+        warnMsg = "在 Cache 上无法枚举用户角色"
         logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
-        warnMsg = "on Cache it is not possible to enumerate the hostname"
+        warnMsg = "在 Cache 上无法枚举主机名"
         logger.warning(warnMsg)

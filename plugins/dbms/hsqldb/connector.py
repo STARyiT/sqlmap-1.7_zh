@@ -33,7 +33,7 @@ class Connector(GenericConnector):
     def connect(self):
         self.initConnection()
         try:
-            msg = "please enter the location of 'hsqldb.jar'? "
+            msg = "请输入 'hsqldb.jar' 的位置: "
             jar = readInput(msg)
             checkFile(jar)
             args = "-Djava.class.path=%s" % jar

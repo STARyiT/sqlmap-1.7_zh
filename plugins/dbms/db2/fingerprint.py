@@ -47,18 +47,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.DB2
@@ -66,19 +66,19 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -88,19 +88,19 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        logMsg = "testing %s" % DBMS.DB2
+        logMsg = "测试 %s" % DBMS.DB2
         logger.info(logMsg)
 
         result = inject.checkBooleanExpression("[RANDNUM]=(SELECT [RANDNUM] FROM SYSIBM.SYSDUMMY1)")
 
         if result:
-            logMsg = "confirming %s" % DBMS.DB2
+            logMsg = "确认 %s" % DBMS.DB2
             logger.info(logMsg)
 
             result = inject.checkBooleanExpression("JULIAN_DAY(CURRENT DATE) IS NOT NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.DB2
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.DB2
                 logger.warning(warnMsg)
 
                 return False
@@ -114,7 +114,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.DB2
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.DB2
             logger.warning(warnMsg)
 
             return False
@@ -123,8 +123,7 @@ class Fingerprint(GenericFingerprint):
         if Backend.getOs():
             return
 
-        infoMsg = "fingerprinting the back-end DBMS operating system "
-        infoMsg += "version and service pack"
+        infoMsg = "指纹后端 DBMS 操作系统版本和服务包"
         logger.info(infoMsg)
 
         query = "(SELECT LENGTH(OS_NAME) FROM SYSIBMADM.ENV_SYS_INFO WHERE OS_NAME LIKE '%WIN%')>0"
@@ -135,7 +134,7 @@ class Fingerprint(GenericFingerprint):
         else:
             Backend.setOs(OS.WINDOWS)
 
-        infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+        infoMsg = "后端 DBMS 操作系统是 %s" % Backend.getOs()
 
         if result:
             versions = {
@@ -171,7 +170,7 @@ class Fingerprint(GenericFingerprint):
 
             if not Backend.getOsServicePack():
                 Backend.setOsServicePack(0)
-                debugMsg = "assuming the operating system has no service pack"
+                debugMsg = "假设操作系统没有服务包"
                 logger.debug(debugMsg)
 
             if Backend.getOsVersion():

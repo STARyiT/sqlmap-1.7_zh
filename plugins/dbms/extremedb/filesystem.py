@@ -10,9 +10,9 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
-        errMsg = "on eXtremeDB it is not possible to read files"
+        errMsg = "在 eXtremeDB 上无法读取文件"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "on eXtremeDB it is not possible to write files"
+        errMsg = "在 eXtremeDB 上无法写入文件"
         raise SqlmapUnsupportedFeatureException(errMsg)

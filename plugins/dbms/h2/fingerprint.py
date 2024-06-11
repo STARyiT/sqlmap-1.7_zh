@@ -36,18 +36,18 @@ class Fingerprint(GenericFingerprint):
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
 
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.H2
@@ -57,22 +57,22 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         if fork:
-            value += "\n%sfork fingerprint: %s" % (blank, fork)
+            value += "\n%sfork 指纹: %s" % (blank, fork)
 
         return value
 
@@ -84,19 +84,19 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.H2
+        infoMsg = "测试 %s" % DBMS.H2
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("ZERO() IS 0")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.H2
+            infoMsg = "确认 %s" % DBMS.H2
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("ROUNDMAGIC(PI())>=3")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.H2
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.H2
                 logger.warning(warnMsg)
 
                 return False
@@ -107,11 +107,11 @@ class Fingerprint(GenericFingerprint):
 
                 return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.H2
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.H2
             logger.warning(warnMsg)
 
             return False
 
     def getHostname(self):
-        warnMsg = "on H2 it is not possible to enumerate the hostname"
+        warnMsg = "在 H2 上无法枚举主机名"
         logger.warning(warnMsg)

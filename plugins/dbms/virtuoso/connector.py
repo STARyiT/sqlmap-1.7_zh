@@ -10,6 +10,5 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     def connect(self):
-        errMsg = "on Virtuoso it is not (currently) possible to establish a "
-        errMsg += "direct connection"
+        errMsg = "在 Virtuoso 中，目前无法直接建立连接"
         raise SqlmapUnsupportedFeatureException(errMsg)

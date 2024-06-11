@@ -10,9 +10,9 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
-        errMsg = "on Microsoft Access it is not possible to read files"
+        errMsg = "在 Microsoft Access 中无法读取文件"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     def writeFile(self, localFile, remoteFile, fileType=None, forceCheck=False):
-        errMsg = "on Microsoft Access it is not possible to write files"
+        errMsg = "在 Microsoft Access 中无法写入文件"
         raise SqlmapUnsupportedFeatureException(errMsg)

@@ -32,7 +32,7 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 class Filesystem(GenericFilesystem):
     def nonStackedReadFile(self, rFile):
         if not kb.bruteMode:
-            infoMsg = "fetching file: '%s'" % rFile
+            infoMsg = "获取文件: '%s'" % rFile
             logger.info(infoMsg)
 
         result = inject.getValue("HEX(LOAD_FILE('%s'))" % rFile, charsetType=CHARSET_TYPE.HEXADECIMAL)
@@ -41,7 +41,7 @@ class Filesystem(GenericFilesystem):
 
     def stackedReadFile(self, remoteFile):
         if not kb.bruteMode:
-            infoMsg = "fetching file: '%s'" % remoteFile
+            infoMsg = "获取文件: '%s'" % remoteFile
             logger.info(infoMsg)
 
         self.createSupportTbl(self.fileTblName, self.tblField, "longtext")
@@ -49,25 +49,22 @@ class Filesystem(GenericFilesystem):
 
         tmpFile = "%s/tmpf%s" % (conf.tmpPath, randomStr(lowercase=True))
 
-        debugMsg = "saving hexadecimal encoded content of file '%s' " % remoteFile
-        debugMsg += "into temporary file '%s'" % tmpFile
+        debugMsg = "将文件 '%s' 的十六进制编码内容保存到临时文件 '%s'" % (remoteFile, tmpFile)
         logger.debug(debugMsg)
         inject.goStacked("SELECT HEX(LOAD_FILE('%s')) INTO DUMPFILE '%s'" % (remoteFile, tmpFile))
 
-        debugMsg = "loading the content of hexadecimal encoded file "
-        debugMsg += "'%s' into support table" % remoteFile
+        debugMsg = "将文件 '%s' 的十六进制编码内容加载到支持表中" % remoteFile
         logger.debug(debugMsg)
         inject.goStacked("LOAD DATA INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY '%s' (%s)" % (tmpFile, self.fileTblName, randomStr(10), self.tblField))
 
         length = inject.getValue("SELECT LENGTH(%s) FROM %s" % (self.tblField, self.fileTblName), resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
         if not isNumPosStrValue(length):
-            warnMsg = "unable to retrieve the content of the "
-            warnMsg += "file '%s'" % remoteFile
+            warnMsg = "无法获取文件 '%s' 的内容" % remoteFile
 
             if conf.direct or isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION):
                 if not kb.bruteMode:
-                    warnMsg += ", going to fall-back to simpler UNION technique"
+                    warnMsg += ", 将回退到更简单的 UNION 技术"
                     logger.warning(warnMsg)
                 result = self.nonStackedReadFile(remoteFile)
             else:
@@ -89,20 +86,18 @@ class Filesystem(GenericFilesystem):
 
     @stackedmethod
     def unionWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        logger.debug("encoding file to its hexadecimal string value")
+        logger.debug("将文件编码为十六进制字符串值")
 
         fcEncodedList = self.fileEncode(localFile, "hex", True)
         fcEncodedStr = fcEncodedList[0]
         fcEncodedStrLen = len(fcEncodedStr)
 
         if kb.injection.place == PLACE.GET and fcEncodedStrLen > 8000:
-            warnMsg = "as the injection is on a GET parameter and the file "
-            warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
-            warnMsg += "bytes, this might cause errors in the file "
-            warnMsg += "writing process"
+            warnMsg = "注入位置是 GET 参数，文件要写入的十六进制值长度为 %d 字节，这可能会导致文件写入过程中出现错误" % fcEncodedStrLen
+
             logger.warning(warnMsg)
 
-        debugMsg = "exporting the %s file content to file '%s'" % (fileType, remoteFile)
+        debugMsg = "将 %s 文件内容导出到文件 '%s'" % (fileType, remoteFile)
         logger.debug(debugMsg)
 
         pushValue(kb.forceWhere)
@@ -111,27 +106,23 @@ class Filesystem(GenericFilesystem):
         unionUse(sqlQuery, unpack=False)
         kb.forceWhere = popValue()
 
-        warnMsg = "expect junk characters inside the "
-        warnMsg += "file as a leftover from UNION query"
+        warnMsg = "文件中包含垃圾字符，这是从 UNION 查询中留下的"
         singleTimeWarnMessage(warnMsg)
 
         return self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
     def linesTerminatedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        logger.debug("encoding file to its hexadecimal string value")
+        logger.debug("将文件编码为十六进制字符串值")
 
         fcEncodedList = self.fileEncode(localFile, "hex", True)
         fcEncodedStr = fcEncodedList[0][2:]
         fcEncodedStrLen = len(fcEncodedStr)
 
         if kb.injection.place == PLACE.GET and fcEncodedStrLen > 8000:
-            warnMsg = "the injection is on a GET parameter and the file "
-            warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
-            warnMsg += "bytes, this might cause errors in the file "
-            warnMsg += "writing process"
+            warnMsg = "注入位置是 GET 参数，文件要写入的十六进制值长度为 %d 字节，这可能会导致文件写入过程中出现错误" % fcEncodedStrLen
             logger.warning(warnMsg)
 
-        debugMsg = "exporting the %s file content to file '%s'" % (fileType, remoteFile)
+        debugMsg = "将 %s 文件内容导出到文件 '%s'" % (fileType, remoteFile)
         logger.debug(debugMsg)
 
         query = getSQLSnippet(DBMS.MYSQL, "write_file_limit", OUTFILE=remoteFile, HEXSTRING=fcEncodedStr)
@@ -139,36 +130,33 @@ class Filesystem(GenericFilesystem):
         payload = agent.payload(newValue=query)
         Request.queryPage(payload, content=False, raise404=False, silent=True, noteResponseTime=False)
 
-        warnMsg = "expect junk characters inside the "
-        warnMsg += "file as a leftover from original query"
+        warnMsg = "文件中包含垃圾字符，这是从原始查询中留下的"
         singleTimeWarnMessage(warnMsg)
 
         return self.askCheckWrittenFile(localFile, remoteFile, forceCheck)
 
     def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        debugMsg = "creating a support table to write the hexadecimal "
-        debugMsg += "encoded file to"
+        debugMsg = "创建支持表以写入十六进制编码文件"
         logger.debug(debugMsg)
 
         self.createSupportTbl(self.fileTblName, self.tblField, "longblob")
 
-        logger.debug("encoding file to its hexadecimal string value")
+        logger.debug("将文件编码为十六进制字符串值")
         fcEncodedList = self.fileEncode(localFile, "hex", False)
 
-        debugMsg = "forging SQL statements to write the hexadecimal "
-        debugMsg += "encoded file to the support table"
+        debugMsg = "构造 SQL 语句以将十六进制编码文件写入支持表"
         logger.debug(debugMsg)
 
         sqlQueries = self.fileToSqlQueries(fcEncodedList)
 
-        logger.debug("inserting the hexadecimal encoded file to the support table")
+        logger.debug("将十六进制编码文件插入支持表")
 
         inject.goStacked("SET GLOBAL max_allowed_packet = %d" % (1024 * 1024))  # 1MB (Note: https://github.com/sqlmapproject/sqlmap/issues/3230)
 
         for sqlQuery in sqlQueries:
             inject.goStacked(sqlQuery)
 
-        debugMsg = "exporting the %s file content to file '%s'" % (fileType, remoteFile)
+        debugMsg = "将 %s 文件内容导出到文件 '%s'" % (fileType, remoteFile)
         logger.debug(debugMsg)
 
         # Reference: http://dev.mysql.com/doc/refman/5.1/en/select.html

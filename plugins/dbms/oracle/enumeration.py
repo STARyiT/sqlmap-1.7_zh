@@ -27,12 +27,12 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getRoles(self, query2=False):
-        infoMsg = "fetching database users roles"
+        infoMsg = "检索数据库用户角色"
 
         rootQuery = queries[DBMS.ORACLE].roles
 
         if conf.user == CURRENT_USER:
-            infoMsg += " for current user"
+            infoMsg += "获取当前用户的角色"
             conf.user = self.getCurrentUser()
 
         logger.info(infoMsg)
@@ -56,7 +56,7 @@ class Enumeration(GenericEnumeration):
             values = inject.getValue(query, blind=False, time=False)
 
             if not values and not query2:
-                infoMsg = "trying with table 'USER_ROLE_PRIVS'"
+                infoMsg = "尝试使用表 'USER_ROLE_PRIVS'"
                 logger.info(infoMsg)
 
                 return self.getRoles(query2=True)
@@ -100,8 +100,7 @@ class Enumeration(GenericEnumeration):
                 if user in retrievedUsers:
                     continue
 
-                infoMsg = "fetching number of roles "
-                infoMsg += "for user '%s'" % user
+                infoMsg = "检索用户 '%s' 的角色数量"
                 logger.info(infoMsg)
 
                 if unescapedUser:
@@ -117,17 +116,16 @@ class Enumeration(GenericEnumeration):
 
                 if not isNumPosStrValue(count):
                     if count != 0 and not query2:
-                        infoMsg = "trying with table 'USER_SYS_PRIVS'"
+                        infoMsg = "尝试使用表 'USER_SYS_PRIVS'"
                         logger.info(infoMsg)
 
                         return self.getPrivileges(query2=True)
 
-                    warnMsg = "unable to retrieve the number of "
-                    warnMsg += "roles for user '%s'" % user
+                    warnMsg = "无法检索用户 '%s' 的角色数量"
                     logger.warning(warnMsg)
                     continue
 
-                infoMsg = "fetching roles for user '%s'" % user
+                infoMsg = "检索用户 '%s' 的角色"
                 logger.info(infoMsg)
 
                 roles = set()
@@ -147,15 +145,13 @@ class Enumeration(GenericEnumeration):
                 if roles:
                     kb.data.cachedUsersRoles[user] = list(roles)
                 else:
-                    warnMsg = "unable to retrieve the roles "
-                    warnMsg += "for user '%s'" % user
+                    warnMsg = "无法检索用户 '%s' 的角色"
                     logger.warning(warnMsg)
 
                 retrievedUsers.add(user)
 
         if not kb.data.cachedUsersRoles:
-            errMsg = "unable to retrieve the roles "
-            errMsg += "for the database users"
+            errMsg = "无法检索数据库用户的角色"
             raise SqlmapNoneDataException(errMsg)
 
         for user, privileges in kb.data.cachedUsersRoles.items():

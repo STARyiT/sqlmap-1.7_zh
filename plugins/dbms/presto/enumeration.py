@@ -10,49 +10,49 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getBanner(self):
-        warnMsg = "on Presto it is not possible to get the banner"
+        warnMsg = "在 Presto 中，无法获取 banner"
         logger.warning(warnMsg)
 
         return None
 
     def getCurrentDb(self):
-        warnMsg = "on Presto it is not possible to get name of the current database (schema)"
+        warnMsg = "在 Presto 中，无法获取当前数据库名称（schema）"
         logger.warning(warnMsg)
 
     def isDba(self, user=None):
-        warnMsg = "on Presto it is not possible to test if current user is DBA"
+        warnMsg = "在 Presto 中，无法测试当前用户是否为 DBA"
         logger.warning(warnMsg)
 
     def getUsers(self):
-        warnMsg = "on Presto it is not possible to enumerate the users"
+        warnMsg = "在 Presto 中，无法枚举用户"
         logger.warning(warnMsg)
 
         return []
 
     def getPasswordHashes(self):
-        warnMsg = "on Presto it is not possible to enumerate the user password hashes"
+        warnMsg = "在 Presto 中，无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getPrivileges(self, *args, **kwargs):
-        warnMsg = "on Presto it is not possible to enumerate the user privileges"
+        warnMsg = "在 Presto 中，无法枚举用户权限"
         logger.warning(warnMsg)
 
         return {}
 
     def getRoles(self, *args, **kwargs):
-        warnMsg = "on Presto it is not possible to enumerate the user roles"
+        warnMsg = "在 Presto 中，无法枚举用户角色"
         logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
-        warnMsg = "on Presto it is not possible to enumerate the hostname"
+        warnMsg = "在 Presto 中，无法枚举主机名"
         logger.warning(warnMsg)
 
     def getStatements(self):
-        warnMsg = "on Presto it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Presto 中，无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []

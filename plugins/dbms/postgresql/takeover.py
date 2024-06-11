@@ -52,14 +52,14 @@ class Takeover(GenericTakeover):
         banVer = kb.bannerFp["dbmsVersion"]
 
         if not banVer or not banVer[0].isdigit():
-            errMsg = "unsupported feature on unknown version of PostgreSQL"
+            errMsg = "不支持未知版本的 PostgreSQL"
             raise SqlmapUnsupportedFeatureException(errMsg)
         elif LooseVersion(banVer) >= LooseVersion("10"):
             majorVer = banVer.split('.')[0]
         elif LooseVersion(banVer) >= LooseVersion("8.2") and '.' in banVer:
             majorVer = '.'.join(banVer.split('.')[:2])
         else:
-            errMsg = "unsupported feature on versions of PostgreSQL before 8.2"
+            errMsg = "不支持低于 8.2 版本的 PostgreSQL"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
         try:
@@ -74,12 +74,12 @@ class Takeover(GenericTakeover):
                 self.udfLocalFile = decloakToTemp(_)
                 self.udfSharedLibExt = "so"
         except SqlmapSystemException:
-            errMsg = "unsupported feature on PostgreSQL %s (%s-bit)" % (majorVer, Backend.getArch())
+            errMsg = "不支持 PostgreSQL %s (%s-bit)" % (majorVer, Backend.getArch())
             raise SqlmapUnsupportedFeatureException(errMsg)
 
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:
-            logger.info("creating UDF '%s' from the binary UDF file" % udf)
+            logger.info("从二进制 UDF 文件创建 UDF '%s'" % udf)
 
             inp = ", ".join(i for i in inpRet["input"])
             ret = inpRet["return"]
@@ -90,7 +90,7 @@ class Takeover(GenericTakeover):
 
             self.createdUdf.add(udf)
         else:
-            logger.debug("keeping existing UDF '%s' as requested" % udf)
+            logger.debug("保持现有的 UDF '%s' 不变" % udf)
 
     def uncPathRequest(self):
         self.createSupportTbl(self.fileTblName, self.tblField, "text")

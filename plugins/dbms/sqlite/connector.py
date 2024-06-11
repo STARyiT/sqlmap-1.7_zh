@@ -47,15 +47,14 @@ class Connector(GenericConnector):
             cursor.close()
 
         except (self.__sqlite.DatabaseError, self.__sqlite.OperationalError):
-            warnMsg = "unable to connect using SQLite 3 library, trying with SQLite 2"
+            warnMsg = "无法使用 SQLite 3 库连接，尝试使用 SQLite 2"
             logger.warning(warnMsg)
 
             try:
                 try:
                     import sqlite
                 except ImportError:
-                    errMsg = "sqlmap requires 'python-sqlite' third-party library "
-                    errMsg += "in order to directly connect to the database '%s'" % self.db
+                    errMsg = "sqlmap 需要 'python-sqlite' 第三方库才能直接连接数据库 '%s'" % self.db
                     raise SqlmapMissingDependence(errMsg)
 
                 self.__sqlite = sqlite

@@ -22,18 +22,18 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.INFORMIX
@@ -41,19 +41,19 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -65,19 +65,19 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.INFORMIX
+        infoMsg = "测试 %s" % DBMS.INFORMIX
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("[RANDNUM]=(SELECT [RANDNUM] FROM SYSMASTER:SYSDUAL)")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.INFORMIX
+            infoMsg = "确认 %s" % DBMS.INFORMIX
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("(SELECT DBINFO('DBNAME') FROM SYSMASTER:SYSDUAL) IS NOT NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.INFORMIX
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.INFORMIX
                 logger.warning(warnMsg)
 
                 return False
@@ -93,7 +93,7 @@ class Fingerprint(GenericFingerprint):
             if not conf.extensiveFp:
                 return True
 
-            infoMsg = "actively fingerprinting %s" % DBMS.INFORMIX
+            infoMsg = "活跃指纹 %s" % DBMS.INFORMIX
             logger.info(infoMsg)
 
             for version in ("14.1", "12.1", "11.7", "11.5", "10.0"):
@@ -105,7 +105,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.INFORMIX
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.INFORMIX
             logger.warning(warnMsg)
 
             return False

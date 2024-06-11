@@ -10,23 +10,23 @@ from plugins.generic.enumeration import Enumeration as GenericEnumeration
 
 class Enumeration(GenericEnumeration):
     def getPasswordHashes(self):
-        warnMsg = "on Cubrid it is not possible to enumerate password hashes"
+        warnMsg = "在 Cubrid 上无法枚举用户密码哈希值"
         logger.warning(warnMsg)
 
         return {}
 
     def getStatements(self):
-        warnMsg = "on Cubrid it is not possible to enumerate the SQL statements"
+        warnMsg = "在 Cubrid 上无法枚举 SQL 语句"
         logger.warning(warnMsg)
 
         return []
 
     def getRoles(self, *args, **kwargs):
-        warnMsg = "on Cubrid it is not possible to enumerate the user roles"
+        warnMsg = "在 Cubrid 上无法枚举用户角色"
         logger.warning(warnMsg)
 
         return {}
 
     def getHostname(self):
-        warnMsg = "on Cubrid it is not possible to enumerate the hostname"
+        warnMsg = "在 Cubrid 上无法枚举主机名"
         logger.warning(warnMsg)

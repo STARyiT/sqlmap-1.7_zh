@@ -10,6 +10,5 @@ from plugins.generic.connector import Connector as GenericConnector
 
 class Connector(GenericConnector):
     def connect(self):
-        errMsg = "on Altibase it is not (currently) possible to establish a "
-        errMsg += "direct connection"
+        errMsg = "在 Altibase 中无法建立直接连接"
         raise SqlmapUnsupportedFeatureException(errMsg)

@@ -30,13 +30,13 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.MYSQL)
 
     def _commentCheck(self):
-        infoMsg = "executing %s comment injection fingerprint" % DBMS.MYSQL
+        infoMsg = "执行 %s 注释注入指纹" % DBMS.MYSQL
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("[RANDNUM]=[RANDNUM]/* NoValue */")
 
         if not result:
-            warnMsg = "unable to perform %s comment injection" % DBMS.MYSQL
+            warnMsg = "无法执行 %s 注释注入" % DBMS.MYSQL
             logger.warning(warnMsg)
 
             return None
@@ -104,18 +104,18 @@ class Fingerprint(GenericFingerprint):
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
 
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp and not conf.api:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp and not conf.api:
                 value += "%s\n" % dbmsOsFp
 
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
         actVer = Format.getDbms()
 
         if not conf.extensiveFp:
@@ -126,29 +126,29 @@ class Fingerprint(GenericFingerprint):
 
         comVer = self._commentCheck()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if comVer:
             comVer = Format.getDbms([comVer])
-            value += "\n%scomment injection fingerprint: %s" % (blank, comVer)
+            value += "\n%s注释注入指纹: %s" % (blank, comVer)
 
         if kb.bannerFp:
             banVer = kb.bannerFp.get("dbmsVersion")
 
             if banVer:
                 if banVer and re.search(r"-log$", kb.data.banner or ""):
-                    banVer += ", logging enabled"
+                    banVer += ", 启用日志记录"
 
                 banVer = Format.getDbms([banVer])
-                value += "\n%sbanner parsing fingerprint: %s" % (blank, banVer)
+                value += "\n%sbanner 解析指纹: %s" % (blank, banVer)
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         if fork:
-            value += "\n%sfork fingerprint: %s" % (blank, fork)
+            value += "\n%sfork 指纹: %s" % (blank, fork)
 
         return value
 
@@ -172,13 +172,13 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.MYSQL
+        infoMsg = "测试 %s" % DBMS.MYSQL
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("QUARTER(NULL) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.MYSQL
+            infoMsg = "确认 %s" % DBMS.MYSQL
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("SESSION_USER() LIKE USER()")
@@ -191,7 +191,7 @@ class Fingerprint(GenericFingerprint):
                     hashDBWrite(HASHDB_KEYS.DBMS_FORK, FORK.MEMSQL)
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.MYSQL
                 logger.warning(warnMsg)
 
                 return False
@@ -216,7 +216,7 @@ class Fingerprint(GenericFingerprint):
                 if not conf.extensiveFp:
                     return True
 
-                infoMsg = "actively fingerprinting %s" % DBMS.MYSQL
+                infoMsg = "活跃指纹 %s" % DBMS.MYSQL
                 logger.info(infoMsg)
 
                 # Check if it is MySQL >= 5.7
@@ -296,7 +296,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.MYSQL
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.MYSQL
             logger.warning(warnMsg)
 
             return False
@@ -305,7 +305,7 @@ class Fingerprint(GenericFingerprint):
         if Backend.getOs():
             return
 
-        infoMsg = "fingerprinting the back-end DBMS operating system"
+        infoMsg = "指纹后端 DBMS 操作系统"
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("'W'=UPPER(MID(@@version_compile_os,1,1))")
@@ -316,7 +316,7 @@ class Fingerprint(GenericFingerprint):
             Backend.setOs(OS.LINUX)
 
         if Backend.getOs():
-            infoMsg = "the back-end DBMS operating system is %s" % Backend.getOs()
+            infoMsg = "后端 DBMS 操作系统是 %s" % Backend.getOs()
             logger.info(infoMsg)
         else:
             self.userChooseDbmsOs()

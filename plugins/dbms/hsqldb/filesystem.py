@@ -16,7 +16,7 @@ from plugins.generic.filesystem import Filesystem as GenericFilesystem
 
 class Filesystem(GenericFilesystem):
     def readFile(self, remoteFile):
-        errMsg = "on HSQLDB it is not possible to read files"
+        errMsg = "在 HSQLDB 上无法读取文件"
         raise SqlmapUnsupportedFeatureException(errMsg)
 
     @stackedmethod
@@ -24,7 +24,7 @@ class Filesystem(GenericFilesystem):
         funcName = randomStr()
         max_bytes = 1024 * 1024
 
-        debugMsg = "creating JLP procedure '%s'" % funcName
+        debugMsg = "创建 JLP 过程 '%s'" % funcName
         logger.debug(debugMsg)
 
         addFuncQuery = "CREATE PROCEDURE %s (IN paramString VARCHAR, IN paramArrayOfByte VARBINARY(%s)) " % (funcName, max_bytes)
@@ -37,13 +37,11 @@ class Filesystem(GenericFilesystem):
         fcEncodedStrLen = len(fcEncodedStr)
 
         if kb.injection.place == PLACE.GET and fcEncodedStrLen > 8000:
-            warnMsg = "as the injection is on a GET parameter and the file "
-            warnMsg += "to be written hexadecimal value is %d " % fcEncodedStrLen
-            warnMsg += "bytes, this might cause errors in the file "
-            warnMsg += "writing process"
+            warnMsg = "由于注入在 GET 参数中，文件要写入十六进制值 %d 字节，" % fcEncodedStrLen
+            warnMsg += "这可能会导致文件写入过程出错"
             logger.warning(warnMsg)
 
-        debugMsg = "exporting the %s file content to file '%s'" % (fileType, remoteFile)
+        debugMsg = "将 %s 文件内容导出到文件 '%s'" % (fileType, remoteFile)
         logger.debug(debugMsg)
 
         # Reference: http://hsqldb.org/doc/guide/sqlroutines-chapt.html#src_jrt_procedures
@@ -54,6 +52,5 @@ class Filesystem(GenericFilesystem):
         delQuery = "DELETE PROCEDURE %s" % funcName
         inject.goStacked(delQuery)
 
-        message = "the local file '%s' has been written on the back-end DBMS" % localFile
-        message += "file system ('%s')" % remoteFile
+        message = "本地文件 '%s' 已被写入后端 DBMS 文件系统 ('%s')" % (localFile, remoteFile)
         logger.info(message)

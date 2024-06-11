@@ -24,7 +24,7 @@ class Fingerprint(GenericFingerprint):
         GenericFingerprint.__init__(self, DBMS.MAXDB)
 
     def _versionCheck(self):
-        infoMsg = "executing %s SYSINFO version check" % DBMS.MAXDB
+        infoMsg = "执行 %s SYSINFO 版本检查" % DBMS.MAXDB
         logger.info(infoMsg)
 
         query = agent.prefixQuery("/* NoValue */")
@@ -33,7 +33,7 @@ class Fingerprint(GenericFingerprint):
         result = Request.queryPage(payload)
 
         if not result:
-            warnMsg = "unable to perform %s version check" % DBMS.MAXDB
+            warnMsg = "无法执行 %s 版本检查" % DBMS.MAXDB
             logger.warning(warnMsg)
 
             return None
@@ -59,19 +59,19 @@ class Fingerprint(GenericFingerprint):
 
     def getFingerprint(self):
         value = ""
-        wsOsFp = Format.getOs("web server", kb.headersFp)
+        wsOsFp = Format.getOs("web 服务器", kb.headersFp)
 
         if wsOsFp:
             value += "%s\n" % wsOsFp
 
         if kb.data.banner:
-            dbmsOsFp = Format.getOs("back-end DBMS", kb.bannerFp)
+            dbmsOsFp = Format.getOs("后端 DBMS", kb.bannerFp)
 
             if dbmsOsFp:
                 value += "%s\n" % dbmsOsFp
 
         blank = " " * 15
-        value += "back-end DBMS: "
+        value += "后端 DBMS: "
 
         if not conf.extensiveFp:
             value += DBMS.MAXDB
@@ -79,15 +79,15 @@ class Fingerprint(GenericFingerprint):
 
         actVer = Format.getDbms() + " (%s)" % self._versionCheck()
         blank = " " * 15
-        value += "active fingerprint: %s" % actVer
+        value += "活跃指纹: %s" % actVer
 
         if kb.bannerFp:
-            value += "\n%sbanner parsing fingerprint: -" % blank
+            value += "\n%sbanner 解析指纹: -" % blank
 
         htmlErrorFp = Format.getErrorParsedDBMSes()
 
         if htmlErrorFp:
-            value += "\n%shtml error message fingerprint: %s" % (blank, htmlErrorFp)
+            value += "\n%shtml 错误消息指纹: %s" % (blank, htmlErrorFp)
 
         return value
 
@@ -99,19 +99,19 @@ class Fingerprint(GenericFingerprint):
 
             return True
 
-        infoMsg = "testing %s" % DBMS.MAXDB
+        infoMsg = "测试 %s" % DBMS.MAXDB
         logger.info(infoMsg)
 
         result = inject.checkBooleanExpression("ALPHA(NULL) IS NULL")
 
         if result:
-            infoMsg = "confirming %s" % DBMS.MAXDB
+            infoMsg = "确认 %s" % DBMS.MAXDB
             logger.info(infoMsg)
 
             result = inject.checkBooleanExpression("MAPCHAR(NULL,1,DEFAULTMAP) IS NULL")
 
             if not result:
-                warnMsg = "the back-end DBMS is not %s" % DBMS.MAXDB
+                warnMsg = "后端 DBMS 不是 %s" % DBMS.MAXDB
                 logger.warning(warnMsg)
 
                 return False
@@ -122,7 +122,7 @@ class Fingerprint(GenericFingerprint):
 
             return True
         else:
-            warnMsg = "the back-end DBMS is not %s" % DBMS.MAXDB
+            warnMsg = "后端 DBMS 不是 %s" % DBMS.MAXDB
             logger.warning(warnMsg)
 
             return False

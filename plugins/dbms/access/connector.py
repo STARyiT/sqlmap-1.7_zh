@@ -30,8 +30,7 @@ class Connector(GenericConnector):
 
     def connect(self):
         if not IS_WIN:
-            errMsg = "currently, direct connection to Microsoft Access database(s) "
-            errMsg += "is restricted to Windows platforms"
+            errMsg = "目前,直接连接到 Microsoft Access 数据库仅限于 Windows 平台"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
         self.initConnection()

@@ -40,12 +40,12 @@ class Takeover(GenericTakeover):
 
         if banVer and LooseVersion(banVer) >= LooseVersion("5.0.67"):
             if self.__plugindir is None:
-                logger.info("retrieving MySQL plugin directory absolute path")
+                logger.info("检索 MySQL 插件目录的绝对路径")
                 self.__plugindir = unArrayizeValue(inject.getValue("SELECT @@plugin_dir"))
 
             # On MySQL 5.1 >= 5.1.19 and on any version of MySQL 6.0
             if self.__plugindir is None and LooseVersion(banVer) >= LooseVersion("5.1.19"):
-                logger.info("retrieving MySQL base directory absolute path")
+                logger.info("检索 MySQL 基础目录的绝对路径")
 
                 # Reference: http://dev.mysql.com/doc/refman/5.1/en/server-options.html#option_mysqld_basedir
                 self.__basedir = unArrayizeValue(inject.getValue("SELECT @@basedir"))
@@ -97,7 +97,7 @@ class Takeover(GenericTakeover):
 
     def udfCreateFromSharedLib(self, udf, inpRet):
         if udf in self.udfToCreate:
-            logger.info("creating UDF '%s' from the binary UDF file" % udf)
+            logger.info("创建 UDF '%s' 从二进制 UDF 文件" % udf)
 
             ret = inpRet["return"]
 
@@ -107,7 +107,7 @@ class Takeover(GenericTakeover):
 
             self.createdUdf.add(udf)
         else:
-            logger.debug("keeping existing UDF '%s' as requested" % udf)
+            logger.debug("保持现有的 UDF '%s' 不变" % udf)
 
     def uncPathRequest(self):
         if not isStackingAvailable():
