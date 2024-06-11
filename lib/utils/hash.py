@@ -634,8 +634,7 @@ def storeHashesToFile(attack_dict):
                     items.add(item)
 
     if kb.choices.storeHashes is None:
-        message = "do you want to store hashes to a temporary file "
-        message += "for eventual further processing with other tools [y/N] "
+        message = "您是否要将哈希值存储到临时文件中,以便以后使用其他工具进行进一步处理 [y/N] "
 
         kb.choices.storeHashes = readInput(message, default='N', boolean=True)
 
@@ -643,7 +642,7 @@ def storeHashesToFile(attack_dict):
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.HASHES, suffix=".txt")
         os.close(handle)
 
-        infoMsg = "writing hashes to a temporary file '%s' " % filename
+        infoMsg = "将哈希值写入临时文件 '%s'" % filename
         logger.info(infoMsg)
 
         with openFile(filename, "w+") as f:
@@ -677,7 +676,7 @@ def attackDumpedTable():
         if not count:
             return
 
-        debugMsg = "analyzing table dump for possible password hashes"
+        debugMsg = "分析表转储以查找可能的密码哈希值"
         logger.debug(debugMsg)
 
         found = False
@@ -699,8 +698,7 @@ def attackDumpedTable():
 
         if binary_fields:
             _ = ','.join(binary_fields)
-            warnMsg = "potential binary fields detected ('%s'). In case of any problems you are " % _
-            warnMsg += "advised to rerun table dump with '--fresh-queries --binary-fields=\"%s\"'" % _
+            warnMsg = "检测到潜在的二进制字段('%s')。如果遇到任何问题,建议您使用 '--fresh-queries --binary-fields=\"%s\"' 重新运行表转储" % (_, _)
             logger.warning(warnMsg)
 
         for i in xrange(count):
@@ -738,13 +736,13 @@ def attackDumpedTable():
                     col_passwords.add(column)
 
         if attack_dict:
-            infoMsg = "recognized possible password hashes in column%s " % ("s" if len(col_passwords) > 1 else "")
+            infoMsg = "在%s列中识别到可能的密码哈希值" % ("多个" if len(col_passwords) > 1 else "列")
             infoMsg += "'%s'" % ", ".join(col for col in col_passwords)
             logger.info(infoMsg)
 
             storeHashesToFile(attack_dict)
 
-            message = "do you want to crack them via a dictionary-based attack? %s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
+            message = "您是否要通过基于字典的攻击来破解它们？%s" % ("[y/N/q]" if conf.multipleTargets else "[Y/n/q]")
             choice = readInput(message, default='N' if conf.multipleTargets else 'Y').upper()
 
             if choice == 'N':
@@ -761,7 +759,7 @@ def attackDumpedTable():
                     lut[key.lower()] = password
                     lut["0x%s" % key.lower()] = password
 
-            debugMsg = "post-processing table dump"
+            debugMsg = "正在进行表转储的后处理"
             logger.debug(debugMsg)
 
             for i in xrange(count):
@@ -848,12 +846,12 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
 
                             clearConsoleLine()
 
-                            infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                            infoMsg = "\r[%s] [INFO] 破解密码 '%s'" % (time.strftime("%X"), word)
 
                             if user and not user.startswith(DUMMY_USER_PREFIX):
-                                infoMsg += " for user '%s'\n" % user
+                                infoMsg += "为用户 '%s' " % user
                             else:
-                                infoMsg += " for hash '%s'\n" % hash_
+                                infoMsg += "为哈希值 '%s' " % hash_
 
                             dataToStdout(infoMsg, True)
 
@@ -877,8 +875,8 @@ def _bruteProcessVariantA(attack_info, hash_regex, suffix, retVal, proc_id, proc
                 pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception as ex:
-                warnMsg = "there was a problem while hashing entry: %s ('%s'). " % (repr(word), getSafeExString(ex))
-                warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
+                warnMsg = "在哈希条目时出现问题:%s('%s')。" % (repr(word), getSafeExString(ex))
+                warnMsg += "请通过电子邮件报告给 '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -924,12 +922,12 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
 
                     clearConsoleLine()
 
-                    infoMsg = "\r[%s] [INFO] cracked password '%s'" % (time.strftime("%X"), word)
+                    infoMsg = "\r[%s] [INFO] 破解密码 '%s'" % (time.strftime("%X"), word)
 
                     if user and not user.startswith(DUMMY_USER_PREFIX):
-                        infoMsg += " for user '%s'\n" % user
+                        infoMsg += ",对于用户 '%s'\n" % user
                     else:
-                        infoMsg += " for hash '%s'\n" % hash_
+                        infoMsg += ",对于哈希值 '%s'\n" % hash_
 
                     dataToStdout(infoMsg, True)
 
@@ -956,8 +954,8 @@ def _bruteProcessVariantB(user, hash_, kwargs, hash_regex, suffix, retVal, found
                 pass  # ignore possible encoding problems caused by some words in custom dictionaries
 
             except Exception as ex:
-                warnMsg = "there was a problem while hashing entry: %s ('%s'). " % (repr(word), getSafeExString(ex))
-                warnMsg += "Please report by e-mail to '%s'" % DEV_EMAIL_ADDRESS
+                warnMsg = "在哈希条目时出现问题:%s('%s')。" % (repr(word), getSafeExString(ex))
+                warnMsg += "请通过电子邮件报告给 '%s'" % DEV_EMAIL_ADDRESS
                 logger.critical(warnMsg)
 
     except KeyboardInterrupt:
@@ -1011,7 +1009,7 @@ def dictionaryAttack(attack_dict):
 
             if regex and regex not in hash_regexes:
                 hash_regexes.append(regex)
-                infoMsg = "using hash method '%s'" % __functions__[regex].__name__
+                infoMsg = "使用哈希方法 '%s'" % __functions__[regex].__name__
                 logger.info(infoMsg)
 
     for hash_regex in hash_regexes:
@@ -1063,7 +1061,7 @@ def dictionaryAttack(attack_dict):
                             if ITOA64.index(hash_[3]) < 32:
                                 item = [(user, hash_), {"salt": hash_[4:12], "count": 1 << ITOA64.index(hash_[3]), "prefix": hash_[:3]}]
                             else:
-                                warnMsg = "invalid hash '%s'" % hash_
+                                warnMsg = "无效的哈希值 '%s'" % hash_
                                 logger.warning(warnMsg)
 
                         if item and hash_ not in keys:
@@ -1072,9 +1070,9 @@ def dictionaryAttack(attack_dict):
                                 attack_info.append(item)
                                 user_hash.append(item[0])
                             else:
-                                infoMsg = "resuming password '%s' for hash '%s'" % (resumed, hash_)
+                                infoMsg = "恢复密码 '%s' 为哈希值 '%s'" % (resumed, hash_)
                                 if user and not user.startswith(DUMMY_USER_PREFIX):
-                                    infoMsg += " for user '%s'" % user
+                                    infoMsg += " 为用户 '%s'" % user
                                 logger.info(infoMsg)
                                 resumes.append((user, hash_, resumed))
                             keys.add(hash_)
@@ -1094,27 +1092,27 @@ def dictionaryAttack(attack_dict):
                 else:
                     dictPaths = [paths.WORDLIST]
 
-                message = "what dictionary do you want to use?\n"
-                message += "[1] default dictionary file '%s' (press Enter)\n" % dictPaths[0]
-                message += "[2] custom dictionary file\n"
-                message += "[3] file with list of dictionary files"
+                message = "您想使用哪个字典？\n"
+                message += "[1] 默认字典文件 '%s' (按Enter)\n" % dictPaths[0]
+                message += "[2] 自定义字典文件\n"
+                message += "[3] 包含字典文件列表的文件"
                 choice = readInput(message, default='1')
 
                 try:
                     if choice == '2':
-                        message = "what's the custom dictionary's location?\n"
+                        message = "您想使用哪个自定义字典？\n"
                         dictPath = readInput(message)
                         if dictPath:
                             dictPaths = [dictPath]
-                            logger.info("using custom dictionary")
+                            logger.info("使用自定义字典")
                     elif choice == '3':
-                        message = "what's the list file location?\n"
+                        message = "您想使用哪个字典文件列表？\n"
                         listPath = readInput(message)
                         checkFile(listPath)
                         dictPaths = getFileItems(listPath)
-                        logger.info("using custom list of dictionaries")
+                        logger.info("使用自定义字典列表")
                     else:
-                        logger.info("using default dictionary")
+                        logger.info("使用默认字典")
 
                     dictPaths = [_ for _ in dictPaths if _]
 
@@ -1124,7 +1122,7 @@ def dictionaryAttack(attack_dict):
                         if isZipFile(dictPath):
                             _ = zipfile.ZipFile(dictPath, 'r')
                             if len(_.namelist()) == 0:
-                                errMsg = "no file(s) inside '%s'" % dictPath
+                                errMsg = "在 '%s' 中没有文件" % dictPath
                                 raise SqlmapDataException(errMsg)
                             else:
                                 _.open(_.namelist()[0])
@@ -1132,16 +1130,15 @@ def dictionaryAttack(attack_dict):
                     kb.wordlists = dictPaths
 
                 except Exception as ex:
-                    warnMsg = "there was a problem while loading dictionaries"
-                    warnMsg += " ('%s')" % getSafeExString(ex)
+                    warnMsg = "加载字典时出现问题('%s')" % getSafeExString(ex)
                     logger.critical(warnMsg)
 
-            message = "do you want to use common password suffixes? (slow!) [y/N] "
+            message = "您想使用常见密码后缀吗？(慢!) [y/N] "
 
             if readInput(message, default='N', boolean=True):
                 suffix_list += COMMON_PASSWORD_SUFFIXES
 
-        infoMsg = "starting dictionary-based cracking (%s)" % __functions__[hash_regex].__name__
+        infoMsg = "开始基于字典的破解(%s)" % __functions__[hash_regex].__name__
         logger.info(infoMsg)
 
         for item in attack_info:
@@ -1157,7 +1154,7 @@ def dictionaryAttack(attack_dict):
 
                 if suffix:
                     clearConsoleLine()
-                    infoMsg = "using suffix '%s'" % suffix
+                    infoMsg = "使用后缀 '%s'" % suffix
                     logger.info(infoMsg)
 
                 retVal = None
@@ -1166,7 +1163,7 @@ def dictionaryAttack(attack_dict):
                 try:
                     if _multiprocessing:
                         if _multiprocessing.cpu_count() > 1:
-                            infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
+                            infoMsg = "启动 %d 个进程" % _multiprocessing.cpu_count()
                             singleTimeLogMessage(infoMsg)
 
                         gc.disable()
@@ -1186,8 +1183,7 @@ def dictionaryAttack(attack_dict):
                             time.sleep(0.5)
 
                     else:
-                        warnMsg = "multiprocessing hash cracking is currently "
-                        warnMsg += "%s on this platform" % ("not supported" if not conf.disableMulti else "disabled")
+                        warnMsg = "在此平台上,多进程哈希破解当前%s" % ("不受支持" if not conf.disableMulti else "已禁用")
                         singleTimeWarnMessage(warnMsg)
 
                         retVal = _queue.Queue()
@@ -1196,7 +1192,7 @@ def dictionaryAttack(attack_dict):
                 except KeyboardInterrupt:
                     print()
                     processException = True
-                    warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
+                    warnMsg = "用户在字典破解阶段中中断(Ctrl+C)"
                     logger.warning(warnMsg)
 
                 finally:
@@ -1221,7 +1217,7 @@ def dictionaryAttack(attack_dict):
 
                     if suffix:
                         clearConsoleLine()
-                        infoMsg = "using suffix '%s'" % suffix
+                        infoMsg = "使用后缀 '%s'" % suffix
                         logger.info(infoMsg)
 
                     retVal = None
@@ -1230,7 +1226,7 @@ def dictionaryAttack(attack_dict):
                     try:
                         if _multiprocessing:
                             if _multiprocessing.cpu_count() > 1:
-                                infoMsg = "starting %d processes " % _multiprocessing.cpu_count()
+                                infoMsg = "启动 %d 个进程" % _multiprocessing.cpu_count()
                                 singleTimeLogMessage(infoMsg)
 
                             gc.disable()
@@ -1253,8 +1249,7 @@ def dictionaryAttack(attack_dict):
                             found = found_.value != 0
 
                         else:
-                            warnMsg = "multiprocessing hash cracking is currently "
-                            warnMsg += "%s on this platform" % ("not supported" if not conf.disableMulti else "disabled")
+                            warnMsg = "在此平台上,多进程哈希破解当前%s" % ("不受支持" if not conf.disableMulti else "已禁用")
                             singleTimeWarnMessage(warnMsg)
 
                             class Value(object):
@@ -1271,7 +1266,7 @@ def dictionaryAttack(attack_dict):
                     except KeyboardInterrupt:
                         print()
                         processException = True
-                        warnMsg = "user aborted during dictionary-based attack phase (Ctrl+C was pressed)"
+                        warnMsg = "用户在字典破解阶段中中断(Ctrl+C)"
                         logger.warning(warnMsg)
 
                         for process in processes:
@@ -1289,11 +1284,11 @@ def dictionaryAttack(attack_dict):
     results.extend(resumes)
 
     if foundHash and len(hash_regexes) == 0:
-        warnMsg = "unknown hash format"
+        warnMsg = "未知哈希格式"
         logger.warning(warnMsg)
 
     if len(results) == 0:
-        warnMsg = "no clear password(s) found"
+        warnMsg = "未找到清晰的密码"
         logger.warning(warnMsg)
 
     return results

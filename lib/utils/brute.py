@@ -49,7 +49,7 @@ from lib.request import inject
 def _addPageTextWords():
     wordsList = []
 
-    infoMsg = "adding words used on web page to the check list"
+    infoMsg = "将网页上使用的单词添加到检查列表中"
     logger.info(infoMsg)
     pageWords = getPageWordSet(kb.originalPage)
 
@@ -64,11 +64,11 @@ def _addPageTextWords():
 @stackedmethod
 def tableExists(tableFile, regex=None):
     if kb.choices.tableExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
-        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
-        warnMsg += "for common table existence check"
+        warnMsg = "不建议在常规表存在检查中使用 '%s' and/or '%s'" % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+
         logger.warning(warnMsg)
 
-        message = "are you sure you want to continue? [y/N] "
+        message = "您确定要继续吗？[y/N] "
         kb.choices.tableExists = readInput(message, default='N', boolean=True)
 
         if not kb.choices.tableExists:
@@ -77,9 +77,8 @@ def tableExists(tableFile, regex=None):
     result = inject.checkBooleanExpression("%s" % safeStringFormat(BRUTE_TABLE_EXISTS_TEMPLATE, (randomInt(1), randomStr())))
 
     if result:
-        errMsg = "can't use table existence check because of detected invalid results "
-        errMsg += "(most likely caused by inability of the used injection "
-        errMsg += "to distinguish erroneous results)"
+        errMsg = "由于检测到无效结果,无法使用表存在检查 "
+        errMsg += "(很可能是由于所使用的注入无法区分错误结果)"
         raise SqlmapDataException(errMsg)
 
     pushValue(conf.db)
@@ -87,16 +86,16 @@ def tableExists(tableFile, regex=None):
     if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
         conf.db = conf.db.upper()
 
-    message = "which common tables (wordlist) file do you want to use?\n"
-    message += "[1] default '%s' (press Enter)\n" % tableFile
-    message += "[2] custom"
+    message = "您想使用哪种常见表(词汇)文件？\n"
+    message += "[1] 默认 '%s' (按下Enter)\n" % tableFile
+    message += "[2] 自定义"
     choice = readInput(message, default='1')
 
     if choice == '2':
-        message = "what's the custom common tables file location?\n"
+        message = "您想使用哪种自定义常见表文件？\n"
         tableFile = readInput(message) or tableFile
 
-    infoMsg = "performing table existence using items from '%s'" % tableFile
+    infoMsg = "使用 '%s' 中的项目进行表存在检查" % tableFile
     logger.info(infoMsg)
 
     tables = getFileItems(tableFile, lowercase=Backend.getIdentifiedDbms() in (DBMS.ACCESS,), unique=True)
@@ -105,7 +104,7 @@ def tableExists(tableFile, regex=None):
 
     for conf.db in (conf.db.split(',') if conf.db else [conf.db]):
         if conf.db and METADB_SUFFIX not in conf.db:
-            infoMsg = "checking database '%s'" % conf.db
+            infoMsg = "检查数据库 '%s'" % conf.db
             logger.info(infoMsg)
 
         threadData = getCurrentThreadData()
@@ -146,29 +145,28 @@ def tableExists(tableFile, regex=None):
 
                     if conf.verbose in (1, 2) and not conf.api:
                         clearConsoleLine(True)
-                        infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
+                        infoMsg = "[%s] [INFO] 检索: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(table))
                         dataToStdout(infoMsg, True)
 
                 if conf.verbose in (1, 2):
-                    status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                    dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                    status = '%d/%d 项 (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                    dataToStdout("\r[%s] [INFO] 尝试 %s" % (time.strftime("%X"), status), True)
 
                 kb.locks.io.release()
 
         try:
             runThreads(conf.threads, tableExistsThread, threadChoice=True)
         except KeyboardInterrupt:
-            warnMsg = "user aborted during table existence "
-            warnMsg += "check. sqlmap will display partial output"
+            warnMsg = "用户在表存在检查过程中中止。sqlmap将显示部分输出"
             logger.warning(warnMsg)
 
         clearConsoleLine(True)
         dataToStdout("\n")
 
         if not threadData.shared.files:
-            warnMsg = "no table(s) found"
+            warnMsg = "未找到表"
             if conf.db:
-                warnMsg += " for database '%s'" % conf.db
+                warnMsg += " 数据库 '%s'" % conf.db
             logger.warning(warnMsg)
         else:
             for item in threadData.shared.files:
@@ -188,18 +186,18 @@ def tableExists(tableFile, regex=None):
 
 def columnExists(columnFile, regex=None):
     if kb.choices.columnExists is None and not any(_ for _ in kb.injection.data if _ not in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED)) and not conf.direct:
-        warnMsg = "it's not recommended to use '%s' and/or '%s' " % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
-        warnMsg += "for common column existence check"
+        warnMsg = "不建议在常规列存在检查中使用 '%s' 和/或 '%s'" % (PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.TIME], PAYLOAD.SQLINJECTION[PAYLOAD.TECHNIQUE.STACKED])
+
         logger.warning(warnMsg)
 
-        message = "are you sure you want to continue? [y/N] "
+        message = "您确定要继续吗？[y/N] "
         kb.choices.columnExists = readInput(message, default='N', boolean=True)
 
         if not kb.choices.columnExists:
             return None
 
     if not conf.tbl:
-        errMsg = "missing table parameter"
+        errMsg = "缺少表参数"
         raise SqlmapMissingMandatoryOptionException(errMsg)
 
     if conf.db and Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
@@ -208,21 +206,20 @@ def columnExists(columnFile, regex=None):
     result = inject.checkBooleanExpression(safeStringFormat(BRUTE_COLUMN_EXISTS_TEMPLATE, (randomStr(), randomStr())))
 
     if result:
-        errMsg = "can't use column existence check because of detected invalid results "
-        errMsg += "(most likely caused by inability of the used injection "
-        errMsg += "to distinguish erroneous results)"
+        errMsg = "由于检测到无效结果,无法使用列存在检查 "
+        errMsg += "(很可能是由于所使用的注入无法区分错误结果)"
         raise SqlmapDataException(errMsg)
 
-    message = "which common columns (wordlist) file do you want to use?\n"
-    message += "[1] default '%s' (press Enter)\n" % columnFile
-    message += "[2] custom"
+    message = "您想使用哪种常见列(词汇)文件？\n"
+    message += "[1] 默认 '%s' (按下Enter)\n" % columnFile
+    message += "[2] 自定义"
     choice = readInput(message, default='1')
 
     if choice == '2':
-        message = "what's the custom common columns file location?\n"
+        message = "您想使用哪种自定义常见列文件？\n"
         columnFile = readInput(message) or columnFile
 
-    infoMsg = "checking column existence using items from '%s'" % columnFile
+    infoMsg = "使用 '%s' 中的项目进行列存在检查" % columnFile
     logger.info(infoMsg)
 
     columns = getFileItems(columnFile, unique=True)
@@ -267,20 +264,19 @@ def columnExists(columnFile, regex=None):
 
                 if conf.verbose in (1, 2) and not conf.api:
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
+                    infoMsg = "[%s] [INFO] 检索: %s\n" % (time.strftime("%X"), unsafeSQLIdentificatorNaming(column))
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = "%d/%d items (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                status = "%d/%d 项 (%d%%)" % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                dataToStdout("\r[%s] [INFO] 尝试 %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()
 
     try:
         runThreads(conf.threads, columnExistsThread, threadChoice=True)
     except KeyboardInterrupt:
-        warnMsg = "user aborted during column existence "
-        warnMsg += "check. sqlmap will display partial output"
+        warnMsg = "用户在列存在检查过程中中止。sqlmap将显示部分输出"
         logger.warning(warnMsg)
     finally:
         kb.bruteMode = False
@@ -289,7 +285,7 @@ def columnExists(columnFile, regex=None):
     dataToStdout("\n")
 
     if not threadData.shared.files:
-        warnMsg = "no column(s) found"
+        warnMsg = "未找到列"
         logger.warning(warnMsg)
     else:
         columns = {}
@@ -323,16 +319,16 @@ def columnExists(columnFile, regex=None):
 def fileExists(pathFile):
     retVal = []
 
-    message = "which common files file do you want to use?\n"
-    message += "[1] default '%s' (press Enter)\n" % pathFile
-    message += "[2] custom"
+    message = "您想使用哪种常见文件？\n"
+    message += "[1] 默认 '%s' (按下Enter)\n" % pathFile
+    message += "[2] 自定义"
     choice = readInput(message, default='1')
 
     if choice == '2':
-        message = "what's the custom common files file location?\n"
+        message = "您想使用哪种自定义常见文件？\n"
         pathFile = readInput(message) or pathFile
 
-    infoMsg = "checking files existence using items from '%s'" % pathFile
+    infoMsg = "使用 '%s' 中的项执行文件存在检查" % pathFile
     logger.info(infoMsg)
 
     paths = getFileItems(pathFile, unique=True)
@@ -377,12 +373,12 @@ def fileExists(pathFile):
 
                 if not conf.api:
                     clearConsoleLine(True)
-                    infoMsg = "[%s] [INFO] retrieved: '%s'\n" % (time.strftime("%X"), path)
+                    infoMsg = "[%s] [INFO] 检索: '%s'\n" % (time.strftime("%X"), path)
                     dataToStdout(infoMsg, True)
 
             if conf.verbose in (1, 2):
-                status = '%d/%d items (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
-                dataToStdout("\r[%s] [INFO] tried %s" % (time.strftime("%X"), status), True)
+                status = '%d/%d 项 (%d%%)' % (threadData.shared.count, threadData.shared.limit, round(100.0 * threadData.shared.count / threadData.shared.limit))
+                dataToStdout("\r[%s] [INFO] 尝试 %s" % (time.strftime("%X"), status), True)
 
             kb.locks.io.release()
 
@@ -392,8 +388,7 @@ def fileExists(pathFile):
 
         runThreads(conf.threads, fileExistsThread, threadChoice=True)
     except KeyboardInterrupt:
-        warnMsg = "user aborted during file existence "
-        warnMsg += "check. sqlmap will display partial output"
+        warnMsg = "用户在文件存在检查过程中中止。sqlmap将显示部分输出"
         logger.warning(warnMsg)
     finally:
         kb.bruteMode = False
@@ -403,7 +398,7 @@ def fileExists(pathFile):
     dataToStdout("\n")
 
     if not threadData.shared.files:
-        warnMsg = "no file(s) found"
+        warnMsg = "未找到文件"
         logger.warning(warnMsg)
     else:
         retVal = threadData.shared.files

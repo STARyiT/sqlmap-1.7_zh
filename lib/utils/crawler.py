@@ -61,7 +61,7 @@ def crawl(target, post=None, cookie=None):
                         if current in visited:
                             continue
                         elif conf.crawlExclude and re.search(conf.crawlExclude, current):
-                            dbgMsg = "skipping '%s'" % current
+                            dbgMsg = "跳过 '%s'" % current
                             logger.debug(dbgMsg)
                             continue
                         else:
@@ -74,15 +74,13 @@ def crawl(target, post=None, cookie=None):
                     if current:
                         content = Request.getPage(url=current, post=post, cookie=None, crawling=True, raise404=False)[0]
                 except SqlmapConnectionException as ex:
-                    errMsg = "connection exception detected ('%s'). skipping " % getSafeExString(ex)
-                    errMsg += "URL '%s'" % current
+                    errMsg = "检测到连接异常('%s')。跳过URL '%s'" % (getSafeExString(ex), current)
                     logger.critical(errMsg)
                 except SqlmapSyntaxException:
-                    errMsg = "invalid URL detected. skipping '%s'" % current
+                    errMsg = "检测到无效的URL。跳过 '%s'" % current
                     logger.critical(errMsg)
                 except _http_client.InvalidURL as ex:
-                    errMsg = "invalid URL detected ('%s'). skipping " % getSafeExString(ex)
-                    errMsg += "URL '%s'" % current
+                    errMsg = "检测到无效的URL('%s')。跳过URL '%s'" % (getSafeExString(ex), current)
                     logger.critical(errMsg)
 
                 if not kb.threadContinue:
@@ -149,8 +147,7 @@ def crawl(target, post=None, cookie=None):
             threadData.shared.value.add(target)
 
         if kb.checkSitemap is None:
-            message = "do you want to check for the existence of "
-            message += "site's sitemap(.xml) [y/N] "
+            message = "你想要检查站点是否存在网站地图(.xml)吗？[y/N] "
             kb.checkSitemap = readInput(message, default='N', boolean=True)
 
         if kb.checkSitemap:
@@ -162,7 +159,7 @@ def crawl(target, post=None, cookie=None):
             except SqlmapConnectionException as ex:
                 if "page not found" in getSafeExString(ex):
                     found = False
-                    logger.warning("'sitemap.xml' not found")
+                    logger.warning("'sitemap.xml' 未找到")
             except:
                 pass
             finally:
@@ -173,10 +170,10 @@ def crawl(target, post=None, cookie=None):
                                 threadData.shared.value.add(item)
                         if conf.crawlDepth > 1:
                             threadData.shared.unprocessed.update(items)
-                    logger.info("%s links found" % ("no" if not items else len(items)))
+                    logger.info("%s个链接已找到" % ("没有" if not items else len(items)))
 
         if not conf.bulkFile:
-            infoMsg = "starting crawler for target URL '%s'" % target
+            infoMsg = "开始对目标URL '%s' 进行爬取" % target
             logger.info(infoMsg)
 
         for i in xrange(conf.crawlDepth):
@@ -185,7 +182,7 @@ def crawl(target, post=None, cookie=None):
             numThreads = min(conf.threads, len(threadData.shared.unprocessed))
 
             if not conf.bulkFile:
-                logger.info("searching for links with depth %d" % (i + 1))
+                logger.info("搜索深度为 %d 的链接" % (i + 1))
 
             runThreads(numThreads, crawlThread, threadChoice=(i > 0))
             clearConsoleLine(True)
@@ -196,8 +193,7 @@ def crawl(target, post=None, cookie=None):
                 break
 
     except KeyboardInterrupt:
-        warnMsg = "user aborted during crawling. sqlmap "
-        warnMsg += "will use partial list"
+        warnMsg = "用户在爬取过程中中止。sqlmap将使用部分列表"
         logger.warning(warnMsg)
 
     finally:
@@ -205,9 +201,9 @@ def crawl(target, post=None, cookie=None):
 
         if not threadData.shared.value:
             if not (conf.forms and threadData.shared.formsFound):
-                warnMsg = "no usable links found (with GET parameters)"
+                warnMsg = "未找到可用的链接(带GET参数)"
                 if conf.forms:
-                    warnMsg += " or forms"
+                    warnMsg += "或表单"
                 logger.warning(warnMsg)
         else:
             for url in threadData.shared.value:
@@ -215,8 +211,7 @@ def crawl(target, post=None, cookie=None):
 
         if kb.targets:
             if kb.normalizeCrawlingChoice is None:
-                message = "do you want to normalize "
-                message += "crawling results [Y/n] "
+                message = "您想对爬取结果进行规范化吗？[Y/n] "
 
                 kb.normalizeCrawlingChoice = readInput(message, default='Y', boolean=True)
 
@@ -242,8 +237,7 @@ def storeResultsToFile(results):
         return
 
     if kb.storeCrawlingChoice is None:
-        message = "do you want to store crawling results to a temporary file "
-        message += "for eventual further processing with other tools [y/N] "
+        message = "您是否要将爬取结果存储到临时文件中,以便以后使用其他工具进行进一步处理 [y/N] "
 
         kb.storeCrawlingChoice = readInput(message, default='N', boolean=True)
 
@@ -251,7 +245,7 @@ def storeResultsToFile(results):
         handle, filename = tempfile.mkstemp(prefix=MKSTEMP_PREFIX.CRAWLER, suffix=".csv" if conf.forms else ".txt")
         os.close(handle)
 
-        infoMsg = "writing crawling results to a temporary file '%s' " % filename
+        infoMsg = "将爬取结果写入临时文件 '%s' " % filename
         logger.info(infoMsg)
 
         with openFile(filename, "w+b") as f:

@@ -54,7 +54,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
         count = int(count)
 
     if count == 0:
-        infoMsg = "table '%s' appears to be empty" % unsafeSQLIdentificatorNaming(table)
+        infoMsg = "表 '%s' 似乎为空" % unsafeSQLIdentificatorNaming(table)
         logger.info(infoMsg)
 
         for column in colList:
@@ -75,8 +75,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     if conf.pivotColumn:
         for _ in colList:
             if re.search(r"(.+\.)?%s" % re.escape(conf.pivotColumn), _, re.I):
-                infoMsg = "using column '%s' as a pivot " % conf.pivotColumn
-                infoMsg += "for retrieving row data"
+                infoMsg = "使用列 '%s' 作为数据行的枢轴" % conf.pivotColumn
                 logger.info(infoMsg)
 
                 colList.remove(_)
@@ -86,14 +85,12 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                 break
 
         if not validPivotValue:
-            warnMsg = "column '%s' not " % conf.pivotColumn
-            warnMsg += "found in table '%s'" % table
+            warnMsg = "列 '%s' 在表 '%s' 中未找到" % (conf.pivotColumn, table)
             logger.warning(warnMsg)
 
     if not validPivotValue:
         for column in colList:
-            infoMsg = "fetching number of distinct "
-            infoMsg += "values for column '%s'" % column.replace(("%s." % alias) if alias else "", "")
+            infoMsg = "获取列 '%s' 的不同值数量" % column.replace(("%s." % alias) if alias else "", "")
             logger.info(infoMsg)
 
             query = dumpNode.count2 % (column, table)
@@ -104,8 +101,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                 validColumnList = True
 
                 if value == count:
-                    infoMsg = "using column '%s' as a pivot " % column.replace(("%s." % alias) if alias else "", "")
-                    infoMsg += "for retrieving row data"
+                    infoMsg = "使用列 '%s' 作为数据行的枢轴" % column.replace(("%s." % alias) if alias else "", "")
                     logger.info(infoMsg)
 
                     validPivotValue = True
@@ -114,12 +110,11 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
                     break
 
         if not validColumnList:
-            errMsg = "all provided column name(s) are non-existent"
+            errMsg = "所有提供的列名称都不存在"
             raise SqlmapNoneDataException(errMsg)
 
         if not validPivotValue:
-            warnMsg = "no proper pivot column provided (with unique values)."
-            warnMsg += " It won't be possible to retrieve all rows"
+            warnMsg = "未提供适当的枢轴列(具有唯一值)。无法检索所有行"
             logger.warning(warnMsg)
 
     pivotValue = " "
@@ -159,8 +154,7 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
 
                 if conf.limitStart or conf.limitStop:
                     if conf.limitStart and (i + 1) < conf.limitStart:
-                        warnMsg = "skipping first %d pivot " % conf.limitStart
-                        warnMsg += "point values"
+                        warnMsg = "跳过前 %d 个枢轴点值" % conf.limitStart
                         singleTimeWarnMessage(warnMsg)
                         break
                     elif conf.limitStop and (i + 1) > conf.limitStop:
@@ -175,13 +169,11 @@ def pivotDumpTable(table, colList, count=None, blind=True, alias=None):
     except KeyboardInterrupt:
         kb.dumpKeyboardInterrupt = True
 
-        warnMsg = "user aborted during enumeration. sqlmap "
-        warnMsg += "will display partial output"
+        warnMsg = "用户在枚举过程中中止。sqlmap 将显示部分输出"
         logger.warning(warnMsg)
 
     except SqlmapConnectionException as ex:
-        errMsg = "connection exception detected ('%s'). sqlmap " % getSafeExString(ex)
-        errMsg += "will display partial output"
+        errMsg = "检测到连接异常('%s')。sqlmap 将显示部分输出" % getSafeExString(ex)
 
         logger.critical(errMsg)
 

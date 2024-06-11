@@ -25,11 +25,11 @@ def purge(directory):
     """
 
     if not os.path.isdir(directory):
-        warnMsg = "skipping purging of directory '%s' as it does not exist" % directory
+        warnMsg = "跳过目录 '%s' 的清除" % directory
         logger.warning(warnMsg)
         return
 
-    infoMsg = "purging content of directory '%s'..." % directory
+    infoMsg = "清除目录 '%s' 的内容..." % directory
     logger.info(infoMsg)
 
     filepaths = []
@@ -39,14 +39,14 @@ def purge(directory):
         dirpaths.extend(os.path.abspath(os.path.join(rootpath, _)) for _ in directories)
         filepaths.extend(os.path.abspath(os.path.join(rootpath, _)) for _ in filenames)
 
-    logger.debug("changing file attributes")
+    logger.debug("改变文件属性")
     for filepath in filepaths:
         try:
             os.chmod(filepath, stat.S_IREAD | stat.S_IWRITE)
         except:
             pass
 
-    logger.debug("writing random data to files")
+    logger.debug("写入随机数据到文件")
     for filepath in filepaths:
         try:
             filesize = os.path.getsize(filepath)
@@ -55,7 +55,7 @@ def purge(directory):
         except:
             pass
 
-    logger.debug("truncating files")
+    logger.debug("截断文件")
     for filepath in filepaths:
         try:
             with open(filepath, 'w') as f:
@@ -63,7 +63,7 @@ def purge(directory):
         except:
             pass
 
-    logger.debug("renaming filenames to random values")
+    logger.debug("重命名文件名为随机值")
     for filepath in filepaths:
         try:
             os.rename(filepath, os.path.join(os.path.dirname(filepath), "".join(random.sample(string.ascii_letters, random.randint(4, 8)))))
@@ -72,15 +72,15 @@ def purge(directory):
 
     dirpaths.sort(key=functools.cmp_to_key(lambda x, y: y.count(os.path.sep) - x.count(os.path.sep)))
 
-    logger.debug("renaming directory names to random values")
+    logger.debug("重命名目录名为随机值")
     for dirpath in dirpaths:
         try:
             os.rename(dirpath, os.path.join(os.path.dirname(dirpath), "".join(random.sample(string.ascii_letters, random.randint(4, 8)))))
         except:
             pass
 
-    logger.debug("deleting the whole directory tree")
+    logger.debug("删除整个目录树")
     try:
         shutil.rmtree(directory)
     except OSError as ex:
-        logger.error("problem occurred while removing directory '%s' ('%s')" % (getUnicode(directory), getSafeExString(ex)))
+        logger.error("删除目录 '%s' 时出现问题('%s')" % (getUnicode(directory), getSafeExString(ex)))

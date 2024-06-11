@@ -129,7 +129,7 @@ def start_httpd():
     thread.daemon = True
     thread.start()
 
-    print("[i] running HTTP server at '%s:%d'" % (HTTP_ADDRESS, HTTP_PORT))
+    print("[i] 运行 HTTP 服务器 at '%s:%d'" % (HTTP_ADDRESS, HTTP_PORT))
 
 if __name__ == "__main__":
     try:

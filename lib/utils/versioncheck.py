@@ -22,7 +22,6 @@ for _ in extensions:
         errors.append(_)
 
 if errors:
-    errMsg = "[%s] [CRITICAL] missing one or more core extensions (%s) " % (time.strftime("%X"), ", ".join("'%s'" % _ for _ in errors))
-    errMsg += "most likely because current version of Python has been "
-    errMsg += "built without appropriate dev packages"
+    errMsg = "[%s] [CRITICAL] 缺少一个或多个核心扩展(%s)," % (time.strftime("%X"), ", ".join("'%s'" % _ for _ in errors))
+    errMsg += "很可能是因为当前版本的 Python 没有正确的开发包构建"
     sys.exit(errMsg)

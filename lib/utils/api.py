@@ -90,7 +90,7 @@ class Database(object):
         self.connection = sqlite3.connect(self.database, timeout=3, isolation_level=None, check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.lock = threading.Lock()
-        logger.debug("REST-JSON API %s connected to IPC database" % who)
+        logger.debug("REST-JSON API %s 已连接到IPC数据库" % who)
 
     def disconnect(self):
         if self.cursor:
@@ -382,7 +382,7 @@ def task_new():
 
     DataStore.tasks[taskid] = Task(taskid, remote_addr)
 
-    logger.debug("Created new task: '%s'" % taskid)
+    logger.debug("创建新任务: '%s'" % taskid)
     return jsonize({"success": True, "taskid": taskid})
 
 @get("/task/<taskid>/delete")
@@ -393,11 +393,11 @@ def task_delete(taskid):
     if taskid in DataStore.tasks:
         DataStore.tasks.pop(taskid)
 
-        logger.debug("(%s) Deleted task" % taskid)
+        logger.debug("(%s) 删除任务" % taskid)
         return jsonize({"success": True})
     else:
         response.status = 404
-        logger.warning("[%s] Non-existing task ID provided to task_delete()" % taskid)
+        logger.warning("[%s] 提供给 task_delete() 的任务ID不存在" % taskid)
         return jsonize({"success": False, "message": "Non-existing task ID"})
 
 ###################
@@ -416,7 +416,7 @@ def task_list(token=None):
         if is_admin(token) or DataStore.tasks[key].remote_addr == request.remote_addr:
             tasks[key] = dejsonize(scan_status(key))["status"]
 
-    logger.debug("(%s) Listed task pool (%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
+    logger.debug("(%s)列出任务池(%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "tasks": tasks, "tasks_num": len(tasks)})
 
 @get("/admin/flush")
@@ -431,7 +431,7 @@ def task_flush(token=None):
             DataStore.tasks[key].engine_kill()
             del DataStore.tasks[key]
 
-    logger.debug("(%s) Flushed task pool (%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
+    logger.debug("(%s)清空任务池(%s)" % (token, "admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True})
 
 ##################################
@@ -445,10 +445,10 @@ def option_list(taskid):
     List options for a certain task ID
     """
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to option_list()" % taskid)
+        logger.warning("[%s] 提供给 option_list() 的任务ID不存在" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
-    logger.debug("(%s) Listed task options" % taskid)
+    logger.debug("(%s) 列出任务选项" % taskid)
     return jsonize({"success": True, "options": DataStore.tasks[taskid].get_options()})
 
 @post("/option/<taskid>/get")
@@ -457,7 +457,7 @@ def option_get(taskid):
     Get value of option(s) for a certain task ID
     """
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to option_get()" % taskid)
+        logger.warning("[%s] 提供给 option_get() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     options = request.json or []
@@ -467,10 +467,10 @@ def option_get(taskid):
         if option in DataStore.tasks[taskid].options:
             results[option] = DataStore.tasks[taskid].options[option]
         else:
-            logger.debug("(%s) Requested value for unknown option '%s'" % (taskid, option))
+            logger.debug("(%s) 请求未知选项 '%s'" % (taskid, option))
             return jsonize({"success": False, "message": "Unknown option '%s'" % option})
 
-    logger.debug("(%s) Retrieved values for option(s) '%s'" % (taskid, ','.join(options)))
+    logger.debug("(%s) 获取选项 '%s'" % (taskid, ','.join(options)))
 
     return jsonize({"success": True, "options": results})
 
@@ -481,17 +481,17 @@ def option_set(taskid):
     """
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to option_set()" % taskid)
+        logger.warning("[%s] 提供给 option_set() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if request.json is None:
-        logger.warning("[%s] Invalid JSON options provided to option_set()" % taskid)
+        logger.warning("[%s] 提供给 option_set() 的 JSON选项无效" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
     for option, value in request.json.items():
         DataStore.tasks[taskid].set_option(option, value)
 
-    logger.debug("(%s) Requested to set options" % taskid)
+    logger.debug("(%s) 请求设置选项" % taskid)
     return jsonize({"success": True})
 
 # Handle scans
@@ -502,16 +502,16 @@ def scan_start(taskid):
     """
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_start()" % taskid)
+        logger.warning("[%s] 提供给 scan_start() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if request.json is None:
-        logger.warning("[%s] Invalid JSON options provided to scan_start()" % taskid)
+        logger.warning("[%s] 提供给 scan_start() 的 JSON选项无效" % taskid)
         return jsonize({"success": False, "message": "Invalid JSON options"})
 
     for key in request.json:
         if key in RESTAPI_UNSUPPORTED_OPTIONS:
-            logger.warning("[%s] Unsupported option '%s' provided to scan_start()" % (taskid, key))
+            logger.warning("[%s] 提供给 scan_start() 的选项 '%s' 不支持" % (taskid, key))
             return jsonize({"success": False, "message": "Unsupported option '%s'" % key})
 
     # Initialize sqlmap engine's options with user's provided options, if any
@@ -521,7 +521,7 @@ def scan_start(taskid):
     # Launch sqlmap engine in a separate process
     DataStore.tasks[taskid].engine_start()
 
-    logger.debug("(%s) Started scan" % taskid)
+    logger.debug("(%s) 启动扫描" % taskid)
     return jsonize({"success": True, "engineid": DataStore.tasks[taskid].engine_get_id()})
 
 @get("/scan/<taskid>/stop")
@@ -531,12 +531,12 @@ def scan_stop(taskid):
     """
 
     if (taskid not in DataStore.tasks or DataStore.tasks[taskid].engine_process() is None or DataStore.tasks[taskid].engine_has_terminated()):
-        logger.warning("[%s] Invalid task ID provided to scan_stop()" % taskid)
+        logger.warning("[%s] 提供给 scan_stop() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     DataStore.tasks[taskid].engine_stop()
 
-    logger.debug("(%s) Stopped scan" % taskid)
+    logger.debug("(%s) 停止扫描" % taskid)
     return jsonize({"success": True})
 
 @get("/scan/<taskid>/kill")
@@ -546,12 +546,12 @@ def scan_kill(taskid):
     """
 
     if (taskid not in DataStore.tasks or DataStore.tasks[taskid].engine_process() is None or DataStore.tasks[taskid].engine_has_terminated()):
-        logger.warning("[%s] Invalid task ID provided to scan_kill()" % taskid)
+        logger.warning("[%s] 提供给 scan_kill() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     DataStore.tasks[taskid].engine_kill()
 
-    logger.debug("(%s) Killed scan" % taskid)
+    logger.debug("(%s) 杀死扫描" % taskid)
     return jsonize({"success": True})
 
 @get("/scan/<taskid>/status")
@@ -561,7 +561,7 @@ def scan_status(taskid):
     """
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_status()" % taskid)
+        logger.warning("[%s] 提供给 scan_status() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if DataStore.tasks[taskid].engine_process() is None:
@@ -569,7 +569,7 @@ def scan_status(taskid):
     else:
         status = "terminated" if DataStore.tasks[taskid].engine_has_terminated() is True else "running"
 
-    logger.debug("(%s) Retrieved scan status" % taskid)
+    logger.debug("(%s) 获取扫描状态" % taskid)
     return jsonize({
         "success": True,
         "status": status,
@@ -586,7 +586,7 @@ def scan_data(taskid):
     json_errors_message = list()
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_data()" % taskid)
+        logger.warning("[%s] 提供给 scan_data() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all data from the IPC database for the taskid
@@ -597,7 +597,7 @@ def scan_data(taskid):
     for error in DataStore.current_db.execute("SELECT error FROM errors WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_errors_message.append(error)
 
-    logger.debug("(%s) Retrieved scan data and error messages" % taskid)
+    logger.debug("(%s)检索到扫描数据和错误消息" % taskid)
     return jsonize({"success": True, "data": json_data_message, "error": json_errors_message})
 
 # Functions to handle scans' logs
@@ -610,11 +610,11 @@ def scan_log_limited(taskid, start, end):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_log_limited()" % taskid)
+        logger.warning("[%s] 提供给 scan_log_limited() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     if not start.isdigit() or not end.isdigit() or int(end) < int(start):
-        logger.warning("[%s] Invalid start or end value provided to scan_log_limited()" % taskid)
+        logger.warning("[%s] 提供给 scan_log_limited() 的起始值或结束值无效" % taskid)
         return jsonize({"success": False, "message": "Invalid start or end value, must be digits"})
 
     start = max(1, int(start))
@@ -624,7 +624,7 @@ def scan_log_limited(taskid, start, end):
     for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? AND id >= ? AND id <= ? ORDER BY id ASC", (taskid, start, end)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages subset" % taskid)
+    logger.debug("(%s) 检索到扫描日志消息子集" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 @get("/scan/<taskid>/log")
@@ -636,14 +636,14 @@ def scan_log(taskid):
     json_log_messages = list()
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to scan_log()" % taskid)
+        logger.warning("[%s] 提供给 scan_log() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     # Read all log messages from the IPC database
     for time_, level, message in DataStore.current_db.execute("SELECT time, level, message FROM logs WHERE taskid = ? ORDER BY id ASC", (taskid,)):
         json_log_messages.append({"time": time_, "level": level, "message": message})
 
-    logger.debug("(%s) Retrieved scan log messages" % taskid)
+    logger.debug("(%s) 检索到扫描日志消息" % taskid)
     return jsonize({"success": True, "log": json_log_messages})
 
 # Function to handle files inside the output directory
@@ -654,21 +654,21 @@ def download(taskid, target, filename):
     """
 
     if taskid not in DataStore.tasks:
-        logger.warning("[%s] Invalid task ID provided to download()" % taskid)
+        logger.warning("[%s] 提供给 download() 的任务ID无效" % taskid)
         return jsonize({"success": False, "message": "Invalid task ID"})
 
     path = os.path.abspath(os.path.join(paths.SQLMAP_OUTPUT_PATH, target, filename))
     # Prevent file path traversal
     if not path.startswith(paths.SQLMAP_OUTPUT_PATH):
-        logger.warning("[%s] Forbidden path (%s)" % (taskid, target))
+        logger.warning("[%s] 禁止路径 (%s)" % (taskid, target))
         return jsonize({"success": False, "message": "Forbidden path"})
 
     if os.path.isfile(path):
-        logger.debug("(%s) Retrieved content of file %s" % (taskid, target))
+        logger.debug("(%s) 检索文件 %s 的内容" % (taskid, target))
         content = openFile(path, "rb").read()
         return jsonize({"success": True, "file": encodeBase64(content, binary=False)})
     else:
-        logger.warning("[%s] File does not exist %s" % (taskid, target))
+        logger.warning("[%s] 文件不存在 %s" % (taskid, target))
         return jsonize({"success": False, "message": "File does not exist"})
 
 @get("/version")
@@ -677,7 +677,7 @@ def version(token=None):
     Fetch server version
     """
 
-    logger.debug("Fetched version (%s)" % ("admin" if is_admin(token) else request.remote_addr))
+    logger.debug("检索到版本 (%s)" % ("admin" if is_admin(token) else request.remote_addr))
     return jsonize({"success": True, "version": VERSION_STRING.split('/')[-1]})
 
 def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=RESTAPI_DEFAULT_ADAPTER, username=None, password=None):
@@ -697,9 +697,9 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
             s.bind((host, 0))
             port = s.getsockname()[1]
 
-    logger.info("Running REST-JSON API server at '%s:%d'.." % (host, port))
-    logger.info("Admin (secret) token: %s" % DataStore.admin_token)
-    logger.debug("IPC database: '%s'" % Database.filepath)
+    logger.info("正在运行 REST-JSON API 服务器,地址为 '%s:%d'.." % (host, port))
+    logger.info("管理员(秘密)令牌:%s" % DataStore.admin_token)
+    logger.debug("IPC 数据库:'%s'" % Database.filepath)
 
     # Initialize IPC database
     DataStore.current_db = Database()
@@ -717,20 +717,20 @@ def server(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, adapter=REST
         elif adapter == "eventlet":
             import eventlet
             eventlet.monkey_patch()
-        logger.debug("Using adapter '%s' to run bottle" % adapter)
+        logger.debug("使用适配器 '%s' 运行 bottle" % adapter)
         run(host=host, port=port, quiet=True, debug=True, server=adapter)
     except socket.error as ex:
         if "already in use" in getSafeExString(ex):
-            logger.error("Address already in use ('%s:%s')" % (host, port))
+            logger.error("地址已被使用 ('%s:%s')" % (host, port))
         else:
             raise
     except ImportError:
         if adapter.lower() not in server_names:
-            errMsg = "Adapter '%s' is unknown. " % adapter
-            errMsg += "List of supported adapters: %s" % ', '.join(sorted(list(server_names.keys())))
+            errMsg = "适配器 '%s' 未知. " % adapter
+            errMsg += "支持的适配器列表: %s" % ', '.join(sorted(list(server_names.keys())))
         else:
-            errMsg = "Server support for adapter '%s' is not installed on this system " % adapter
-            errMsg += "(Note: you can try to install it with 'apt install python-%s' or 'pip%s install %s')" % (adapter, '3' if six.PY3 else "", adapter)
+            errMsg = "适配器 '%s' 的服务器支持未安装在本系统上 " % adapter
+            errMsg += "(注意: 您可以尝试使用 'apt install python-%s' 或 'pip%s install %s')" % (adapter, '3' if six.PY3 else "", adapter)
         logger.critical(errMsg)
 
 def _client(url, options=None):
@@ -751,7 +751,7 @@ def _client(url, options=None):
         text = getText(response.read())
     except:
         if options:
-            logger.error("Failed to load and parse %s" % url)
+            logger.error("加载和解析 %s 失败" % url)
         raise
     return text
 
@@ -763,7 +763,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     DataStore.username = username
     DataStore.password = password
 
-    dbgMsg = "Example client access from command line:"
+    dbgMsg = "示例客户端访问命令行:"
     dbgMsg += "\n\t$ taskid=$(curl http://%s:%d/task/new 2>1 | grep -o -I '[a-f0-9]\\{16\\}') && echo $taskid" % (host, port)
     dbgMsg += "\n\t$ curl -H \"Content-Type: application/json\" -X POST -d '{\"url\": \"http://testphp.vulnweb.com/artists.php?artist=1\"}' http://%s:%d/scan/$taskid/start" % (host, port)
     dbgMsg += "\n\t$ curl http://%s:%d/scan/$taskid/data" % (host, port)
@@ -771,14 +771,13 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     logger.debug(dbgMsg)
 
     addr = "http://%s:%d" % (host, port)
-    logger.info("Starting REST-JSON API client to '%s'..." % addr)
+    logger.info("启动 REST-JSON API 客户端到 '%s'..." % addr)
 
     try:
         _client(addr)
     except Exception as ex:
         if not isinstance(ex, _urllib.error.HTTPError) or ex.code == _http_client.UNAUTHORIZED:
-            errMsg = "There has been a problem while connecting to the "
-            errMsg += "REST-JSON API server at '%s' " % addr
+            errMsg = "连接到REST-JSON API服务器 '%s' 时出现问题 " % addr
             errMsg += "(%s)" % getSafeExString(ex)
             logger.critical(errMsg)
             return
@@ -788,7 +787,7 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
     autoCompletion(AUTOCOMPLETE_TYPE.API, commands=commands)
 
     taskid = None
-    logger.info("Type 'help' or '?' for list of available commands")
+    logger.info("Type 'help' 或 '?' 获取可用命令列表")
 
     while True:
         try:
@@ -801,17 +800,17 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
 
         if command in ("data", "log", "status", "stop", "kill"):
             if not taskid:
-                logger.error("No task ID in use")
+                logger.error("没有使用任务ID")
                 continue
             raw = _client("%s/scan/%s/%s" % (addr, taskid, command))
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command %s" % command)
+                logger.error("执行命令失败 %s" % command)
             dataToStdout("%s\n" % raw)
 
         elif command.startswith("option"):
             if not taskid:
-                logger.error("No task ID in use")
+                logger.error("没有使用任务ID")
                 continue
             try:
                 command, option = command.split(" ", 1)
@@ -822,18 +821,18 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
                 raw = _client("%s/option/%s/get" % (addr, taskid), options)
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command %s" % command)
+                logger.error("执行命令失败(%s)" % command)
             dataToStdout("%s\n" % raw)
 
         elif command.startswith("new"):
             if ' ' not in command:
-                logger.error("Program arguments are missing")
+                logger.error("程序参数缺失")
                 continue
 
             try:
                 argv = ["sqlmap.py"] + shlex.split(command)[1:]
             except Exception as ex:
-                logger.error("Error occurred while parsing arguments ('%s')" % getSafeExString(ex))
+                logger.error("解析参数时发生错误('%s')" % getSafeExString(ex))
                 taskid = None
                 continue
 
@@ -850,42 +849,42 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             raw = _client("%s/task/new" % addr)
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to create new task ('%s')" % res.get("message", ""))
+                logger.error("创建新任务失败('%s')" % res.get("message", ""))
                 continue
             taskid = res["taskid"]
-            logger.info("New task ID is '%s'" % taskid)
+            logger.info("新任务ID为 '%s'" % taskid)
 
             raw = _client("%s/scan/%s/start" % (addr, taskid), cmdLineOptions)
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to start scan ('%s')" % res.get("message", ""))
+                logger.error("扫描失败('%s')" % res.get("message", ""))
                 continue
-            logger.info("Scanning started")
+            logger.info("扫描开始")
 
         elif command.startswith("use"):
             taskid = (command.split()[1] if ' ' in command else "").strip("'\"")
             if not taskid:
-                logger.error("Task ID is missing")
+                logger.error("任务ID缺失")
                 taskid = None
                 continue
             elif not re.search(r"\A[0-9a-fA-F]{16}\Z", taskid):
-                logger.error("Invalid task ID '%s'" % taskid)
+                logger.error("无效的任务ID '%s'" % taskid)
                 taskid = None
                 continue
-            logger.info("Switching to task ID '%s' " % taskid)
+            logger.info("切换到任务ID '%s' " % taskid)
 
         elif command in ("version",):
             raw = _client("%s/%s" % (addr, command))
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command %s" % command)
+                logger.error("执行命令失败(%s)" % command)
             dataToStdout("%s\n" % raw)
 
         elif command in ("list", "flush"):
             raw = _client("%s/admin/%s" % (addr, command))
             res = dejsonize(raw)
             if not res["success"]:
-                logger.error("Failed to execute command %s" % command)
+                logger.error("执行命令失败(%s)" % command)
             elif command == "flush":
                 taskid = None
             dataToStdout("%s\n" % raw)
@@ -894,22 +893,22 @@ def client(host=RESTAPI_DEFAULT_ADDRESS, port=RESTAPI_DEFAULT_PORT, username=Non
             return
 
         elif command in ("help", "?"):
-            msg = "help           Show this help message\n"
-            msg += "new ARGS       Start a new scan task with provided arguments (e.g. 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
-            msg += "use TASKID     Switch current context to different task (e.g. 'use c04d8c5c7582efb4')\n"
-            msg += "data           Retrieve and show data for current task\n"
-            msg += "log            Retrieve and show log for current task\n"
-            msg += "status         Retrieve and show status for current task\n"
-            msg += "option OPTION  Retrieve and show option for current task\n"
-            msg += "options        Retrieve and show all options for current task\n"
-            msg += "stop           Stop current task\n"
-            msg += "kill           Kill current task\n"
-            msg += "list           Display all tasks\n"
-            msg += "version        Fetch server version\n"
-            msg += "flush          Flush tasks (delete all tasks)\n"
-            msg += "exit           Exit this client\n"
+            msg = "help           显示此帮助消息\n"
+            msg += "new ARGS       使用提供的参数启动新的扫描任务(例如 'new -u \"http://testphp.vulnweb.com/artists.php?artist=1\"')\n"
+            msg += "use TASKID     切换当前上下文到不同的任务(例如 'use c04d8c5c7582efb4')\n"
+            msg += "data           检索并显示当前任务的数据\n"
+            msg += "log            检索并显示当前任务的日志\n"
+            msg += "status         检索并显示当前任务的状态\n"
+            msg += "option OPTION  检索并显示当前任务的选项\n"
+            msg += "options        检索并显示当前任务的所有选项\n"
+            msg += "stop           停止当前任务\n"
+            msg += "kill           终止当前任务\n"
+            msg += "list           显示所有任务\n"
+            msg += "version        获取服务器版本\n"
+            msg += "flush          清空任务(删除所有任务)\n"
+            msg += "exit           退出客户端\n"
 
             dataToStdout(msg)
 
         elif command:
-            logger.error("Unknown command '%s'" % command)
+            logger.error("未知命令(%s)" % command)

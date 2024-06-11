@@ -59,11 +59,11 @@ def _search(dork):
         req = _urllib.request.Request("https://www.google.com/ncr", headers=requestHeaders)
         conn = _urllib.request.urlopen(req)
     except Exception as ex:
-        errMsg = "unable to connect to Google ('%s')" % getSafeExString(ex)
+        errMsg = "无法连接到 Google ('%s')" % getSafeExString(ex)
         raise SqlmapConnectionException(errMsg)
 
     gpage = conf.googlePage if conf.googlePage > 1 else 1
-    logger.info("using search result page #%d" % gpage)
+    logger.info("使用搜索结果页 #%d" % gpage)
 
     url = "https://www.google.com/search?"                                  # NOTE: if consent fails, try to use the "http://"
     url += "q=%s&" % urlencode(dork, convall=True)
@@ -96,12 +96,11 @@ def _search(dork):
             page = ex.read()
             responseHeaders = ex.info()
         except Exception as _:
-            warnMsg = "problem occurred while trying to get "
-            warnMsg += "an error page information (%s)" % getSafeExString(_)
+            warnMsg = "尝试获取错误页面信息时发生问题(%s)" % getSafeExString(_)
             logger.critical(warnMsg)
             return None
     except (_urllib.error.URLError, _http_client.error, socket.error, socket.timeout, socks.ProxyError):
-        errMsg = "unable to connect to Google"
+        errMsg = "无法连接到 Google"
         raise SqlmapConnectionException(errMsg)
 
     page = decodePage(page, responseHeaders.get(HTTP_HEADER.CONTENT_ENCODING), responseHeaders.get(HTTP_HEADER.CONTENT_TYPE))
@@ -111,8 +110,8 @@ def _search(dork):
     retVal = [_urllib.parse.unquote(match.group(1) or match.group(2)) for match in re.finditer(GOOGLE_REGEX, page, re.I)]
 
     if not retVal and "detected unusual traffic" in page:
-        warnMsg = "Google has detected 'unusual' traffic from "
-        warnMsg += "used IP address disabling further searches"
+        warnMsg = "Google 检测到来自使用的 IP 地址的 '异常' 流量,禁止进一步搜索"
+
 
         if conf.proxyList:
             raise SqlmapBaseException(warnMsg)
@@ -120,10 +119,10 @@ def _search(dork):
             logger.critical(warnMsg)
 
     if not retVal:
-        message = "no usable links found. What do you want to do?"
-        message += "\n[1] (re)try with DuckDuckGo (default)"
-        message += "\n[2] (re)try with Bing"
-        message += "\n[3] quit"
+        message = "未找到可用的链接. 您想做什么?"
+        message += "\n[1] (re)试用 DuckDuckGo (默认)"
+        message += "\n[2] (re)试用 Bing"
+        message += "\n[3] 退出"
         choice = readInput(message, default='1')
 
         if choice == '3':
@@ -163,8 +162,7 @@ def _search(dork):
                 page = ex.read()
                 page = decodePage(page, ex.headers.get("Content-Encoding"), ex.headers.get("Content-Type"))
             except socket.timeout:
-                warnMsg = "connection timed out while trying "
-                warnMsg += "to get error page information (%d)" % ex.code
+                warnMsg = "尝试获取错误页面信息时连接超时(%d)" % ex.code
                 logger.critical(warnMsg)
                 return None
         except:
@@ -174,8 +172,7 @@ def _search(dork):
         retVal = [_urllib.parse.unquote(match.group(1).replace("&amp;", "&")) for match in re.finditer(regex, page, re.I | re.S)]
 
         if not retVal and "issue with the Tor Exit Node you are currently using" in page:
-            warnMsg = "DuckDuckGo has detected 'unusual' traffic from "
-            warnMsg += "used (Tor) IP address"
+            warnMsg = "DuckDuckGo 检测到来自使用的(Tor)IP 地址的 '异常' 流量"
 
             if conf.proxyList:
                 raise SqlmapBaseException(warnMsg)
@@ -195,7 +192,7 @@ def search(dork):
         if conf.proxyList:
             logger.critical(getSafeExString(ex))
 
-            warnMsg = "changing proxy"
+            warnMsg = "切换代理"
             logger.warning(warnMsg)
 
             conf.proxy = None

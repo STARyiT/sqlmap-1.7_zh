@@ -23,9 +23,7 @@ def checkDependencies():
 
                 pymssql = __import__("pymssql")
                 if not hasattr(pymssql, "__version__") or pymssql.__version__ < "1.0.2":
-                    warnMsg = "'%s' third-party library must be " % data[1]
-                    warnMsg += "version >= 1.0.2 to work properly. "
-                    warnMsg += "Download from '%s'" % data[2]
+                    warnMsg = "'%s' 第三方库的版本必须大于等于 1.0.2 才能正常工作。请从 '%s' 下载" % (data[1], data[2])
                     logger.warning(warnMsg)
             elif dbmsName == DBMS.MYSQL:
                 __import__("pymysql")
@@ -59,84 +57,70 @@ def checkDependencies():
             elif dbmsName == DBMS.CUBRID:
                 __import__("CUBRIDdb")
         except:
-            warnMsg = "sqlmap requires '%s' third-party library " % data[1]
-            warnMsg += "in order to directly connect to the DBMS "
-            warnMsg += "'%s'. Download from '%s'" % (dbmsName, data[2])
+            warnMsg = "sqlmap需要 '%s' 第三方库才能直接连接到数据库管理系统 '%s'。请从 '%s' 下载" % (data[1], dbmsName, data[2])
             logger.warning(warnMsg)
             missing_libraries.add(data[1])
 
             continue
 
-        debugMsg = "'%s' third-party library is found" % data[1]
+        debugMsg = "'%s' 第三方库已找到" % data[1]
         logger.debug(debugMsg)
 
     try:
         __import__("impacket")
-        debugMsg = "'python-impacket' third-party library is found"
+        debugMsg = "'python-impacket' 第三方库已找到"
         logger.debug(debugMsg)
     except ImportError:
-        warnMsg = "sqlmap requires 'python-impacket' third-party library for "
-        warnMsg += "out-of-band takeover feature. Download from "
-        warnMsg += "'https://github.com/coresecurity/impacket'"
+        warnMsg = "sqlmap需要 'python-impacket' 第三方库以支持带外接管功能。"
         logger.warning(warnMsg)
         missing_libraries.add('python-impacket')
 
     try:
         __import__("ntlm")
-        debugMsg = "'python-ntlm' third-party library is found"
+        debugMsg = "'python-ntlm' 第三方库已找到"
         logger.debug(debugMsg)
     except ImportError:
-        warnMsg = "sqlmap requires 'python-ntlm' third-party library "
-        warnMsg += "if you plan to attack a web application behind NTLM "
-        warnMsg += "authentication. Download from 'https://github.com/mullender/python-ntlm'"
+        warnMsg = "如果您计划攻击一个使用NTLM身份验证的Web应用程序,sqlmap需要 'python-ntlm' 第三方库。"
         logger.warning(warnMsg)
         missing_libraries.add('python-ntlm')
 
     try:
         __import__("websocket._abnf")
-        debugMsg = "'websocket-client' library is found"
+        debugMsg = "'websocket-client' 第三方库已找到"
         logger.debug(debugMsg)
     except ImportError:
-        warnMsg = "sqlmap requires 'websocket-client' third-party library "
-        warnMsg += "if you plan to attack a web application using WebSocket. "
-        warnMsg += "Download from 'https://pypi.python.org/pypi/websocket-client/'"
+        warnMsg = "如果您计划攻击一个使用WebSocket的Web应用程序,sqlmap需要 'websocket-client' 第三方库。 下载"
         logger.warning(warnMsg)
         missing_libraries.add('websocket-client')
 
     try:
         __import__("tkinter")
-        debugMsg = "'tkinter' library is found"
+        debugMsg = "'tkinter' 第三方库已找到"
         logger.debug(debugMsg)
     except ImportError:
-        warnMsg = "sqlmap requires 'tkinter' library "
-        warnMsg += "if you plan to run a GUI"
+        warnMsg = "sqlmap需要 'tkinter'"
         logger.warning(warnMsg)
         missing_libraries.add('tkinter')
 
     try:
         __import__("tkinter.ttk")
-        debugMsg = "'tkinter.ttk' library is found"
+        debugMsg = "'tkinter.ttk' 第三方库已找到"
         logger.debug(debugMsg)
     except ImportError:
-        warnMsg = "sqlmap requires 'tkinter.ttk' library "
-        warnMsg += "if you plan to run a GUI"
+        warnMsg = "sqlmap需要 'tkinter.ttk'"
         logger.warning(warnMsg)
         missing_libraries.add('tkinter.ttk')
 
     if IS_WIN:
         try:
             __import__("pyreadline")
-            debugMsg = "'python-pyreadline' third-party library is found"
+            debugMsg = "找到了 'python-pyreadline' 第三方库"
             logger.debug(debugMsg)
         except ImportError:
-            warnMsg = "sqlmap requires 'pyreadline' third-party library to "
-            warnMsg += "be able to take advantage of the sqlmap TAB "
-            warnMsg += "completion and history support features in the SQL "
-            warnMsg += "shell and OS shell. Download from "
-            warnMsg += "'https://pypi.org/project/pyreadline/'"
+            warnMsg = "sqlmap需要 'pyreadline' 第三方库才能在SQL shell和OS shell中使用sqlmap的TAB补全和历史记录支持功能。请从 'https://pypi.org/project/pyreadline/' 下载"
             logger.warning(warnMsg)
             missing_libraries.add('python-pyreadline')
 
     if len(missing_libraries) == 0:
-        infoMsg = "all dependencies are installed"
+        infoMsg = "所有依赖项已安装"
         logger.info(infoMsg)

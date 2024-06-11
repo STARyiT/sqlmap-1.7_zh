@@ -46,8 +46,7 @@ class HashDB(object):
                 threadData.hashDBCursor.execute("CREATE TABLE IF NOT EXISTS storage (id INTEGER PRIMARY KEY, value TEXT)")
                 connection.commit()
             except Exception as ex:
-                errMsg = "error occurred while opening a session "
-                errMsg += "file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                errMsg = "打开会话文件 '%s' 时发生错误('%s')" % (self.filepath, getSafeExString(ex))
                 raise SqlmapConnectionException(errMsg)
 
         return threadData.hashDBCursor
@@ -96,13 +95,13 @@ class HashDB(object):
                             retVal = row[0]
                     except (sqlite3.OperationalError, sqlite3.DatabaseError) as ex:
                         if any(_ in getSafeExString(ex) for _ in ("locked", "no such table")):
-                            warnMsg = "problem occurred while accessing session file '%s' ('%s')" % (self.filepath, getSafeExString(ex))
+                            warnMsg = "访问会话文件 '%s' 时出现问题('%s')" % (self.filepath, getSafeExString(ex))
                             singleTimeWarnMessage(warnMsg)
                         elif "Could not decode" in getSafeExString(ex):
                             break
                         else:
-                            errMsg = "error occurred while accessing session file '%s' ('%s'). " % (self.filepath, getSafeExString(ex))
-                            errMsg += "If the problem persists please rerun with '--flush-session'"
+                            errMsg = "访问会话文件 '%s' 时出现问题('%s'). " % (self.filepath, getSafeExString(ex))
+                            errMsg += "如果问题仍然存在,请重新运行sqlmap命令(--flush-session)"
                             raise SqlmapConnectionException(errMsg)
                     else:
                         break
@@ -114,8 +113,8 @@ class HashDB(object):
                 retVal = unserializeObject(retVal)
             except:
                 retVal = None
-                warnMsg = "error occurred while unserializing value for session key '%s'. " % key
-                warnMsg += "If the problem persists please rerun with '--flush-session'"
+                warnMsg = "反序列化会话键 '%s' 的值时出现错误. " % key
+                warnMsg += "如果问题仍然存在,请重新运行sqlmap命令(--flush-session)"
                 logger.warning(warnMsg)
 
         return retVal
@@ -156,13 +155,12 @@ class HashDB(object):
                         break
                     except sqlite3.DatabaseError as ex:
                         if not os.path.exists(self.filepath):
-                            debugMsg = "session file '%s' does not exist" % self.filepath
+                            debugMsg = "会话文件 '%s' 不存在" % self.filepath
                             logger.debug(debugMsg)
                             break
 
                         if retries == 0:
-                            warnMsg = "there has been a problem while writing to "
-                            warnMsg += "the session file ('%s')" % getSafeExString(ex)
+                            warnMsg = "写入会话文件时出现问题('%s')" % getSafeExString(ex)
                             logger.warning(warnMsg)
 
                         if retries >= HASHDB_FLUSH_RETRIES:
