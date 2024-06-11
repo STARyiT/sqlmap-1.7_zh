@@ -96,7 +96,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
         page, headers, _ = Request.queryPage(payload, content=True, raise404=False)
 
         if page and kb.chars.start.upper() in page and kb.chars.start not in page:
-            singleTimeWarnMessage("results seems to be upper-cased by force. sqlmap will automatically lower-case them")
+            singleTimeWarnMessage("结果似乎被强制转换为大写。sqlmap将自动转换为小写")
 
             page = page.lower()
 
@@ -145,7 +145,7 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
 
             # Automatically patching last char trimming cases
             if kb.chars.stop not in (page or "") and kb.chars.stop[:-1] in (page or ""):
-                warnMsg = "automatically patching output having last char trimmed"
+                warnMsg = "自动修补最后一个字符被截断的输出"
                 singleTimeWarnMessage(warnMsg)
                 page = page.replace(kb.chars.stop[:-1], kb.chars.stop)
 
@@ -164,20 +164,19 @@ def _oneShotUnionUse(expression, unpack=True, limited=False):
             trimmed = _("%s(?P<result>.*?)<" % (kb.chars.start))
 
             if trimmed:
-                warnMsg = "possible server trimmed output detected "
-                warnMsg += "(probably due to its length and/or content): "
+                warnMsg = "检测到可能由于长度 and/or 内容而被服务器截断的输出(可能是因为长度 and/or内容)"
                 warnMsg += safecharencode(trimmed)
                 logger.warning(warnMsg)
 
             elif re.search(r"ORDER BY [^ ]+\Z", expression):
-                debugMsg = "retrying failed SQL query without the ORDER BY clause"
+                debugMsg = "尝试不使用ORDER BY子句的SQL查询"
                 singleTimeDebugMessage(debugMsg)
 
                 expression = re.sub(r"\s*ORDER BY [^ ]+\Z", "", expression)
                 retVal = _oneShotUnionUse(expression, unpack, limited)
 
             elif kb.nchar and re.search(r" AS N(CHAR|VARCHAR)", agent.nullAndCastField(expression)):
-                debugMsg = "turning off NATIONAL CHARACTER casting"  # NOTE: in some cases there are "known" incompatibilities between original columns and NCHAR (e.g. http://testphp.vulnweb.com/artists.php?artist=1)
+                debugMsg = "关闭NATIONAL CHARACTER 转换"  # NOTE: in some cases there are "known" incompatibilities between original columns and NCHAR (e.g. http://testphp.vulnweb.com/artists.php?artist=1)
                 singleTimeDebugMessage(debugMsg)
 
                 kb.nchar = False
@@ -209,13 +208,12 @@ def configUnion(char=None, columns=None):
             colsStart, colsStop = columns, columns
 
         if not isDigit(colsStart) or not isDigit(colsStop):
-            raise SqlmapSyntaxException("--union-cols must be a range of integers")
+            errMsg = "--union-cols 范围必须表示列的较低到较高的数量"
 
         conf.uColsStart, conf.uColsStop = int(colsStart), int(colsStop)
 
         if conf.uColsStart > conf.uColsStop:
-            errMsg = "--union-cols range has to represent lower to "
-            errMsg += "higher number of columns"
+            errMsg = "--union-cols 范围必须表示列的较低到较高的数量"
             raise SqlmapSyntaxException(errMsg)
 
     _configUnionChar(char)
@@ -248,8 +246,8 @@ def unionUse(expression, unpack=True, dump=False):
     if expressionFieldsList and len(expressionFieldsList) > 1 and "ORDER BY" in expression.upper():
         # Removed ORDER BY clause because UNION does not play well with it
         expression = re.sub(r"(?i)\s*ORDER BY\s+[\w,]+", "", expression)
-        debugMsg = "stripping ORDER BY clause from statement because "
-        debugMsg += "it does not play well with UNION query SQL injection"
+        debugMsg = "从语句中去除ORDER BY子句，因为它不适合UNION查询SQL注入"
+        debugMsg += ""
         singleTimeDebugMessage(debugMsg)
 
     if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.ORACLE, DBMS.PGSQL, DBMS.MSSQL, DBMS.SQLITE) and expressionFields and not any((conf.binaryFields, conf.limitStart, conf.limitStop, conf.forcePartial, conf.disableJson)):
@@ -295,23 +293,18 @@ def unionUse(expression, unpack=True, dump=False):
                 else:
                     stopLimit = int(count)
 
-                    debugMsg = "used SQL query returns "
-                    debugMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
+                    debugMsg = "使用的SQL查询返回 %d %s" % (stopLimit, "条记录" if stopLimit > 1 else "条记录")
                     logger.debug(debugMsg)
 
             elif count and (not isinstance(count, six.string_types) or not count.isdigit()):
-                warnMsg = "it was not possible to count the number "
-                warnMsg += "of entries for the SQL query provided. "
-                warnMsg += "sqlmap will assume that it returns only "
-                warnMsg += "one entry"
+                warnMsg = "无法计算所提供的SQL查询的条目数。sqlmap将假设它只返回一个条目"
                 logger.warning(warnMsg)
 
                 stopLimit = 1
 
             elif (not count or int(count) == 0):
                 if not count:
-                    warnMsg = "the SQL query provided does not "
-                    warnMsg += "return any output"
+                    warnMsg = "所提供的SQL查询没有返回任何输出"
                     logger.warning(warnMsg)
                 else:
                     value = []  # for empty tables
@@ -323,8 +316,7 @@ def unionUse(expression, unpack=True, dump=False):
                 try:
                     threadData.shared.limits = iter(xrange(startLimit, stopLimit))
                 except OverflowError:
-                    errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
-                    errMsg += "with switch '--fresh-queries'"
+                    errMsg = "边界限制(%d,%d)太大。请重新运行,并使用'--fresh-queries'开关" % (startLimit, stopLimit)
                     raise SqlmapDataException(errMsg)
 
                 numThreads = min(conf.threads, (stopLimit - startLimit))
@@ -339,8 +331,7 @@ def unionUse(expression, unpack=True, dump=False):
 
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
-                    debugMsg = "suppressing possible resume console info for "
-                    debugMsg += "large number of rows as it might take too long"
+                    debugMsg = "由于可能需要很长时间,因此不显示大量行的恢复控制台信息"
                     logger.debug(debugMsg)
 
                 try:
@@ -427,8 +418,7 @@ def unionUse(expression, unpack=True, dump=False):
                 except KeyboardInterrupt:
                     abortedFlag = True
 
-                    warnMsg = "user aborted during enumeration. sqlmap "
-                    warnMsg += "will display partial output"
+                    warnMsg = "用户在枚举过程中中止。sqlmap将显示部分输出"
                     logger.warning(warnMsg)
 
                 finally:
@@ -445,7 +435,7 @@ def unionUse(expression, unpack=True, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d quer%s in %.2f seconds" % (kb.counters[PAYLOAD.TECHNIQUE.UNION], 'y' if kb.counters[PAYLOAD.TECHNIQUE.UNION] == 1 else "ies", duration)
+        debugMsg = "在 %.2f 秒内执行了 %d 个查询" % (duration, kb.counters[PAYLOAD.TECHNIQUE.UNION]), 'y' if kb.counters[PAYLOAD.TECHNIQUE.UNION] == 1 else "ies"
         logger.debug(debugMsg)
 
     return value

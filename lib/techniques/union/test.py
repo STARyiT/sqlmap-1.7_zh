@@ -68,11 +68,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
 
         if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
-            infoMsg = "'ORDER BY' technique appears to be usable. "
-            infoMsg += "This should reduce the time needed "
-            infoMsg += "to find the right number "
-            infoMsg += "of query columns. Automatically extending the "
-            infoMsg += "range for current UNION query injection technique test"
+            infoMsg = "似乎可以使用'ORDER BY'技术。这应该减少查找正确数量的查询列所需的时间。自动扩展当前UNION查询注入技术测试的范围"
             singleTimeLogMessage(infoMsg)
 
             lowCols, highCols = 1 if lowerCount is None else lowerCount, ORDER_BY_STEP if upperCount is None else upperCount
@@ -107,7 +103,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
 
             if found:
                 kb.orderByColumns = found
-                infoMsg = "target URL appears to have %d column%s in query" % (found, 's' if found > 1 else "")
+                infoMsg = "目标URL中的查询似乎有%d个列" % found
                 singleTimeLogMessage(infoMsg)
                 return found
             elif kb.futileUnion:
@@ -175,7 +171,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
         kb.errorIsNone = popValue()
 
     if retVal:
-        infoMsg = "target URL appears to be UNION injectable with %d columns" % retVal
+        infoMsg = "目标URL似乎可以使用UNION注入,具有%d个列" % retVal
         singleTimeLogMessage(infoMsg, logging.INFO, re.sub(r"\d+", 'N', infoMsg))
 
     return retVal
@@ -274,16 +270,16 @@ def _unionPosition(comment, place, parameter, prefix, suffix, count, where=PAYLO
                         page, headers, _ = Request.queryPage(payload, place=place, content=True, raise404=False)
                         content = ("%s%s" % (removeReflectiveValues(page, payload) or "", removeReflectiveValues(listToStrValue(headers.headers if headers else None), payload, True) or "")).lower()
                         if content.count(phrase) > 0 and content.count(phrase) < LIMITED_ROWS_TEST_NUMBER:
-                            warnMsg = "output with limited number of rows detected. Switching to partial mode"
+                            warnMsg = "检测到有限行数的输出。切换到部分模式"
                             logger.warning(warnMsg)
                             vector = (position, count, comment, prefix, suffix, kb.uChar, where, kb.unionDuplicates, True, kb.tableFrom, kb.unionTemplate)
 
                 unionErrorCase = kb.errorIsNone and wasLastResponseDBMSError()
 
                 if unionErrorCase and count > 1:
-                    warnMsg = "combined UNION/error-based SQL injection case found on "
-                    warnMsg += "column %d. sqlmap will try to find another " % (position + 1)
-                    warnMsg += "column with better characteristics"
+                    warnMsg = "上发现了联合/基于错误的组合SQL注入案例 "
+                    warnMsg += "列 %d. sqlmap 将尝试查找另一个 " % (position + 1)
+                    warnMsg += "具有更好特性的列"
                     logger.warning(warnMsg)
                 else:
                     break
@@ -330,34 +326,32 @@ def _unionTestByCharBruteforce(comment, place, parameter, value, prefix, suffix)
         if not all((validPayload, vector)) and not all((conf.uChar, conf.dbms, kb.unionTemplate)):
             if Backend.getIdentifiedDbms() and kb.orderByColumns and kb.orderByColumns < FUZZ_UNION_MAX_COLUMNS:
                 if kb.fuzzUnionTest is None:
-                    msg = "do you want to (re)try to find proper "
-                    msg += "UNION column types with fuzzy test? [y/N] "
+                    msg = "您是否要尝试使用模糊测试找到正确的UNION列类型？[y/N] "
 
                     kb.fuzzUnionTest = readInput(msg, default='N', boolean=True)
                     if kb.fuzzUnionTest:
                         kb.unionTemplate = _fuzzUnionCols(place, parameter, prefix, suffix)
 
-            warnMsg = "if UNION based SQL injection is not detected, "
-            warnMsg += "please consider "
+            warnMsg = "如果未检测到基于UNION的SQL注入,请考虑"
 
             if not conf.uChar and count > 1 and kb.uChar == NULL:
-                message = "injection not exploitable with NULL values. Do you want to try with a random integer value for option '--union-char'? [Y/n] "
+                message = "使用NULL值无法进行注入利用。您是否要尝试使用随机整数值作为'--union-char'选项？[Y/n] "
 
                 if not readInput(message, default='Y', boolean=True):
-                    warnMsg += "usage of option '--union-char' "
-                    warnMsg += "(e.g. '--union-char=1') "
+                    warnMsg += "请使用'--union-char'选项(e.g. '--union-char=1')"
+
                 else:
                     conf.uChar = kb.uChar = str(randomInt(2))
                     validPayload, vector = _unionConfirm(comment, place, parameter, prefix, suffix, count)
 
             if not conf.dbms:
                 if not conf.uChar:
-                    warnMsg += "and/or try to force the "
+                    warnMsg += "and/or 尝试强制"
                 else:
-                    warnMsg += "forcing the "
-                warnMsg += "back-end DBMS (e.g. '--dbms=mysql') "
+                    warnMsg += "强制"
+                warnMsg += "后端DBMS(e.g. '--dbms=mysql')"
 
-            if not all((validPayload, vector)) and not warnMsg.endswith("consider "):
+            if not all((validPayload, vector)) and not warnMsg.endswith("考虑"):
                 singleTimeWarnMessage(warnMsg)
 
         if orderBy is None and kb.orderByColumns is not None and not all((validPayload, vector)):  # discard ORDER BY results (not usable - e.g. maybe invalid altogether)

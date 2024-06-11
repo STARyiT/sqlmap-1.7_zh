@@ -71,13 +71,13 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
 
     if retVal and PARTIAL_VALUE_MARKER in retVal:
         partialValue = retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
-        logger.info("resuming partial value: '%s'" % _formatPartialContent(partialValue))
+        logger.info("恢复部分值:'%s'" % _formatPartialContent(partialValue))
         offset += len(partialValue)
 
     threadData.resumed = retVal is not None and not partialValue
 
     if any(Backend.isDbms(dbms) for dbms in (DBMS.MYSQL, DBMS.MSSQL, DBMS.SYBASE, DBMS.ORACLE)) and kb.errorChunkLength is None and not chunkTest and not kb.testMode:
-        debugMsg = "searching for error chunk length..."
+        debugMsg = "正在搜索错误块长度..."
         logger.debug(debugMsg)
 
         seen = set()
@@ -164,8 +164,7 @@ def _oneShotErrorUse(expression, field=None, chunkTest=False):
 
                     if trimmed:
                         if not chunkTest:
-                            warnMsg = "possible server trimmed output detected "
-                            warnMsg += "(due to its length and/or content): "
+                            warnMsg = "检测到可能由于长度和/或内容而被服务器截断的输出:"
                             warnMsg += safecharencode(trimmed)
                             logger.warning(warnMsg)
 
@@ -342,23 +341,18 @@ def errorUse(expression, dump=False):
                 else:
                     stopLimit = int(count)
 
-                    debugMsg = "used SQL query returns "
-                    debugMsg += "%d %s" % (stopLimit, "entries" if stopLimit > 1 else "entry")
+                    debugMsg = "使用的SQL查询返回%d个%s" % (stopLimit, "条目" if stopLimit > 1 else "条目")
                     logger.debug(debugMsg)
 
             elif count and not count.isdigit():
-                warnMsg = "it was not possible to count the number "
-                warnMsg += "of entries for the SQL query provided. "
-                warnMsg += "sqlmap will assume that it returns only "
-                warnMsg += "one entry"
+                warnMsg = "无法计算所提供的SQL查询的条目数。sqlmap将假设它只返回一个条目"
                 logger.warning(warnMsg)
 
                 stopLimit = 1
 
             elif (not count or int(count) == 0):
                 if not count:
-                    warnMsg = "the SQL query provided does not "
-                    warnMsg += "return any output"
+                    warnMsg = "所提供的SQL查询没有返回任何输出"
                     logger.warning(warnMsg)
                 else:
                     value = []  # for empty tables
@@ -366,8 +360,7 @@ def errorUse(expression, dump=False):
 
             if isNumPosStrValue(count) and int(count) > 1:
                 if " ORDER BY " in expression and (stopLimit - startLimit) > SLOW_ORDER_COUNT_THRESHOLD:
-                    message = "due to huge table size do you want to remove "
-                    message += "ORDER BY clause gaining speed over consistency? [y/N] "
+                    message = "由于表的大小巨大,你想要移除 ORDER BY 子句以获得速度而牺牲一致性吗？[y/N] "
 
                     if readInput(message, default='N', boolean=True):
                         expression = expression[:expression.index(" ORDER BY ")]
@@ -379,8 +372,7 @@ def errorUse(expression, dump=False):
                 try:
                     threadData.shared.limits = iter(xrange(startLimit, stopLimit))
                 except OverflowError:
-                    errMsg = "boundary limits (%d,%d) are too large. Please rerun " % (startLimit, stopLimit)
-                    errMsg += "with switch '--fresh-queries'"
+                    errMsg = "边界限制(%d,%d)太大。请使用'--fresh-queries'开关重新运行" % (startLimit, stopLimit)
                     raise SqlmapDataException(errMsg)
 
                 threadData.shared.value = BigArray()
@@ -396,14 +388,12 @@ def errorUse(expression, dump=False):
                     for field in expressionFieldsList:
                         if _oneShotErrorUse("SELECT COUNT(%s) FROM %s" % (field, kb.dumpTable)) == '0':
                             emptyFields.append(field)
-                            debugMsg = "column '%s' of table '%s' will not be " % (field, kb.dumpTable)
-                            debugMsg += "dumped as it appears to be empty"
+                            debugMsg = "表格'%s'的列'%s'不会被转储,因为它似乎是空的" % (kb.dumpTable, field)
                             logger.debug(debugMsg)
 
                 if stopLimit > TURN_OFF_RESUME_INFO_LIMIT:
                     kb.suppressResumeInfo = True
-                    debugMsg = "suppressing possible resume console info because of "
-                    debugMsg += "large number of rows. It might take too long"
+                    debugMsg = "由于行数过多,抑制可能的恢复控制台信息。这可能需要很长时间"
                     logger.debug(debugMsg)
 
                 try:
@@ -443,8 +433,7 @@ def errorUse(expression, dump=False):
 
                 except KeyboardInterrupt:
                     abortedFlag = True
-                    warnMsg = "user aborted during enumeration. sqlmap "
-                    warnMsg += "will display partial output"
+                    warnMsg = "用户在枚举过程中中止。sqlmap将显示部分输出"
                     logger.warning(warnMsg)
 
                 finally:
@@ -464,7 +453,7 @@ def errorUse(expression, dump=False):
     duration = calculateDeltaSeconds(start)
 
     if not kb.bruteMode:
-        debugMsg = "performed %d quer%s in %.2f seconds" % (kb.counters[getTechnique()], 'y' if kb.counters[getTechnique()] == 1 else "ies", duration)
+        debugMsg = "在%.2f秒内执行了%d个查询" % (duration, kb.counters[getTechnique()]) + ("y" if kb.counters[getTechnique()] == 1 else "ies")
         logger.debug(debugMsg)
 
     return value

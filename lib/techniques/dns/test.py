@@ -15,19 +15,19 @@ from lib.core.exception import SqlmapNotVulnerableException
 from lib.techniques.dns.use import dnsUse
 
 def dnsTest(payload):
-    logger.info("testing for data retrieval through DNS channel")
+    logger.info("通过DNS通道测试数据检索")
 
     randInt = randomInt()
     kb.dnsTest = dnsUse(payload, "SELECT %d%s" % (randInt, FROM_DUMMY_TABLE.get(Backend.getIdentifiedDbms(), ""))) == str(randInt)
 
     if not kb.dnsTest:
-        errMsg = "data retrieval through DNS channel failed"
+        errMsg = "通过DNS通道数据检索失败"
         if not conf.forceDns:
             conf.dnsDomain = None
-            errMsg += ". Turning off DNS exfiltration support"
+            errMsg += ". 关闭DNS数据泄露支持"
             logger.error(errMsg)
         else:
             raise SqlmapNotVulnerableException(errMsg)
     else:
-        infoMsg = "data retrieval through DNS channel was successful"
+        infoMsg = "通过DNS通道数据检索成功"
         logger.info(infoMsg)

@@ -108,12 +108,11 @@ def dnsUse(payload, expression):
                     hashDBWrite(expression, output)
 
         if not kb.bruteMode:
-            debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
+            debugMsg = "在%.2f秒内执行了%d个查询" % (calculateDeltaSeconds(start), count) + ("y" if count == 1 else "ies")
             logger.debug(debugMsg)
 
     elif conf.dnsDomain:
-        warnMsg = "DNS data exfiltration method through SQL injection "
-        warnMsg += "is currently not available for DBMS %s" % Backend.getIdentifiedDbms()
+        warnMsg = "当前无法在DBMS %s上使用SQL注入进行DNS数据泄露方法" % Backend.getIdentifiedDbms()
         singleTimeWarnMessage(warnMsg)
 
     return safecharencode(retVal) if kb.safeCharEncode else retVal

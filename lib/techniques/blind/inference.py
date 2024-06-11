@@ -94,17 +94,17 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
             if retVal and conf.hexConvert:
                 partialValue = retVal
-                infoMsg = "resuming partial value: %s" % safecharencode(partialValue)
+                infoMsg = "恢复部分值:%s" % safecharencode(partialValue)
                 logger.info(infoMsg)
         elif PARTIAL_VALUE_MARKER in retVal:
             retVal = retVal.replace(PARTIAL_VALUE_MARKER, "")
 
             if retVal and not conf.hexConvert:
                 partialValue = retVal
-                infoMsg = "resuming partial value: %s" % safecharencode(partialValue)
+                infoMsg = "恢复部分值:%s" % safecharencode(partialValue)
                 logger.info(infoMsg)
         else:
-            infoMsg = "resumed: %s" % safecharencode(retVal)
+            infoMsg = "恢复:%s" % safecharencode(retVal)
             logger.info(infoMsg)
 
             return 0, retVal
@@ -189,22 +189,21 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
         if numThreads > 1:
             if not timeBasedCompare or kb.forceThreads:
-                debugMsg = "starting %d thread%s" % (numThreads, ("s" if numThreads > 1 else ""))
+                debugMsg = "启动%d个线程" % numThreads
                 logger.debug(debugMsg)
             else:
                 numThreads = 1
 
         if conf.threads == 1 and not any((timeBasedCompare, conf.predictOutput)):
-            warnMsg = "running in a single-thread mode. Please consider "
-            warnMsg += "usage of option '--threads' for faster data retrieval"
+            warnMsg = "在单线程模式下运行。请考虑使用'--threads'选项进行更快的数据检索"
             singleTimeWarnMessage(warnMsg)
 
         if conf.verbose in (1, 2) and not any((showEta, conf.api, kb.bruteMode)):
             if isinstance(length, int) and numThreads > 1:
-                dataToStdout("[%s] [INFO] retrieved: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
-                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
+                dataToStdout("[%s] [INFO] 检索到: %s" % (time.strftime("%X"), "_" * min(length, conf.progressWidth)))
+                dataToStdout("\r[%s] [INFO] 检索到: " % time.strftime("%X"))
             else:
-                dataToStdout("\r[%s] [INFO] retrieved: " % time.strftime("%X"))
+                dataToStdout("\r[%s] [INFO] 检索到: " % time.strftime("%X"))
 
         def tryHint(idx):
             with kb.locks.hint:
@@ -251,7 +250,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             if result and timeBasedCompare and getTechniqueData().trueCode:
                 result = threadData.lastCode == getTechniqueData().trueCode
                 if not result:
-                    warnMsg = "detected HTTP code '%s' in validation phase is differing from expected '%s'" % (threadData.lastCode, getTechniqueData().trueCode)
+                    warnMsg = "检测到HTTP代码'%s'与预期代码'%s'不同" % (threadData.lastCode, getTechniqueData().trueCode)
                     singleTimeWarnMessage(warnMsg)
 
             incrementCounter(getTechnique())
@@ -367,11 +366,11 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                         unexpectedCode |= threadData.lastCode not in (getTechniqueData().falseCode, getTechniqueData().trueCode)
                         if unexpectedCode:
                             if threadData.lastCode is not None:
-                                warnMsg = "unexpected HTTP code '%s' detected." % threadData.lastCode
+                                warnMsg = "检测到意外的HTTP代码'%s'" % threadData.lastCode
                             else:
-                                warnMsg = "unexpected response detected."
+                                warnMsg = "检测到意外的响应"
 
-                            warnMsg += " Will use (extra) validation step in similar cases"
+                            warnMsg += "在类似情况下将使用(额外)验证步骤"
 
                             singleTimeWarnMessage(warnMsg)
 
@@ -420,23 +419,23 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
 
                                     threadData.validationRun = 0
                                     if (retried or 0) < MAX_REVALIDATION_STEPS:
-                                        errMsg = "invalid character detected. retrying.."
+                                        errMsg = "检测到无效字符。正在重试.."
                                         logger.error(errMsg)
 
                                         if timeBasedCompare:
                                             if kb.adjustTimeDelay is not ADJUST_TIME_DELAY.DISABLE:
                                                 conf.timeSec += 1
-                                                warnMsg = "increasing time delay to %d second%s" % (conf.timeSec, 's' if conf.timeSec > 1 else '')
+                                                warnMsg = "增加时间延迟到%d秒" % conf.timeSec
                                                 logger.warning(warnMsg)
 
                                             if kb.adjustTimeDelay is ADJUST_TIME_DELAY.YES:
-                                                dbgMsg = "turning off time auto-adjustment mechanism"
+                                                dbgMsg = "关闭时间自动调整机制"
                                                 logger.debug(dbgMsg)
                                                 kb.adjustTimeDelay = ADJUST_TIME_DELAY.NO
 
                                         return getChar(idx, originalTbl, continuousOrder, expand, shiftTable, (retried or 0) + 1)
                                     else:
-                                        errMsg = "unable to properly validate last character value ('%s').." % decodeIntToUnicode(retVal)
+                                        errMsg = "无法正确验证最后一个字符值('%s').." % decodeIntToUnicode(retVal)
                                         logger.error(errMsg)
                                         conf.timeSec = kb.originalTimeDelay
                                         return decodeIntToUnicode(retVal)
@@ -444,7 +443,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     if timeBasedCompare:
                                         threadData.validationRun += 1
                                         if kb.adjustTimeDelay is ADJUST_TIME_DELAY.NO and threadData.validationRun > VALID_TIME_CHARS_RUN_THRESHOLD:
-                                            dbgMsg = "turning back on time auto-adjustment mechanism"
+                                            dbgMsg = "重新打开时间自动调整机制"
                                             logger.debug(dbgMsg)
                                             kb.adjustTimeDelay = ADJUST_TIME_DELAY.YES
 
@@ -453,7 +452,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                 return None
             else:
                 if "'%s'" % CHAR_INFERENCE_MARK in payload and conf.charset:
-                    errMsg = "option '--charset' is not supported on '%s'" % Backend.getIdentifiedDbms()
+                    errMsg = "选项'--charset'不支持'%s'" % Backend.getIdentifiedDbms()
                     raise SqlmapUnsupportedFeatureException(errMsg)
 
                 candidates = list(originalTbl)
@@ -559,7 +558,7 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                                     status = ' %d/%d (%d%%)' % (_, length, int(100.0 * _ / length))
                                     output += status if _ != length else " " * len(status)
 
-                                    dataToStdout("\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), output))
+                                    dataToStdout("\r[%s] [INFO] 检索到: %s" % (time.strftime("%X"), output))
 
                 runThreads(numThreads, blindThread, startThreadMsg=False)
 
@@ -578,10 +577,10 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
                 partialValue = "".join(value[:value.index(None)])
 
                 if partialValue:
-                    infoMsg = "\r[%s] [INFO] partially retrieved: %s" % (time.strftime("%X"), filterControlChars(partialValue))
+                    infoMsg = "\r[%s] [INFO] 部分检索: %s" % (time.strftime("%X"), filterControlChars(partialValue))
             else:
                 finalValue = "".join(value)
-                infoMsg = "\r[%s] [INFO] retrieved: %s" % (time.strftime("%X"), filterControlChars(finalValue))
+                infoMsg = "\r[%s] [INFO] 检索到: %s" % (time.strftime("%X"), filterControlChars(finalValue))
 
             if conf.verbose in (1, 2) and infoMsg and not any((showEta, conf.api, kb.bruteMode)):
                 dataToStdout(infoMsg)
@@ -698,18 +697,18 @@ def bisection(payload, expression, length=None, charsetType=None, firstChar=None
             hashDBWrite(expression, "%s%s" % (PARTIAL_VALUE_MARKER if not conf.hexConvert else PARTIAL_HEX_VALUE_MARKER, partialValue))
 
     if conf.hexConvert and not any((abortedFlag, conf.api, kb.bruteMode)):
-        infoMsg = "\r[%s] [INFO] retrieved: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
+        infoMsg = "\r[%s] [INFO] 检索到: %s  %s\n" % (time.strftime("%X"), filterControlChars(finalValue), " " * retrievedLength)
         dataToStdout(infoMsg)
     else:
         if conf.verbose in (1, 2) and not any((showEta, conf.api, kb.bruteMode)):
             dataToStdout("\n")
 
         if (conf.verbose in (1, 2) and showEta) or conf.verbose >= 3:
-            infoMsg = "retrieved: %s" % filterControlChars(finalValue)
+            infoMsg = "检索到: %s" % filterControlChars(finalValue)
             logger.info(infoMsg)
 
     if kb.threadException:
-        raise SqlmapThreadException("something unexpected happened inside the threads")
+        raise SqlmapThreadException("线程中发生意外情况")
 
     if abortedFlag:
         raise KeyboardInterrupt
@@ -731,7 +730,7 @@ def queryOutputLength(expression, payload):
     lengthExprUnescaped = agent.forgeQueryOutputLength(expression)
     count, length = bisection(payload, lengthExprUnescaped, charsetType=CHARSET_TYPE.DIGITS)
 
-    debugMsg = "performed %d quer%s in %.2f seconds" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
+    debugMsg = "执行%d个查询%s，耗时%.2f秒" % (count, 'y' if count == 1 else "ies", calculateDeltaSeconds(start))
     logger.debug(debugMsg)
 
     if length == " ":
