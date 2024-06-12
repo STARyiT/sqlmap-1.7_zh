@@ -45,6 +45,5 @@ class Syntax(object):
 
     @staticmethod
     def escape(expression, quote=True):
-        errMsg = "'escape' method must be defined "
-        errMsg += "inside the specific DBMS plugin"
+        errMsg = "escape 方法必须在特定的DBMS插件中定义"
         raise SqlmapUndefinedMethod(errMsg)

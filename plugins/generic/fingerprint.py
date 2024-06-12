@@ -20,29 +20,25 @@ class Fingerprint(object):
         Backend.forceDbms(dbms)
 
     def getFingerprint(self):
-        errMsg = "'getFingerprint' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'getFingerprint' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def checkDbms(self):
-        errMsg = "'checkDbms' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'checkDbms' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def checkDbmsOs(self, detailed=False):
-        errMsg = "'checkDbmsOs' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'checkDbmsOs' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def forceDbmsEnum(self):
         pass
 
     def userChooseDbmsOs(self):
-        warnMsg = "for some reason sqlmap was unable to fingerprint "
-        warnMsg += "the back-end DBMS operating system"
+        warnMsg = "由于某种原因，sqlmap 无法指纹后端 DBMS 操作系统"
         logger.warning(warnMsg)
 
-        msg = "do you want to provide the OS? [(W)indows/(l)inux]"
+        msg = "您想指纹操作系统吗？[(W)indows/(l)inux]"
 
         while True:
             os = readInput(msg, default='W').upper()
@@ -54,5 +50,5 @@ class Fingerprint(object):
                 Backend.setOs(OS.LINUX)
                 break
             else:
-                warnMsg = "invalid value"
+                warnMsg = "无效的值"
                 logger.warning(warnMsg)

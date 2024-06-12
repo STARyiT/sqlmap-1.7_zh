@@ -37,9 +37,7 @@ class Miscellaneous(object):
 
     def getRemoteTempPath(self):
         if not conf.tmpPath and Backend.isDbms(DBMS.MSSQL):
-            debugMsg = "identifying Microsoft SQL Server error log directory "
-            debugMsg += "that sqlmap will use to store temporary files with "
-            debugMsg += "commands' output"
+            debugMsg = "识别 Microsoft SQL Server 错误日志目录，sqlmap 将使用该目录存储临时文件命令输出"
             logger.debug(debugMsg)
 
             _ = unArrayizeValue(inject.getValue("SELECT SERVERPROPERTY('ErrorLogFileName')", safeCharEncode=False))
@@ -69,7 +67,7 @@ class Miscellaneous(object):
         conf.tmpPath = normalizePath(conf.tmpPath)
         conf.tmpPath = ntToPosixSlashes(conf.tmpPath)
 
-        singleTimeDebugMessage("going to use '%s' as temporary files directory" % conf.tmpPath)
+        singleTimeDebugMessage("将使用 '%s' 作为临时文件目录" % conf.tmpPath)
 
         hashDBWrite(HASHDB_KEYS.CONF_TMP_PATH, conf.tmpPath)
 
@@ -79,7 +77,7 @@ class Miscellaneous(object):
         if "dbmsVersion" in kb.bannerFp:
             return
 
-        infoMsg = "detecting back-end DBMS version from its banner"
+        infoMsg = "从后端 DBMS 的banner中检测版本"
         logger.info(infoMsg)
 
         query = queries[Backend.getIdentifiedDbms()].banner.query
@@ -122,7 +120,7 @@ class Miscellaneous(object):
         """
 
         if web and self.webBackdoorFilePath:
-            logger.info("cleaning up the web files uploaded")
+            logger.info("清理上传的 Web 文件")
 
             self.delRemoteFile(self.webStagerFilePath)
             self.delRemoteFile(self.webBackdoorFilePath)
@@ -143,11 +141,11 @@ class Miscellaneous(object):
             libtype = "shared library"
 
         if onlyFileTbl:
-            logger.debug("cleaning up the database management system")
+            logger.debug("清理数据库管理系统")
         else:
-            logger.info("cleaning up the database management system")
+            logger.debug("清理数据库管理系统")
 
-        logger.debug("removing support tables")
+        logger.debug("删除支持表")
         inject.goStacked("DROP TABLE %s" % self.fileTblName, silent=True)
         inject.goStacked("DROP TABLE %shex" % self.fileTblName, silent=True)
 
@@ -161,7 +159,7 @@ class Miscellaneous(object):
                 udfDict = getattr(self, "sysUdfs", {})
 
             for udf, inpRet in udfDict.items():
-                message = "do you want to remove UDF '%s'? [Y/n] " % udf
+                message = "是否要删除 UDF '%s'？[Y/n] " % udf
 
                 if readInput(message, default='Y', boolean=True):
                     dropStr = "DROP FUNCTION %s" % udf
@@ -170,25 +168,23 @@ class Miscellaneous(object):
                         inp = ", ".join(i for i in inpRet["input"])
                         dropStr += "(%s)" % inp
 
-                    logger.debug("removing UDF '%s'" % udf)
+                    logger.debug("删除 UDF '%s'" % udf)
                     inject.goStacked(dropStr, silent=True)
 
-            logger.info("database management system cleanup finished")
+            logger.info("数据库管理系统清理完成")
 
-            warnMsg = "remember that UDF %s files " % libtype
+            warnMsg = "请记住 UDF %s 文件" % libtype
 
             if conf.osPwn:
-                warnMsg += "and Metasploit related files in the temporary "
-                warnMsg += "folder "
+                warnMsg += "和临时文件夹中的 Metasploit 相关文件"
 
-            warnMsg += "saved on the file system can only be deleted "
-            warnMsg += "manually"
+            warnMsg += "只能手动删除"
             logger.warning(warnMsg)
 
     def likeOrExact(self, what):
-        message = "do you want sqlmap to consider provided %s(s):\n" % what
-        message += "[1] as LIKE %s names (default)\n" % what
-        message += "[2] as exact %s names" % what
+        message = "sqlmap 是否要将提供的 %s 视为:\n" % what
+        message += "[1] LIKE %s 名称(默认)\n" % what
+        message += "[2] 精确 %s 名称" % what
 
         choice = readInput(message, default='1')
 
@@ -198,7 +194,7 @@ class Miscellaneous(object):
         elif choice == '2':
             condParam = "='%s'"
         else:
-            errMsg = "invalid value"
+            errMsg = "无效的值"
             raise SqlmapNoneDataException(errMsg)
 
         return choice, condParam

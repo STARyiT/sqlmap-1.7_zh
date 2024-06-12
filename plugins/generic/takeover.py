@@ -47,13 +47,12 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         if isStackingAvailable() or conf.direct:
             web = False
         elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
-            infoMsg = "going to use a web backdoor for command execution"
+            infoMsg = "正在使用web后门执行命令"
             logger.info(infoMsg)
 
             web = True
         else:
-            errMsg = "unable to execute operating system commands via "
-            errMsg += "the back-end DBMS"
+            errMsg = "无法通过后端DBMS执行操作系统命令"
             raise SqlmapNotVulnerableException(errMsg)
 
         self.getRemoteTempPath()
@@ -69,14 +68,12 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         if isStackingAvailable() or conf.direct:
             web = False
         elif not isStackingAvailable() and Backend.isDbms(DBMS.MYSQL):
-            infoMsg = "going to use a web backdoor for command prompt"
+            infoMsg = "将使用Web后门打开命令提示符"
             logger.info(infoMsg)
 
             web = True
         else:
-            errMsg = "unable to prompt for an interactive operating "
-            errMsg += "system shell via the back-end DBMS because "
-            errMsg += "stacked queries SQL injection is not supported"
+            errMsg = "无法通过后端DBMS打开交互式操作系统shell，因为堆叠查询SQL注入不受支持"
             raise SqlmapNotVulnerableException(errMsg)
 
         self.getRemoteTempPath()
@@ -85,7 +82,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             self.initEnv(web=web)
         except SqlmapFilePathException:
             if not web and not conf.direct:
-                infoMsg = "falling back to web backdoor method..."
+                infoMsg = "回退到web后门方法..."
                 logger.info(infoMsg)
 
                 web = True
@@ -109,9 +106,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         self.checkDbmsOs()
 
         if Backend.isOs(OS.WINDOWS):
-            msg = "how do you want to establish the tunnel?"
+            msg = "您想如何建立隧道?"
             msg += "\n[1] TCP: Metasploit Framework (default)"
-            msg += "\n[2] ICMP: icmpsh - ICMP tunneling"
+            msg += "\n[2] ICMP: icmpsh - ICMP隧道"
 
             while True:
                 tunnel = readInput(msg, default='1')
@@ -121,31 +118,25 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     break
 
                 else:
-                    warnMsg = "invalid value, valid values are '1' and '2'"
+                    warnMsg = "无效的值，有效值为'1'和'2'"
                     logger.warning(warnMsg)
         else:
             tunnel = 1
 
-            debugMsg = "the tunnel can be established only via TCP when "
-            debugMsg += "the back-end DBMS is not Windows"
+            debugMsg = "只有当后端DBMS不是Windows时，隧道才能通过TCP建立"
             logger.debug(debugMsg)
 
         if tunnel == 2:
             isAdmin = runningAsAdmin()
 
             if not isAdmin:
-                errMsg = "you need to run sqlmap as an administrator "
-                errMsg += "if you want to establish an out-of-band ICMP "
-                errMsg += "tunnel because icmpsh uses raw sockets to "
-                errMsg += "sniff and craft ICMP packets"
+                errMsg = "您需要以管理员权限运行sqlmap，以建立出站ICMP隧道嗅探和创建ICMP数据包"
                 raise SqlmapMissingPrivileges(errMsg)
 
             try:
                 __import__("impacket")
             except ImportError:
-                errMsg = "sqlmap requires 'python-impacket' third-party library "
-                errMsg += "in order to run icmpsh master. You can get it at "
-                errMsg += "https://github.com/SecureAuthCorp/impacket"
+                errMsg = "sqlmap需要'python-impacket'第三方库来运行icmpsh主机。"
                 raise SqlmapMissingDependence(errMsg)
 
             filename = "/proc/sys/net/ipv4/icmp_echo_ignore_all"
@@ -155,16 +146,12 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     with openFile(filename, "wb") as f:
                         f.write("1")
                 except IOError as ex:
-                    errMsg = "there has been a file opening/writing error "
-                    errMsg += "for filename '%s' ('%s')" % (filename, getSafeExString(ex))
+                    errMsg += "文件打开/写入错误，文件名 '%s' ('%s')" % (filename, getSafeExString(ex))
                     raise SqlmapSystemException(errMsg)
             else:
-                errMsg = "you need to disable ICMP replies by your machine "
-                errMsg += "system-wide. For example run on Linux/Unix:\n"
+                errMsg = "您需要通过您的机器系统禁用ICMP回复，例如，在Linux/Unix上运行：\n"
                 errMsg += "# sysctl -w net.ipv4.icmp_echo_ignore_all=1\n"
-                errMsg += "If you miss doing that, you will receive "
-                errMsg += "information from the database server and it "
-                errMsg += "is unlikely to receive commands sent from you"
+                errMsg += "如果您忘记这样做,您将接收来自数据库服务器的信息,但不太可能接收到您发送的命令"
                 logger.error(errMsg)
 
             if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -179,10 +166,9 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
             if tunnel == 1:
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
-                    msg = "how do you want to execute the Metasploit shellcode "
-                    msg += "on the back-end database underlying operating system?"
-                    msg += "\n[1] Via UDF 'sys_bineval' (in-memory way, anti-forensics, default)"
-                    msg += "\n[2] Via 'shellcodeexec' (file system way, preferred on 64-bit systems)"
+                    msg = "您希望如何在后端数据库底层操作系统上执行Metasploit shellcode？"
+                    msg += "\n[1] 通过UDF 'sys_bineval'(内存方式,反取证, default)"
+                    msg += "\n[2] 通过'shellcodeexec'(文件系统方式,64位系统上首选)"
 
                     while True:
                         choice = readInput(msg, default='1')
@@ -192,7 +178,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                             break
 
                         else:
-                            warnMsg = "invalid value, valid values are '1' and '2'"
+                            warnMsg = "无效的值，有效值为'1'和'2'"
                             logger.warning(warnMsg)
 
                     if choice == 1:
@@ -213,12 +199,11 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                         if Backend.isDbms(DBMS.MYSQL):
                             fallbackToWeb = True
                         else:
-                            msg = "unable to mount the operating system takeover"
+                            msg = "无法建立操作系统takeover"
                             raise SqlmapFilePathException(msg)
 
                 if Backend.isOs(OS.WINDOWS) and Backend.isDbms(DBMS.MYSQL) and conf.privEsc:
-                    debugMsg = "by default MySQL on Windows runs as SYSTEM "
-                    debugMsg += "user, no need to privilege escalate"
+                    debugMsg = "默认情况下，Windows上的MySQL运行为SYSTEM用户，无需特权升级"
                     logger.debug(debugMsg)
 
             elif tunnel == 2:
@@ -228,16 +213,16 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     if Backend.isDbms(DBMS.MYSQL):
                         fallbackToWeb = True
                     else:
-                        msg = "unable to mount the operating system takeover"
+                        msg = "无法建立操作系统takeover"
                         raise SqlmapFilePathException(msg)
 
         if not setupSuccess and Backend.isDbms(DBMS.MYSQL) and not conf.direct and (not isStackingAvailable() or fallbackToWeb):
             web = True
 
             if fallbackToWeb:
-                infoMsg = "falling back to web backdoor to establish the tunnel"
+                infoMsg = "回退到web后门方法"
             else:
-                infoMsg = "going to use a web backdoor to establish the tunnel"
+                infoMsg = "使用web后门方法"
             logger.info(infoMsg)
 
             self.initEnv(web=web, forceInit=fallbackToWeb)
@@ -248,9 +233,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     # system is not Windows
                     conf.privEsc = False
 
-                    warnMsg = "sqlmap does not implement any operating system "
-                    warnMsg += "user privilege escalation technique when the "
-                    warnMsg += "back-end DBMS underlying system is not Windows"
+                    warnMsg = "sqlmap不支持当后端DBMS底层系统不是Windows时进行操作系统用户特权升级技术"
                     logger.warning(warnMsg)
 
                 if tunnel == 1:
@@ -258,14 +241,14 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
                     setupSuccess = self.uploadShellcodeexec(web=web)
 
                     if setupSuccess is not True:
-                        msg = "unable to mount the operating system takeover"
+                        msg = "无法建立操作系统takeover"
                         raise SqlmapFilePathException(msg)
 
                 elif tunnel == 2:
                     setupSuccess = self.uploadIcmpshSlave(web=web)
 
                     if setupSuccess is not True:
-                        msg = "unable to mount the operating system takeover"
+                        msg = "无法建立操作系统takeover"
                         raise SqlmapFilePathException(msg)
 
         if setupSuccess:
@@ -274,7 +257,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             elif tunnel == 2:
                 self.icmpPwn()
         else:
-            errMsg = "unable to prompt for an out-of-band session"
+            errMsg = "无法提示出站外壳会话"
             raise SqlmapNotVulnerableException(errMsg)
 
         if not conf.cleanup:
@@ -284,43 +267,31 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         self.checkDbmsOs()
 
         if not Backend.isOs(OS.WINDOWS):
-            errMsg = "the back-end DBMS underlying operating system is "
-            errMsg += "not Windows: it is not possible to perform the SMB "
-            errMsg += "relay attack"
+            errMsg = "后端DBMS底层操作系统不是Windows，无法执行SMB中继攻击"
             raise SqlmapUnsupportedDBMSException(errMsg)
 
         if not isStackingAvailable() and not conf.direct:
             if Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.MSSQL):
-                errMsg = "on this back-end DBMS it is only possible to "
-                errMsg += "perform the SMB relay attack if stacked "
-                errMsg += "queries are supported"
+                errMsg = "在这种后端DBMS中，只有当堆叠查询支持时，才能执行SMB中继攻击"
                 raise SqlmapUnsupportedDBMSException(errMsg)
 
             elif Backend.isDbms(DBMS.MYSQL):
-                debugMsg = "since stacked queries are not supported, "
-                debugMsg += "sqlmap is going to perform the SMB relay "
-                debugMsg += "attack via inference blind SQL injection"
+                debugMsg = "由于堆叠查询不支持，sqlmap将通过盲注入执行SMB中继攻击"
                 logger.debug(debugMsg)
 
         printWarn = True
-        warnMsg = "it is unlikely that this attack will be successful "
+        warnMsg = "这项攻击不太可能成功"
 
         if Backend.isDbms(DBMS.MYSQL):
-            warnMsg += "because by default MySQL on Windows runs as "
-            warnMsg += "Local System which is not a real user, it does "
-            warnMsg += "not send the NTLM session hash when connecting to "
-            warnMsg += "a SMB service"
+            warnMsg += "，因为默认情况下，Windows上的MySQL运行为Local System，它不是一个真实用户，不会在连接到SMB服务时发送NTLM会话哈希"
+
 
         elif Backend.isDbms(DBMS.PGSQL):
-            warnMsg += "because by default PostgreSQL on Windows runs "
-            warnMsg += "as postgres user which is a real user of the "
-            warnMsg += "system, but not within the Administrators group"
+            warnMsg += "，因为默认情况下，Windows上的PostgreSQL运行为postgres用户，它是一个系统真实用户，但不是Administrators组的成员"
 
         elif Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
-            warnMsg += "because often Microsoft SQL Server %s " % Backend.getVersion()
-            warnMsg += "runs as Network Service which is not a real user, "
-            warnMsg += "it does not send the NTLM session hash when "
-            warnMsg += "connecting to a SMB service"
+            warnMsg += ",因为通常Microsoft SQL Server %s 运行为Network Service，它不是一个真实用户，不会在连接到SMB服务时发送NTLM会话哈希" % Backend.getVersion()
+
 
         else:
             printWarn = False
@@ -335,19 +306,14 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             return
 
         if not Backend.isDbms(DBMS.MSSQL) or not Backend.isVersionWithin(("2000", "2005")):
-            errMsg = "the back-end DBMS must be Microsoft SQL Server "
-            errMsg += "2000 or 2005 to be able to exploit the heap-based "
-            errMsg += "buffer overflow in the 'sp_replwritetovarbin' "
-            errMsg += "stored procedure (MS09-004)"
+            errMsg = "后端DBMS必须是Microsoft SQL Server 2000或2005才能利用'sp_replwritetovarbin'存储过程(MS09-004)中的基于堆的缓冲区溢出漏洞"
             raise SqlmapUnsupportedDBMSException(errMsg)
 
-        infoMsg = "going to exploit the Microsoft SQL Server %s " % Backend.getVersion()
-        infoMsg += "'sp_replwritetovarbin' stored procedure heap-based "
-        infoMsg += "buffer overflow (MS09-004)"
+        infoMsg = "将利用Microsoft SQL Server %s " % Backend.getVersion()
+        infoMsg += "'sp_replwritetovarbin'存储过程的基于堆的缓冲区溢出漏洞(MS09-004)"
         logger.info(infoMsg)
 
-        msg = "this technique is likely to DoS the DBMS process, are you "
-        msg += "sure that you want to carry with the exploit? [y/N] "
+        msg = "此技术可能会导致DBMS进程停止响应,您确定要执行此漏洞利用吗？[y/N] "
 
         if readInput(msg, default='N', boolean=True):
             self.initEnv(mandatory=False, detailed=True)
@@ -356,8 +322,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             self.bof()
 
     def uncPathRequest(self):
-        errMsg = "'uncPathRequest' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'uncPathRequest'方法必须在特定的DBMS插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def _regInit(self):
@@ -367,8 +332,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         self.checkDbmsOs()
 
         if not Backend.isOs(OS.WINDOWS):
-            errMsg = "the back-end DBMS underlying operating system is "
-            errMsg += "not Windows"
+            errMsg = "后端DBMS底层操作系统不是Windows"
             raise SqlmapUnsupportedDBMSException(errMsg)
 
         self.initEnv()
@@ -379,19 +343,19 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
         if not conf.regKey:
             default = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
-            msg = "which registry key do you want to read? [%s] " % default
+            msg = "您要读取哪个注册表键？[%s] " % default
             regKey = readInput(msg, default=default)
         else:
             regKey = conf.regKey
 
         if not conf.regVal:
             default = "ProductName"
-            msg = "which registry key value do you want to read? [%s] " % default
+            msg = "您要读取哪个注册表键值？[%s] " % default
             regVal = readInput(msg, default=default)
         else:
             regVal = conf.regVal
 
-        infoMsg = "reading Windows registry path '%s\\%s' " % (regKey, regVal)
+        infoMsg = "正在读取Windows注册表路径'%s\\%s' " % (regKey, regVal)
         logger.info(infoMsg)
 
         return self.readRegKey(regKey, regVal, True)
@@ -399,10 +363,10 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
     def regAdd(self):
         self._regInit()
 
-        errMsg = "missing mandatory option"
+        errMsg = "缺少必填选项"
 
         if not conf.regKey:
-            msg = "which registry key do you want to write? "
+            msg = "您要写入哪个注册表键？"
             regKey = readInput(msg)
 
             if not regKey:
@@ -411,7 +375,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             regKey = conf.regKey
 
         if not conf.regVal:
-            msg = "which registry key value do you want to write? "
+            msg = "您要写入哪个注册表键值？"
             regVal = readInput(msg)
 
             if not regVal:
@@ -420,7 +384,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             regVal = conf.regVal
 
         if not conf.regData:
-            msg = "which registry key value data do you want to write? "
+            msg = "您要写入哪个注册表键值数据？"
             regData = readInput(msg)
 
             if not regData:
@@ -430,16 +394,15 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
 
         if not conf.regType:
             default = "REG_SZ"
-            msg = "which registry key value data-type is it? "
+            msg = "该注册表键值的数据类型是什么？"
             msg += "[%s] " % default
             regType = readInput(msg, default=default)
         else:
             regType = conf.regType
 
-        infoMsg = "adding Windows registry path '%s\\%s' " % (regKey, regVal)
-        infoMsg += "with data '%s'. " % regData
-        infoMsg += "This will work only if the user running the database "
-        infoMsg += "process has privileges to modify the Windows registry."
+        infoMsg = "正在添加Windows注册表路径'%s\\%s' " % (regKey, regVal)
+        infoMsg += "数据为'%s'。 " % regData
+        infoMsg += "只有运行数据库进程的用户具有修改Windows注册表的权限时,此操作才能成功。"
         logger.info(infoMsg)
 
         self.addRegKey(regKey, regVal, regType, regData)
@@ -447,10 +410,10 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
     def regDel(self):
         self._regInit()
 
-        errMsg = "missing mandatory option"
+        errMsg = "缺少必填选项"
 
         if not conf.regKey:
-            msg = "which registry key do you want to delete? "
+            msg = "您要删除哪个注册表键？"
             regKey = readInput(msg)
 
             if not regKey:
@@ -459,7 +422,7 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
             regKey = conf.regKey
 
         if not conf.regVal:
-            msg = "which registry key value do you want to delete? "
+            msg = "您要删除哪个注册表键值？"
             regVal = readInput(msg)
 
             if not regVal:
@@ -467,15 +430,13 @@ class Takeover(Abstraction, Metasploit, ICMPsh, Registry):
         else:
             regVal = conf.regVal
 
-        message = "are you sure that you want to delete the Windows "
-        message += "registry path '%s\\%s? [y/N] " % (regKey, regVal)
+        message = "您确定要删除Windows注册表路径'%s\\%s'吗？[y/N] " % (regKey, regVal)
 
         if not readInput(message, default='N', boolean=True):
             return
 
-        infoMsg = "deleting Windows registry path '%s\\%s'. " % (regKey, regVal)
-        infoMsg += "This will work only if the user running the database "
-        infoMsg += "process has privileges to modify the Windows registry."
+        infoMsg = "正在删除Windows注册表路径'%s\\%s'。 " % (regKey, regVal)
+        infoMsg += "只有运行数据库进程的用户具有修改Windows注册表的权限时,此操作才能成功。"
         logger.info(infoMsg)
 
         self.delRegKey(regKey, regVal)

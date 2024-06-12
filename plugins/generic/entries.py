@@ -65,9 +65,7 @@ class Entries(object):
 
         if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
-                warnMsg = "missing database parameter. sqlmap is going "
-                warnMsg += "to use the current database to enumerate "
-                warnMsg += "table(s) entries"
+                warnMsg = "缺少数据库参数。sqlmap将使用当前数据库来枚举表格"
                 logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
@@ -77,12 +75,11 @@ class Entries(object):
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
-                errMsg = "only one database name is allowed when enumerating "
-                errMsg += "the tables' columns"
+                errMsg = "在枚举表格列时，只允许指定一个数据库名称"
                 raise SqlmapMissingMandatoryOptionException(errMsg)
 
             if conf.exclude and re.search(conf.exclude, conf.db, re.I) is not None:
-                infoMsg = "skipping database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                infoMsg = "跳过数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 singleTimeLogMessage(infoMsg)
                 return
 
@@ -102,8 +99,7 @@ class Entries(object):
                 if tblList and isListLike(tblList[0]):
                     tblList = tblList[0]
             elif conf.db and not conf.search:
-                errMsg = "unable to retrieve the tables "
-                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                errMsg = "无法获取数据库 '%s' 中的表格" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
             else:
                 return
@@ -116,7 +112,7 @@ class Entries(object):
                 break
 
             if conf.exclude and re.search(conf.exclude, tbl, re.I) is not None:
-                infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                infoMsg = "跳过表格 '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 singleTimeLogMessage(infoMsg)
                 continue
 
@@ -138,10 +134,10 @@ class Entries(object):
                     kb.dumpTable = "%s.%s" % (conf.db, tbl)
 
                 if safeSQLIdentificatorNaming(conf.db) not in kb.data.cachedColumns or safeSQLIdentificatorNaming(tbl, True) not in kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] or not kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)][safeSQLIdentificatorNaming(tbl, True)]:
-                    warnMsg = "unable to enumerate the columns for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg = "无法枚举表格 '%s' 的列" % unsafeSQLIdentificatorNaming(tbl)
                     if METADB_SUFFIX not in conf.db:
-                        warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                    warnMsg += ", skipping" if len(tblList) > 1 else ""
+                        warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += ", 跳过" if len(tblList) > 1 else ""
                     logger.warning(warnMsg)
 
                     continue
@@ -153,10 +149,10 @@ class Entries(object):
                     colList = [_ for _ in colList if re.search(conf.exclude, _, re.I) is None]
 
                 if not colList:
-                    warnMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg = "跳过表格 '%s'" % unsafeSQLIdentificatorNaming(tbl)
                     if METADB_SUFFIX not in conf.db:
-                        warnMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
-                    warnMsg += " (no usable column names)"
+                        warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    warnMsg += " (没有可用的列名称)"
                     logger.warning(warnMsg)
                     continue
 
@@ -164,12 +160,12 @@ class Entries(object):
                 colNames = colString = ','.join(column for column in colList)
                 rootQuery = queries[Backend.getIdentifiedDbms()].dump_table
 
-                infoMsg = "fetching entries"
+                infoMsg = "获取条目"
                 if conf.col:
-                    infoMsg += " of column(s) '%s'" % colNames
-                infoMsg += " for table '%s'" % unsafeSQLIdentificatorNaming(tbl)
+                    infoMsg += "列 '%s'" % colNames
+                infoMsg += "表 '%s'" % unsafeSQLIdentificatorNaming(tbl)
                 if METADB_SUFFIX not in conf.db:
-                    infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    infoMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 logger.info(infoMsg)
 
                 for column in colList:
@@ -193,8 +189,7 @@ class Entries(object):
                             table = "%s.%s" % (conf.db, tbl) if conf.db else tbl
 
                             if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
-                                warnMsg = "in case of table dumping problems (e.g. column entry order) "
-                                warnMsg += "you are advised to rerun with '--force-pivoting'"
+                                warnMsg = "在表格枚举过程中可能出现问题（例如列条目顺序），建议重新运行时使用 '--force-pivoting'"
                                 singleTimeWarnMessage(warnMsg)
 
                                 query = rootQuery.blind.count % table
@@ -221,7 +216,7 @@ class Entries(object):
                                     except KeyboardInterrupt:
                                         kb.dumpKeyboardInterrupt = True
                                         clearConsoleLine()
-                                        warnMsg = "Ctrl+C detected in dumping phase"
+                                        warnMsg = "在转储阶段检测到Ctrl+C"
                                         logger.warning(warnMsg)
 
                             if isNoneValue(entries) and not kb.dumpKeyboardInterrupt:
@@ -231,7 +226,7 @@ class Entries(object):
                                     retVal = None
                                     kb.dumpKeyboardInterrupt = True
                                     clearConsoleLine()
-                                    warnMsg = "Ctrl+C detected in dumping phase"
+                                    warnMsg = "在转储阶段检测到Ctrl+C"
                                     logger.warning(warnMsg)
 
                                 if retVal:
@@ -253,7 +248,7 @@ class Entries(object):
                             entries = None
                             kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
-                            warnMsg = "Ctrl+C detected in dumping phase"
+                            warnMsg = "在转储阶段检测到Ctrl+C"
                             logger.warning(warnMsg)
 
                     if not isNoneValue(entries):
@@ -285,11 +280,11 @@ class Entries(object):
                                 kb.data.dumpedTable[column]["values"].append(colEntry)
 
                 if not kb.data.dumpedTable and isInferenceAvailable() and not conf.direct:
-                    infoMsg = "fetching number of "
+                    infoMsg = "获取"
                     if conf.col:
-                        infoMsg += "column(s) '%s' " % colNames
-                    infoMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                        infoMsg += "列 '%s' " % colNames
+                    infoMsg += "条目表 '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    infoMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.DERBY, DBMS.ALTIBASE, DBMS.MIMERSQL):
@@ -311,9 +306,9 @@ class Entries(object):
                     entries = {}
 
                     if count == 0:
-                        warnMsg = "table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "in database '%s' " % unsafeSQLIdentificatorNaming(conf.db)
-                        warnMsg += "appears to be empty"
+                        warnMsg = "表格 '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg += "在数据库 '%s' " % unsafeSQLIdentificatorNaming(conf.db)
+                        warnMsg += "可能为空"
                         logger.warning(warnMsg)
 
                         for column in colList:
@@ -321,11 +316,11 @@ class Entries(object):
                             entries[column] = []
 
                     elif not isNumPosStrValue(count):
-                        warnMsg = "unable to retrieve the number of "
+                        warnMsg = "无法获取"
                         if conf.col:
-                            warnMsg += "column(s) '%s' " % colNames
-                        warnMsg += "entries for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                            warnMsg += "列 '%s' " % colNames
+                        warnMsg += "条目表 '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                        warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                         logger.warning(warnMsg)
 
                         continue
@@ -339,8 +334,7 @@ class Entries(object):
                             table = "%s:%s" % (conf.db, tbl) if conf.db else tbl
 
                         if Backend.isDbms(DBMS.MSSQL) and not conf.forcePivoting:
-                            warnMsg = "in case of table dumping problems (e.g. column entry order) "
-                            warnMsg += "you are advised to rerun with '--force-pivoting'"
+                            warnMsg = "在转储表时出现问题(例如列条目顺序),建议您重新运行使用'--force-pivoting'"
                             singleTimeWarnMessage(warnMsg)
 
                             try:
@@ -365,7 +359,7 @@ class Entries(object):
                             except KeyboardInterrupt:
                                 kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
-                                warnMsg = "Ctrl+C detected in dumping phase"
+                                warnMsg = "在转储阶段检测到Ctrl+C"
                                 logger.warning(warnMsg)
 
                         if not entries and not kb.dumpKeyboardInterrupt:
@@ -375,7 +369,7 @@ class Entries(object):
                                 retVal = None
                                 kb.dumpKeyboardInterrupt = True
                                 clearConsoleLine()
-                                warnMsg = "Ctrl+C detected in dumping phase"
+                                warnMsg = "在转储阶段检测到Ctrl+C"
                                 logger.warning(warnMsg)
 
                             if retVal:
@@ -387,14 +381,13 @@ class Entries(object):
                         indexRange = getLimitRange(count, plusOne=plusOne)
 
                         if len(colList) < len(indexRange) > CHECK_ZERO_COLUMNS_THRESHOLD:
-                            debugMsg = "checking for empty columns"
+                            debugMsg = "检查空列"
                             logger.debug(infoMsg)
 
                             for column in colList:
                                 if not inject.checkBooleanExpression("(SELECT COUNT(%s) FROM %s)>0" % (column, kb.dumpTable)):
                                     emptyColumns.append(column)
-                                    debugMsg = "column '%s' of table '%s' will not be " % (column, kb.dumpTable)
-                                    debugMsg += "dumped as it appears to be empty"
+                                    debugMsg = "列 '%s' 表 '%s' 不会被转储，因为它可能为空" % (column, kb.dumpTable)
                                     logger.debug(debugMsg)
 
                         try:
@@ -436,7 +429,7 @@ class Entries(object):
                         except KeyboardInterrupt:
                             kb.dumpKeyboardInterrupt = True
                             clearConsoleLine()
-                            warnMsg = "Ctrl+C detected in dumping phase"
+                            warnMsg = "在转储阶段检测到Ctrl+C"
                             logger.warning(warnMsg)
 
                     for column, columnEntries in entries.items():
@@ -447,11 +440,12 @@ class Entries(object):
                         entriesCount = len(columnEntries)
 
                 if len(kb.data.dumpedTable) == 0 or (entriesCount == 0 and kb.permissionFlag):
-                    warnMsg = "unable to retrieve the entries "
+                    warnMsg = "无法获取"
                     if conf.col:
-                        warnMsg += "of columns '%s' " % colNames
-                    warnMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                    warnMsg += "in database '%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), " (permission denied)" if kb.permissionFlag else "")
+                        warnMsg += "列 '%s' " % colNames
+                    warnMsg += "的条目"
+                    warnMsg += "在表'%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    warnMsg += "在数据库'%s'%s" % (unsafeSQLIdentificatorNaming(conf.db), "(权限被拒绝)" if kb.permissionFlag else "")
                     logger.warning(warnMsg)
                 else:
                     kb.data.dumpedTable["__infos__"] = {"count": entriesCount,
@@ -460,14 +454,12 @@ class Entries(object):
                     try:
                         attackDumpedTable()
                     except (IOError, OSError) as ex:
-                        errMsg = "an error occurred while attacking "
-                        errMsg += "table dump ('%s')" % getSafeExString(ex)
+                        errMsg = "在攻击转储表时发生错误 ('%s')" % getSafeExString(ex)
                         logger.critical(errMsg)
                     conf.dumper.dbTableValues(kb.data.dumpedTable)
 
             except SqlmapConnectionException as ex:
-                errMsg = "connection exception detected in dumping phase "
-                errMsg += "('%s')" % getSafeExString(ex)
+                errMsg = "在转储阶段检测到连接异常('%s')" % getSafeExString(ex)
                 logger.critical(errMsg)
 
             finally:
@@ -480,11 +472,10 @@ class Entries(object):
             return
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-            errMsg = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
+            errMsg = "information_schema 不可用, 后端 DBMS 是 MySQL < 5.0"
             raise SqlmapUnsupportedFeatureException(errMsg)
 
-        infoMsg = "sqlmap will dump entries of all tables from all databases now"
+        infoMsg = "sqlmap 将转储所有数据库的所有表格的条目"
         logger.info(infoMsg)
 
         conf.tbl = None
@@ -501,7 +492,7 @@ class Entries(object):
 
                 for table in tables:
                     if conf.exclude and re.search(conf.exclude, table, re.I) is not None:
-                        infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(table)
+                        infoMsg = "跳过表格 '%s'" % unsafeSQLIdentificatorNaming(table)
                         logger.info(infoMsg)
                         continue
 
@@ -512,17 +503,17 @@ class Entries(object):
 
                         self.dumpTable()
                     except SqlmapNoneDataException:
-                        infoMsg = "skipping table '%s'" % unsafeSQLIdentificatorNaming(table)
+                        infoMsg = "跳过表格 '%s'" % unsafeSQLIdentificatorNaming(table)
                         logger.info(infoMsg)
 
     def dumpFoundColumn(self, dbs, foundCols, colConsider):
-        message = "do you want to dump found column(s) entries? [Y/n] "
+        message = "您想转储找到的列条目吗？[Y/n] "
 
         if not readInput(message, default='Y', boolean=True):
             return
 
         dumpFromDbs = []
-        message = "which database(s)?\n[a]ll (default)\n"
+        message = "您想转储哪个数据库？\n[a]ll (default)\n"
 
         for db, tblData in dbs.items():
             if tblData:
@@ -544,7 +535,7 @@ class Entries(object):
 
             conf.db = db
             dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % unsafeSQLIdentificatorNaming(db)
+            message = "您想转储哪个表格？\n"
             message += "[a]ll (default)\n"
 
             for tbl in tblData:
@@ -583,13 +574,13 @@ class Entries(object):
                     conf.dumper.dbTableValues(data)
 
     def dumpFoundTables(self, tables):
-        message = "do you want to dump found table(s) entries? [Y/n] "
+        message = "您想转储找到的表格条目吗？[Y/n] "
 
         if not readInput(message, default='Y', boolean=True):
             return
 
         dumpFromDbs = []
-        message = "which database(s)?\n[a]ll (default)\n"
+        message = "您想转储哪个数据库？\n[a]ll (default)\n"
 
         for db, tablesList in tables.items():
             if tablesList:
@@ -611,8 +602,7 @@ class Entries(object):
 
             conf.db = db
             dumpFromTbls = []
-            message = "which table(s) of database '%s'?\n" % unsafeSQLIdentificatorNaming(db)
-            message += "[a]ll (default)\n"
+            message = "您想转储哪个表格？[a]ll (default)\n"
 
             for tbl in tablesList:
                 message += "[%s]\n" % unsafeSQLIdentificatorNaming(tbl)

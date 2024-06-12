@@ -31,12 +31,12 @@ class Connector(object):
 
     def printConnected(self):
         if self.hostname and self.port:
-            infoMsg = "connection to %s server '%s:%d' established" % (conf.dbms, self.hostname, self.port)
+            infoMsg = "连接到 %s server '%s:%d' 已建立" % (conf.dbms, self.hostname, self.port)
             logger.info(infoMsg)
 
     def closed(self):
         if self.hostname and self.port:
-            infoMsg = "connection to %s server '%s:%d' closed" % (conf.dbms, self.hostname, self.port)
+            infoMsg = "连接到 %s server '%s:%d' 已关闭" % (conf.dbms, self.hostname, self.port)
             logger.info(infoMsg)
 
         self.connector = None
@@ -58,25 +58,21 @@ class Connector(object):
 
     def checkFileDb(self):
         if not os.path.exists(self.db):
-            errMsg = "the provided database file '%s' does not exist" % self.db
+            errMsg = "提供的数据库文件 '%s' 不存在" % self.db
             raise SqlmapFilePathException(errMsg)
 
     def connect(self):
-        errMsg = "'connect' method must be defined "
-        errMsg += "inside the specific DBMS plugin"
+        errMsg = "'connect' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def fetchall(self):
-        errMsg = "'fetchall' method must be defined "
-        errMsg += "inside the specific DBMS plugin"
+        errMsg = "'fetchall' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def execute(self, query):
-        errMsg = "'execute' method must be defined "
-        errMsg += "inside the specific DBMS plugin"
+        errMsg = "'execute' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def select(self, query):
-        errMsg = "'select' method must be defined "
-        errMsg += "inside the specific DBMS plugin"
+        errMsg = "'select' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)

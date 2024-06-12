@@ -63,7 +63,7 @@ class Users(object):
         kb.data.cachedUsersRoles = {}
 
     def getCurrentUser(self):
-        infoMsg = "fetching current user"
+        infoMsg = "获取当前用户"
         logger.info(infoMsg)
 
         query = queries[Backend.getIdentifiedDbms()].current_user.query
@@ -74,7 +74,7 @@ class Users(object):
         return kb.data.currentUser
 
     def isDba(self, user=None):
-        infoMsg = "testing if current user is DBA"
+        infoMsg = "检查当前用户是否为DBA"
         logger.info(infoMsg)
 
         query = None
@@ -97,7 +97,7 @@ class Users(object):
         return kb.data.isDba
 
     def getUsers(self):
-        infoMsg = "fetching database users"
+        infoMsg = "获取数据库用户"
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].users
@@ -123,7 +123,7 @@ class Users(object):
                         kb.data.cachedUsers.append(value)
 
         if not kb.data.cachedUsers and isInferenceAvailable() and not conf.direct:
-            infoMsg = "fetching number of database users"
+            infoMsg = "获取数据库用户数量"
             logger.info(infoMsg)
 
             if Backend.isDbms(DBMS.MYSQL) and Backend.isFork(FORK.DRIZZLE):
@@ -138,7 +138,7 @@ class Users(object):
             if count == 0:
                 return kb.data.cachedUsers
             elif not isNumPosStrValue(count):
-                errMsg = "unable to retrieve the number of database users"
+                errMsg = "无法获取数据库用户数量"
                 raise SqlmapNoneDataException(errMsg)
 
             plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
@@ -160,18 +160,18 @@ class Users(object):
                     kb.data.cachedUsers.append(user)
 
         if not kb.data.cachedUsers:
-            errMsg = "unable to retrieve the database users"
+            errMsg = "无法获取数据库用户"
             logger.error(errMsg)
 
         return kb.data.cachedUsers
 
     def getPasswordHashes(self):
-        infoMsg = "fetching database users password hashes"
+        infoMsg = "获取数据库用户密码哈希"
 
         rootQuery = queries[Backend.getIdentifiedDbms()].passwords
 
         if conf.user == CURRENT_USER:
-            infoMsg += " for current user"
+            infoMsg += "从当前用户"
             conf.user = self.getCurrentUser()
 
         logger.info(infoMsg)
@@ -279,8 +279,7 @@ class Users(object):
                     if Backend.getIdentifiedDbms() in (DBMS.INFORMIX, DBMS.VIRTUOSO):
                         count = 1
                     else:
-                        infoMsg = "fetching number of password hashes "
-                        infoMsg += "for user '%s'" % user
+                        infoMsg = "获取用户'%s'的密码哈希数量" % user
                         logger.info(infoMsg)
 
                         if Backend.isDbms(DBMS.MSSQL) and Backend.isVersionWithin(("2005", "2008")):
@@ -299,12 +298,11 @@ class Users(object):
                                 count = inject.getValue(query.replace("authentication_string", "password"), union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
-                            warnMsg = "unable to retrieve the number of password "
-                            warnMsg += "hashes for user '%s'" % user
+                            warnMsg = "无法获取用户'%s'的密码哈希数量" % user
                             logger.warning(warnMsg)
                             continue
 
-                    infoMsg = "fetching password hashes for user '%s'" % user
+                    infoMsg = "获取用户'%s'的密码哈希" % user
                     logger.info(infoMsg)
 
                     passwords = []
@@ -343,15 +341,13 @@ class Users(object):
                     if passwords:
                         kb.data.cachedUsersPasswords[user] = passwords
                     else:
-                        warnMsg = "unable to retrieve the password "
-                        warnMsg += "hashes for user '%s'" % user
+                        warnMsg = "无法获取用户'%s'的密码哈希" % user
                         logger.warning(warnMsg)
 
                     retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPasswords:
-            errMsg = "unable to retrieve the password hashes for the "
-            errMsg += "database users"
+            errMsg = "无法获取数据库用户的密码哈希"
             logger.error(errMsg)
         else:
             for user in kb.data.cachedUsersPasswords:
@@ -359,8 +355,7 @@ class Users(object):
 
             storeHashesToFile(kb.data.cachedUsersPasswords)
 
-            message = "do you want to perform a dictionary-based attack "
-            message += "against retrieved password hashes? [Y/n/q]"
+            message = "您要对获取的密码哈希进行字典攻击吗？[Y/n/q]"
             choice = readInput(message, default='Y').upper()
 
             if choice == 'N':
@@ -373,12 +368,12 @@ class Users(object):
         return kb.data.cachedUsersPasswords
 
     def getPrivileges(self, query2=False):
-        infoMsg = "fetching database users privileges"
+        infoMsg = "获取数据库用户权限"
 
         rootQuery = queries[Backend.getIdentifiedDbms()].privileges
 
         if conf.user == CURRENT_USER:
-            infoMsg += " for current user"
+            infoMsg += "对当前用户"
             conf.user = self.getCurrentUser()
 
         logger.info(infoMsg)
@@ -425,7 +420,7 @@ class Users(object):
             values = inject.getValue(query, blind=False, time=False)
 
             if not values and Backend.isDbms(DBMS.ORACLE) and not query2:
-                infoMsg = "trying with table 'USER_SYS_PRIVS'"
+                infoMsg = "尝试使用'USER_SYS_PRIVS'表"
                 logger.info(infoMsg)
 
                 return self.getPrivileges(query2=True)
@@ -523,8 +518,7 @@ class Users(object):
                 if Backend.isDbms(DBMS.INFORMIX):
                     count = 1
                 else:
-                    infoMsg = "fetching number of privileges "
-                    infoMsg += "for user '%s'" % outuser
+                    infoMsg = "获取用户'%s'的权限数量" % outuser
                     logger.info(infoMsg)
 
                     if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -540,17 +534,16 @@ class Users(object):
 
                     if not isNumPosStrValue(count):
                         if not retrievedUsers and Backend.isDbms(DBMS.ORACLE) and not query2:
-                            infoMsg = "trying with table 'USER_SYS_PRIVS'"
+                            infoMsg = "尝试使用'USER_SYS_PRIVS'表"
                             logger.info(infoMsg)
 
                             return self.getPrivileges(query2=True)
 
-                        warnMsg = "unable to retrieve the number of "
-                        warnMsg += "privileges for user '%s'" % outuser
+                        warnMsg = "无法获取用户'%s'的权限数量" % outuser
                         logger.warning(warnMsg)
                         continue
 
-                infoMsg = "fetching privileges for user '%s'" % outuser
+                infoMsg = "获取用户 '%s' 的权限" % outuser
                 logger.info(infoMsg)
 
                 privileges = set()
@@ -648,15 +641,13 @@ class Users(object):
                 if privileges:
                     kb.data.cachedUsersPrivileges[user] = list(privileges)
                 else:
-                    warnMsg = "unable to retrieve the privileges "
-                    warnMsg += "for user '%s'" % outuser
+                    warnMsg = "无法获取用户'%s'的权限" % outuser
                     logger.warning(warnMsg)
 
                 retrievedUsers.add(user)
 
         if not kb.data.cachedUsersPrivileges:
-            errMsg = "unable to retrieve the privileges "
-            errMsg += "for the database users"
+            errMsg = "无法获取数据库用户的权限"
             raise SqlmapNoneDataException(errMsg)
 
         for user, privileges in kb.data.cachedUsersPrivileges.items():
@@ -666,8 +657,7 @@ class Users(object):
         return (kb.data.cachedUsersPrivileges, areAdmins)
 
     def getRoles(self, query2=False):
-        warnMsg = "on %s the concept of roles does not " % Backend.getIdentifiedDbms()
-        warnMsg += "exist. sqlmap will enumerate privileges instead"
+        warnMsg = "在 %s 上,角色的概念不存在。sqlmap将枚举权限而不是角色" % Backend.getIdentifiedDbms()
         logger.warning(warnMsg)
 
         return self.getPrivileges(query2)

@@ -49,7 +49,7 @@ class Custom(object):
                         break
 
             if not re.search(r"\b(OPENROWSET|INTO)\b", query, re.I) and (not sqlType or "SELECT" in sqlType):
-                infoMsg = "fetching %s query output: '%s'" % (sqlType if sqlType is not None else "SQL", query)
+                infoMsg = "获取 %s 查询输出: '%s'" % (sqlType if sqlType is not None else "SQL", query)
                 logger.info(infoMsg)
 
                 if Backend.isDbms(DBMS.MSSQL):
@@ -63,16 +63,15 @@ class Custom(object):
 
                 return output
             elif not isStackingAvailable() and not conf.direct:
-                warnMsg = "execution of non-query SQL statements is only "
-                warnMsg += "available when stacked queries are supported"
+                warnMsg = "执行非查询 SQL 语句仅在支持堆叠查询时可用"
                 logger.warning(warnMsg)
 
                 return None
             else:
                 if sqlType:
-                    infoMsg = "executing %s statement: '%s'" % (sqlType if sqlType is not None else "SQL", query)
+                    infoMsg = "执行 %s 语句: '%s'" % (sqlType if sqlType is not None else "SQL", query)
                 else:
-                    infoMsg = "executing unknown SQL command: '%s'" % query
+                    infoMsg = "执行未知 SQL 命令: '%s'" % query
                 logger.info(infoMsg)
 
                 inject.goStacked(query)
@@ -85,8 +84,7 @@ class Custom(object):
         return output
 
     def sqlShell(self):
-        infoMsg = "calling %s shell. To quit type " % Backend.getIdentifiedDbms()
-        infoMsg += "'x' or 'q' and press ENTER"
+        infoMsg = "调用 %s shell. 退出请输入 'x' 或 'q' 并按下 ENTER " % Backend.getIdentifiedDbms()
         logger.info(infoMsg)
 
         autoCompletion(AUTOCOMPLETE_TYPE.SQL)
@@ -126,7 +124,7 @@ class Custom(object):
                 dataToStdout("No output\n")
 
     def sqlFile(self):
-        infoMsg = "executing SQL statements from given file(s)"
+        infoMsg = "执行给定文件中的 SQL 语句"
         logger.info(infoMsg)
 
         for filename in re.split(PARAMETER_SPLITTING_REGEX, conf.sqlFile):

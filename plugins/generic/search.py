@@ -67,7 +67,7 @@ class Search(object):
             if Backend.getIdentifiedDbms() in UPPER_CASE_DBMSES:
                 db = db.upper()
 
-            infoMsg = "searching database"
+            infoMsg = "正在搜索数据库"
             if dbConsider == "1":
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
@@ -75,7 +75,7 @@ class Search(object):
 
             if conf.excludeSysDbs:
                 exclDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                infoMsg = "跳过系统数据库%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(infoMsg)
             else:
                 exclDbsQuery = ""
@@ -100,7 +100,7 @@ class Search(object):
                         foundDbs.append(value)
 
             if not values and isInferenceAvailable() and not conf.direct:
-                infoMsg = "fetching number of database"
+                infoMsg = "正在获取数据库数量"
                 if dbConsider == "1":
                     infoMsg += "s LIKE"
                 infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(db)
@@ -115,7 +115,7 @@ class Search(object):
                 count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                 if not isNumPosStrValue(count):
-                    warnMsg = "no database"
+                    warnMsg = "未找到数据库"
                     if dbConsider == "1":
                         warnMsg += "s LIKE"
                     warnMsg += " '%s' found" % unsafeSQLIdentificatorNaming(db)
@@ -138,18 +138,17 @@ class Search(object):
                     value = safeSQLIdentificatorNaming(value)
                     foundDbs.append(value)
 
-        conf.dumper.lister("found databases", foundDbs)
+        conf.dumper.lister("找到的数据库", foundDbs)
 
     def searchTable(self):
         bruteForce = False
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-            errMsg = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
+            errMsg = "information_schema 不可用,后端 DBMS 是 MySQL < 5.0"
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common table existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+            message = "是否使用通用表存在性检查? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -175,7 +174,7 @@ class Search(object):
                 tbl = tbl.upper()
                 conf.db = conf.db.upper() if conf.db else conf.db
 
-            infoMsg = "searching table"
+            infoMsg = "正在搜索表"
             if tblConsider == '1':
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -186,10 +185,10 @@ class Search(object):
             if dbCond and conf.db:
                 _ = conf.db.split(',')
                 whereDbsQuery = " AND (" + " OR ".join("%s = '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in _) + ")"
-                infoMsg += " for database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
+                infoMsg += "在数据库%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(db for db in _))
             elif conf.excludeSysDbs:
                 whereDbsQuery = "".join(" AND '%s' != %s" % (unsafeSQLIdentificatorNaming(db), dbCond) for db in self.excludeDbsList)
-                msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
+                msg = "跳过系统数据库%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(db for db in self.excludeDbsList))
                 logger.info(msg)
             else:
                 whereDbsQuery = ""
@@ -234,7 +233,7 @@ class Search(object):
             if not values and isInferenceAvailable() and not conf.direct:
                 if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD):
                     if len(whereDbsQuery) == 0:
-                        infoMsg = "fetching number of databases with table"
+                        infoMsg = "正在获取包含表"
                         if tblConsider == "1":
                             infoMsg += "s LIKE"
                         infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -245,7 +244,7 @@ class Search(object):
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
-                            warnMsg = "no databases have table"
+                            warnMsg = "没有数据库包含表"
                             if tblConsider == "1":
                                 warnMsg += "s LIKE"
                             warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(tbl)
@@ -283,7 +282,7 @@ class Search(object):
                 for db in foundTbls:
                     db = safeSQLIdentificatorNaming(db)
 
-                    infoMsg = "fetching number of table"
+                    infoMsg = "正在获取表数量"
                     if tblConsider == "1":
                         infoMsg += "s LIKE"
                     infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(db))
@@ -297,11 +296,11 @@ class Search(object):
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
-                        warnMsg = "no table"
+                        warnMsg = "没有表"
                         if tblConsider == "1":
                             warnMsg += "s LIKE"
                         warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(tbl)
-                        warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                        warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(db)
                         logger.warning(warnMsg)
 
                         continue
@@ -338,7 +337,7 @@ class Search(object):
                 del foundTbls[db]
 
         if not foundTbls:
-            warnMsg = "no databases contain any of the provided tables"
+            warnMsg = "没有数据库包含提供的表"
             logger.warning(warnMsg)
             return
 
@@ -351,12 +350,11 @@ class Search(object):
         self.forceDbmsEnum()
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-            errMsg = "information_schema not available, "
-            errMsg += "back-end DBMS is MySQL < 5.0"
+            errMsg = "information_schema 不可用,后端 DBMS 是 MySQL < 5.0"
             bruteForce = True
 
         if bruteForce:
-            message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+            message = "是否使用通用列存在性检查? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -367,7 +365,7 @@ class Search(object):
                 regex = '|'.join(conf.col.split(','))
                 conf.dumper.dbTableColumns(columnExists(paths.COMMON_COLUMNS, regex))
 
-                message = "do you want to dump entries? [Y/n] "
+                message = "是否导出条目? [Y/n] "
 
                 if readInput(message, default='Y', boolean=True):
                     self.dumpAll()
@@ -404,7 +402,7 @@ class Search(object):
                 conf.db = conf.db.upper() if conf.db else conf.db
                 conf.tbl = conf.tbl.upper() if conf.tbl else conf.tbl
 
-            infoMsg = "searching column"
+            infoMsg = "正在搜索列"
             if colConsider == "1":
                 infoMsg += "s LIKE"
             infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
@@ -429,10 +427,10 @@ class Search(object):
                     infoMsgDb = " in database%s '%s'" % ("s" if len(_) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in _))
                 elif conf.excludeSysDbs:
                     whereDbsQuery = "".join(" AND %s != '%s'" % (dbCond, unsafeSQLIdentificatorNaming(db)) for db in self.excludeDbsList)
-                    msg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
+                    msg = "跳过系统数据库%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                     logger.info(msg)
                 else:
-                    infoMsgDb = " across all databases"
+                    infoMsgDb = "在所有数据库中"
 
                 if conf.exclude:
                     whereDbsQuery += " AND %s NOT LIKE '%s'" % (dbCond, re.sub(r"\.[*+]", '%', conf.exclude._original))
@@ -492,7 +490,7 @@ class Search(object):
 
             if not values and isInferenceAvailable() and not conf.direct:
                 if not conf.db:
-                    infoMsg = "fetching number of databases with tables containing column"
+                    infoMsg = "正在获取包含列的数据库数量"
                     if colConsider == "1":
                         infoMsg += "s LIKE"
                     infoMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
@@ -503,7 +501,7 @@ class Search(object):
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if not isNumPosStrValue(count):
-                        warnMsg = "no databases have tables containing column"
+                        warnMsg = "没有数据库包含列"
                         if colConsider == "1":
                             warnMsg += "s LIKE"
                         warnMsg += " '%s'" % unsafeSQLIdentificatorNaming(column)
@@ -543,7 +541,7 @@ class Search(object):
                         conf.db = origDb
                         conf.tbl = origTbl
 
-                        infoMsg = "fetching number of tables containing column"
+                        infoMsg = "正在获取包含列的表数量"
                         if colConsider == "1":
                             infoMsg += "s LIKE"
                         infoMsg += " '%s' in database '%s'" % (unsafeSQLIdentificatorNaming(column), unsafeSQLIdentificatorNaming(db))
@@ -561,11 +559,11 @@ class Search(object):
                         count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                         if not isNumPosStrValue(count):
-                            warnMsg = "no tables contain column"
+                            warnMsg = "没有表包含列"
                             if colConsider == "1":
                                 warnMsg += "s LIKE"
                             warnMsg += " '%s' " % unsafeSQLIdentificatorNaming(column)
-                            warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                            warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(db)
                             logger.warning(warnMsg)
 
                             continue
@@ -618,8 +616,7 @@ class Search(object):
             conf.dumper.dbColumns(foundCols, colConsider, dbs)
             self.dumpFoundColumn(dbs, foundCols, colConsider)
         else:
-            warnMsg = "no databases have tables containing any of the "
-            warnMsg += "provided columns"
+            warnMsg = "未找到任何数据库中包含提供的列的表"
             logger.warning(warnMsg)
 
     def search(self):
@@ -635,6 +632,5 @@ class Search(object):
         elif conf.db:
             self.searchDb()
         else:
-            errMsg = "missing parameter, provide -D, -T or -C along "
-            errMsg += "with --search"
+            errMsg = "缺少参数,请提供 -D、-T 或 -C 以及 --search"
             raise SqlmapMissingMandatoryOptionException(errMsg)

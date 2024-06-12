@@ -61,15 +61,15 @@ class Filesystem(object):
         try:
             localFileSize = os.path.getsize(localFile)
         except OSError:
-            warnMsg = "file '%s' is missing" % localFile
+            warnMsg = "文件 '%s' 不存在" % localFile
             logger.warning(warnMsg)
             localFileSize = 0
 
         if fileRead and Backend.isDbms(DBMS.PGSQL):
-            logger.info("length of read file '%s' cannot be checked on PostgreSQL" % remoteFile)
+            logger.info("在 PostgreSQL 上无法检查读取文件 '%s' 的长度" % remoteFile)
             sameFile = True
         else:
-            logger.debug("checking the length of the remote file '%s'" % remoteFile)
+            logger.debug("检查远程文件 '%s' 的长度" % remoteFile)
             remoteFileSize = inject.getValue(lengthQuery, resumeValue=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
             sameFile = None
 
@@ -80,21 +80,16 @@ class Filesystem(object):
 
                 if localFileSize == remoteFileSize:
                     sameFile = True
-                    infoMsg = "the local file '%s' and the remote file " % localFile
-                    infoMsg += "'%s' have the same size (%d B)" % (remoteFile, localFileSize)
+                    infoMsg = "本地文件 '%s' 和远程文件 '%s' 大小相同 (%d B)" % (localFile, remoteFile, localFileSize)
                 elif remoteFileSize > localFileSize:
-                    infoMsg = "the remote file '%s' is larger (%d B) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "the local file '%s' (%dB)" % (localFile, localFileSize)
+                    infoMsg = "远程文件 '%s' 大于本地文件 '%s' (%d B)" % (remoteFile, localFile, remoteFileSize)
                 else:
-                    infoMsg = "the remote file '%s' is smaller (%d B) than " % (remoteFile, remoteFileSize)
-                    infoMsg += "file '%s' (%d B)" % (localFile, localFileSize)
+                    infoMsg = "远程文件 '%s' 小于本地文件 '%s' (%d B)" % (remoteFile, localFile, remoteFileSize)
 
                 logger.info(infoMsg)
             else:
                 sameFile = False
-                warnMsg = "it looks like the file has not been written (usually "
-                warnMsg += "occurs if the DBMS process user has no write "
-                warnMsg += "privileges in the destination path)"
+                warnMsg = "看起来文件没有被写入 (通常是因为 DBMS 进程用户没有写入权限)"
                 logger.warning(warnMsg)
 
         return sameFile
@@ -170,9 +165,7 @@ class Filesystem(object):
         choice = None
 
         if forceCheck is not True:
-            message = "do you want confirmation that the local file '%s' " % localFile
-            message += "has been successfully written on the back-end DBMS "
-            message += "file system ('%s')? [Y/n] " % remoteFile
+            message = "您想确认本地文件 '%s' 已成功写入后端 DBMS 文件系统 ('%s')？[Y/n] " % (localFile, remoteFile)
             choice = readInput(message, default='Y', boolean=True)
 
         if forceCheck or choice:
@@ -182,9 +175,7 @@ class Filesystem(object):
 
     def askCheckReadFile(self, localFile, remoteFile):
         if not kb.bruteMode:
-            message = "do you want confirmation that the remote file '%s' " % remoteFile
-            message += "has been successfully downloaded from the back-end "
-            message += "DBMS file system? [Y/n] "
+            message = "您想确认远程文件 '%s' 已成功下载自后端 DBMS 文件系统？[Y/n] " % remoteFile
 
             if readInput(message, default='Y', boolean=True):
                 return self._checkFileLength(localFile, remoteFile, True)
@@ -192,23 +183,19 @@ class Filesystem(object):
         return None
 
     def nonStackedReadFile(self, remoteFile):
-        errMsg = "'nonStackedReadFile' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'nonStackedReadFile' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def stackedReadFile(self, remoteFile):
-        errMsg = "'stackedReadFile' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'stackedReadFile' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def unionWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        errMsg = "'unionWriteFile' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'unionWriteFile' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def stackedWriteFile(self, localFile, remoteFile, fileType, forceCheck=False):
-        errMsg = "'stackedWriteFile' method must be defined "
-        errMsg += "into the specific DBMS plugin"
+        errMsg = "'stackedWriteFile' 方法必须在特定的 DBMS 插件中定义"
         raise SqlmapUndefinedMethod(errMsg)
 
     def readFile(self, remoteFile):
@@ -222,21 +209,17 @@ class Filesystem(object):
 
             if conf.direct or isStackingAvailable():
                 if isStackingAvailable():
-                    debugMsg = "going to read the file with stacked query SQL "
-                    debugMsg += "injection technique"
+                    debugMsg = "尝试读取文件，使用堆叠查询 SQL 注入技术"
                     logger.debug(debugMsg)
 
                 fileContent = self.stackedReadFile(remoteFile)
             elif Backend.isDbms(DBMS.MYSQL):
-                debugMsg = "going to read the file with a non-stacked query "
-                debugMsg += "SQL injection technique"
+                debugMsg = "尝试读取文件，使用非堆叠查询 SQL 注入技术"
                 logger.debug(debugMsg)
 
                 fileContent = self.nonStackedReadFile(remoteFile)
             else:
-                errMsg = "none of the SQL injection techniques detected can "
-                errMsg += "be used to read files from the underlying file "
-                errMsg += "system of the back-end %s server" % Backend.getDbms()
+                errMsg += "没有检测到任何 SQL 注入技术可以用于读取文件，后端 %s 服务器的文件系统" % Backend.getDbms()
                 logger.error(errMsg)
 
                 fileContent = None
@@ -278,7 +261,7 @@ class Filesystem(object):
 
                     localFilePaths.append(localFilePath)
                 elif not kb.bruteMode:
-                    errMsg = "no data retrieved"
+                    errMsg = "没有获取到数据"
                     logger.error(errMsg)
 
         return localFilePaths
@@ -295,28 +278,23 @@ class Filesystem(object):
 
         if conf.direct or isStackingAvailable():
             if isStackingAvailable():
-                debugMsg = "going to upload the file '%s' with " % fileType
-                debugMsg += "stacked query technique"
+                debugMsg = "尝试上传文件 '%s'，使用堆叠查询 SQL 注入技术" % fileType
                 logger.debug(debugMsg)
 
             written = self.stackedWriteFile(localFile, remoteFile, fileType, forceCheck)
             self.cleanup(onlyFileTbl=True)
         elif isTechniqueAvailable(PAYLOAD.TECHNIQUE.UNION) and Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to upload the file '%s' with " % fileType
-            debugMsg += "UNION query technique"
+            debugMsg = "尝试上传文件 '%s'，使用 UNION 查询 SQL 注入技术" % fileType
             logger.debug(debugMsg)
 
             written = self.unionWriteFile(localFile, remoteFile, fileType, forceCheck)
         elif Backend.isDbms(DBMS.MYSQL):
-            debugMsg = "going to upload the file '%s' with " % fileType
-            debugMsg += "LINES TERMINATED BY technique"
+            debugMsg = "尝试上传文件 '%s'，使用 LINES TERMINATED BY 技术" % fileType
             logger.debug(debugMsg)
 
             written = self.linesTerminatedWriteFile(localFile, remoteFile, fileType, forceCheck)
         else:
-            errMsg = "none of the SQL injection techniques detected can "
-            errMsg += "be used to write files to the underlying file "
-            errMsg += "system of the back-end %s server" % Backend.getDbms()
+            errMsg = "没有检测到任何 SQL 注入技术可以用于写入文件，后端 %s 服务器的文件系统" % Backend.getDbms()
             logger.error(errMsg)
 
             return None

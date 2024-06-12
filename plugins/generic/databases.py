@@ -72,7 +72,7 @@ class Databases(object):
         kb.data.cachedStatements = []
 
     def getCurrentDb(self):
-        infoMsg = "fetching current database"
+        infoMsg = "获取当前数据库"
         logger.info(infoMsg)
 
         query = queries[Backend.getIdentifiedDbms()].current_db.query
@@ -84,14 +84,12 @@ class Databases(object):
             kb.data.currentDb = VERTICA_DEFAULT_SCHEMA
 
         if Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE):
-            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
-            warnMsg += "schema names for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
+            warnMsg = "在 %s 上,您需要使用" % Backend.getIdentifiedDbms()
+            warnMsg += "架构名称作为数据库名称的对应项"
             singleTimeWarnMessage(warnMsg)
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
-            warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
-            warnMsg += "user names for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
+            warnMsg = "在 %s 上,您需要使用" % Backend.getIdentifiedDbms()
+            warnMsg += "用户名称作为数据库名称的对应项"
             singleTimeWarnMessage(warnMsg)
 
         return kb.data.currentDb
@@ -103,29 +101,23 @@ class Databases(object):
         infoMsg = None
 
         if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-            warnMsg = "information_schema not available, "
-            warnMsg += "back-end DBMS is MySQL < 5. database "
-            warnMsg += "names will be fetched from 'mysql' database"
+            warnMsg = "information_schema不可用,后端DBMS是MySQL < 5。数据库名称将从'mysql'数据库中获取"
             logger.warning(warnMsg)
 
         elif Backend.getIdentifiedDbms() in (DBMS.ORACLE, DBMS.DB2, DBMS.PGSQL, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CACHE, DBMS.FRONTBASE):
-            warnMsg = "schema names are going to be used on %s " % Backend.getIdentifiedDbms()
-            warnMsg += "for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
+            warnMsg = "架构名称将在%s上用于枚举,作为其他DBMS上数据库名称的对应项" % Backend.getIdentifiedDbms()
             logger.warning(warnMsg)
 
-            infoMsg = "fetching database (schema) names"
+            infoMsg = "获取数据库(架构)名称"
 
         elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
-            warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
-            warnMsg += "for enumeration as the counterpart to database "
-            warnMsg += "names on other DBMSes"
+            warnMsg = "用户名称将用于%s上的枚举,作为其他DBMS上数据库名称的对应项" % Backend.getIdentifiedDbms()
             logger.warning(warnMsg)
 
-            infoMsg = "fetching database (user) names"
+            infoMsg = "获取数据库(用户)名称"
 
         else:
-            infoMsg = "fetching database names"
+            infoMsg = "获取数据库名称"
 
         if infoMsg:
             logger.info(infoMsg)
@@ -143,7 +135,7 @@ class Databases(object):
                 kb.data.cachedDbs = arrayizeValue(values)
 
         if not kb.data.cachedDbs and isInferenceAvailable() and not conf.direct:
-            infoMsg = "fetching number of databases"
+            infoMsg = "获取数据库数量"
             logger.info(infoMsg)
 
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
@@ -153,7 +145,7 @@ class Databases(object):
             count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
             if not isNumPosStrValue(count):
-                errMsg = "unable to retrieve the number of databases"
+                errMsg = "无法获取数据库数量"
                 logger.error(errMsg)
             else:
                 plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
@@ -193,14 +185,14 @@ class Databases(object):
                     break
 
         if not kb.data.cachedDbs:
-            infoMsg = "falling back to current database"
+            infoMsg = "回退到当前数据库"
             logger.info(infoMsg)
             self.getCurrentDb()
 
             if kb.data.currentDb:
                 kb.data.cachedDbs = [kb.data.currentDb]
             else:
-                errMsg = "unable to retrieve the database names"
+                errMsg = "无法获取数据库名称"
                 raise SqlmapNoneDataException(errMsg)
         else:
             kb.data.cachedDbs.sort()
@@ -218,8 +210,7 @@ class Databases(object):
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                warnMsg = "information_schema not available, "
-                warnMsg += "back-end DBMS is MySQL < 5.0"
+                warnMsg = "information_schema不可用,后端DBMS是MySQL < 5.0"
                 logger.warning(warnMsg)
                 bruteForce = True
 
@@ -233,8 +224,7 @@ class Databases(object):
                     tables = None
 
                 if not tables:
-                    warnMsg = "cannot retrieve table names, "
-                    warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
+                    warnMsg = "无法获取表名称,后端DBMS是%s" % Backend.getIdentifiedDbms()
                     logger.warning(warnMsg)
                     bruteForce = True
                 else:
@@ -274,7 +264,7 @@ class Databases(object):
 
                 return kb.data.cachedTables
 
-            message = "do you want to use common table existence check? %s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+            message = "您想使用通用表存在性检查吗？%s " % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
             choice = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if choice == 'N':
@@ -284,7 +274,7 @@ class Databases(object):
             else:
                 return tableExists(paths.COMMON_TABLES)
 
-        infoMsg = "fetching tables for database"
+        infoMsg = "获取数据库表名称"
         infoMsg += "%s: '%s'" % ("s" if len(dbs) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(unArrayizeValue(db)) for db in sorted(dbs)))
         logger.info(infoMsg)
 
@@ -302,7 +292,7 @@ class Databases(object):
                         query += " WHERE %s" % condition
 
                         if conf.excludeSysDbs:
-                            infoMsg = "skipping system database%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
+                            infoMsg = "跳过系统数据库%s '%s'" % ("s" if len(self.excludeDbsList) > 1 else "", ", ".join(unsafeSQLIdentificatorNaming(db) for db in self.excludeDbsList))
                             logger.info(infoMsg)
                             query += " IN (%s)" % ','.join("'%s'" % unsafeSQLIdentificatorNaming(db) for db in sorted(dbs) if db not in self.excludeDbsList)
                         else:
@@ -337,13 +327,12 @@ class Databases(object):
 
                                 comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
                                 if not isNoneValue(comment):
-                                    infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
+                                    infoMsg = "获取表名称 '%s' 的注释 '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
                                     if METADB_SUFFIX not in db:
-                                        infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                        infoMsg += "在数据库 '%s' 中" % unsafeSQLIdentificatorNaming(db)
                                     logger.info(infoMsg)
                             else:
-                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                warnMsg += "possible to get table comments"
+                                warnMsg = "在 %s 中，无法获取表注释" % Backend.getIdentifiedDbms()
                                 singleTimeWarnMessage(warnMsg)
 
                         if db not in kb.data.cachedTables:
@@ -354,12 +343,12 @@ class Databases(object):
         if not kb.data.cachedTables and isInferenceAvailable() and not conf.direct:
             for db in dbs:
                 if conf.excludeSysDbs and db in self.excludeDbsList:
-                    infoMsg = "skipping system database '%s'" % unsafeSQLIdentificatorNaming(db)
+                    infoMsg = "跳过系统数据库 '%s'" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
                     continue
 
                 if conf.exclude and re.search(conf.exclude, db, re.I) is not None:
-                    infoMsg = "skipping database '%s'" % unsafeSQLIdentificatorNaming(db)
+                    infoMsg = "跳过数据库 '%s'" % unsafeSQLIdentificatorNaming(db)
                     singleTimeLogMessage(infoMsg)
                     continue
 
@@ -367,8 +356,7 @@ class Databases(object):
                     if _query is None:
                         break
 
-                    infoMsg = "fetching number of tables for "
-                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(db)
+                    infoMsg += "数据库 '%s' 获取数据库表数量" % unsafeSQLIdentificatorNaming(db)
                     logger.info(infoMsg)
 
                     if Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.FIREBIRD, DBMS.MAXDB, DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB):
@@ -379,14 +367,12 @@ class Databases(object):
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
 
                     if count == 0:
-                        warnMsg = "database '%s' " % unsafeSQLIdentificatorNaming(db)
-                        warnMsg += "appears to be empty"
+                        warnMsg = "数据库 '%s' 似乎为空" % unsafeSQLIdentificatorNaming(db)
                         logger.warning(warnMsg)
                         break
 
                     elif not isNumPosStrValue(count):
-                        warnMsg = "unable to retrieve the number of "
-                        warnMsg += "tables for database '%s'" % unsafeSQLIdentificatorNaming(db)
+                        warnMsg = "无法获取数据库 '%s' 的表数量" % unsafeSQLIdentificatorNaming(db)
                         singleTimeWarnMessage(warnMsg)
                         continue
 
@@ -428,26 +414,24 @@ class Databases(object):
 
                                     comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
                                     if not isNoneValue(comment):
-                                        infoMsg = "retrieved comment '%s' for table '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
+                                        infoMsg = "获取表名称 '%s' 的注释 '%s'" % (comment, unsafeSQLIdentificatorNaming(table))
                                         if METADB_SUFFIX not in db:
-                                            infoMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(db)
+                                            infoMsg += "在数据库 '%s' 中" % unsafeSQLIdentificatorNaming(db)
                                         logger.info(infoMsg)
                                 else:
-                                    warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                    warnMsg += "possible to get table comments"
+                                    warnMsg = "在 %s 中，无法获取表注释" % Backend.getIdentifiedDbms()
                                     singleTimeWarnMessage(warnMsg)
 
                         break
                     else:
-                        warnMsg = "unable to retrieve the table names "
-                        warnMsg += "for database '%s'" % unsafeSQLIdentificatorNaming(db)
+                        warnMsg = "无法获取数据库 '%s' 的表名称" % unsafeSQLIdentificatorNaming(db)
                         logger.warning(warnMsg)
 
         if isNoneValue(kb.data.cachedTables):
             kb.data.cachedTables.clear()
 
         if not kb.data.cachedTables:
-            errMsg = "unable to retrieve the table names for any database"
+            errMsg = "无法获取任何数据库的表名称"
             if bruteForce is None:
                 logger.error(errMsg)
                 return self.getTables(bruteForce=True)
@@ -468,16 +452,13 @@ class Databases(object):
 
         if conf.db is None or conf.db == CURRENT_DB:
             if conf.db is None:
-                warnMsg = "missing database parameter. sqlmap is going "
-                warnMsg += "to use the current database to enumerate "
-                warnMsg += "table(s) columns"
+                warnMsg = "缺少数据库参数。sqlmap将使用当前数据库来枚举表列"
                 logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
 
             if not conf.db:
-                errMsg = "unable to retrieve the current "
-                errMsg += "database name"
+                errMsg = "无法获取当前数据库名称"
                 raise SqlmapNoneDataException(errMsg)
 
         elif conf.db is not None:
@@ -485,8 +466,7 @@ class Databases(object):
                 conf.db = conf.db.upper()
 
             if ',' in conf.db:
-                errMsg = "only one database name is allowed when enumerating "
-                errMsg += "the tables' columns"
+                errMsg = "枚举表列时，只允许指定一个数据库名称"
                 raise SqlmapMissingMandatoryOptionException(errMsg)
 
         conf.db = safeSQLIdentificatorNaming(conf.db)
@@ -526,9 +506,9 @@ class Databases(object):
 
                 tblList = list(tblList)
             elif not conf.search:
-                errMsg = "unable to retrieve the tables"
+                errMsg = "无法获取表名称"
                 if METADB_SUFFIX not in conf.db:
-                    errMsg += " in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    errMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                 raise SqlmapNoneDataException(errMsg)
             else:
                 return kb.data.cachedColumns
@@ -540,14 +520,12 @@ class Databases(object):
 
         if bruteForce is None:
             if Backend.isDbms(DBMS.MYSQL) and not kb.data.has_information_schema:
-                warnMsg = "information_schema not available, "
-                warnMsg += "back-end DBMS is MySQL < 5.0"
+                warnMsg = "information_schema不可用,后端DBMS是MySQL < 5.0"
                 logger.warning(warnMsg)
                 bruteForce = True
 
             elif Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB, DBMS.RAIMA):
-                warnMsg = "cannot retrieve column names, "
-                warnMsg += "back-end DBMS is %s" % Backend.getIdentifiedDbms()
+                warnMsg = "无法获取列名称,后端DBMS是%s" % Backend.getIdentifiedDbms()
                 singleTimeWarnMessage(warnMsg)
                 bruteForce = True
 
@@ -579,7 +557,7 @@ class Databases(object):
                 return kb.data.cachedColumns
 
             if kb.choices.columnExists is None:
-                message = "do you want to use common column existence check? %s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
+                message = "您想使用通用列存在性检查吗？%s" % ("[Y/n/q]" if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI, DBMS.EXTREMEDB) else "[y/N/q]")
                 kb.choices.columnExists = readInput(message, default='Y' if 'Y' in message else 'N').upper()
 
             if kb.choices.columnExists == 'N':
@@ -601,13 +579,12 @@ class Databases(object):
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
-                    infoMsg = "fetched table columns from "
-                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    infoMsg = "从数据库'%s'中获取了表格列信息" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
-                infoMsg = "fetching columns "
+                infoMsg = "获取列信息"
                 condQuery = ""
 
                 if len(colList) > 0:
@@ -647,9 +624,9 @@ class Databases(object):
                 if dumpMode and colList:
                     values = [(_,) for _ in colList]
                 else:
-                    infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    infoMsg += "表 '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     if METADB_SUFFIX not in conf.db:
-                        infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                        infoMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     values = None
@@ -700,11 +677,10 @@ class Databases(object):
 
                                         comment = unArrayizeValue(inject.getValue(query, blind=False, time=False))
                                         if not isNoneValue(comment):
-                                            infoMsg = "retrieved comment '%s' for column '%s'" % (comment, name)
+                                            infoMsg = "获取列名称 '%s' 的注释 '%s'" % (comment, name)
                                             logger.info(infoMsg)
                                     else:
-                                        warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                        warnMsg += "possible to get column comments"
+                                        warnMsg = "在 %s 中，无法获取列注释" % Backend.getIdentifiedDbms()
                                         singleTimeWarnMessage(warnMsg)
 
                                 if len(columnData) == 1:
@@ -737,13 +713,12 @@ class Databases(object):
                 if conf.db is not None and len(kb.data.cachedColumns) > 0 \
                    and conf.db in kb.data.cachedColumns and tbl in \
                    kb.data.cachedColumns[conf.db]:
-                    infoMsg = "fetched table columns from "
-                    infoMsg += "database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                    infoMsg = "从数据库 '%s' 获取表格列信息" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     return {conf.db: kb.data.cachedColumns[conf.db]}
 
-                infoMsg = "fetching columns "
+                infoMsg = "获取列信息"
                 condQuery = ""
 
                 if len(colList) > 0:
@@ -797,9 +772,9 @@ class Databases(object):
                     for value in colList:
                         columns[safeSQLIdentificatorNaming(value)] = None
                 else:
-                    infoMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                    infoMsg += "表 '%s' " % unsafeSQLIdentificatorNaming(tbl)
                     if METADB_SUFFIX not in conf.db:
-                        infoMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                        infoMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                     logger.info(infoMsg)
 
                     count = inject.getValue(query, union=False, error=False, expected=EXPECTED.INT, charsetType=CHARSET_TYPE.DIGITS)
@@ -818,10 +793,9 @@ class Databases(object):
                                     index += 1
 
                         if not columns:
-                            errMsg = "unable to retrieve the %scolumns " % ("number of " if not Backend.isDbms(DBMS.MSSQL) else "")
-                            errMsg += "for table '%s' " % unsafeSQLIdentificatorNaming(tbl)
+                            errMsg = "无法获取表格'%s'的%s列信息" % (unsafeSQLIdentificatorNaming(tbl), "数量" if not Backend.isDbms(DBMS.MSSQL) else "")
                             if METADB_SUFFIX not in conf.db:
-                                errMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                                errMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
                             logger.error(errMsg)
                             continue
 
@@ -872,11 +846,10 @@ class Databases(object):
 
                                 comment = unArrayizeValue(inject.getValue(query, union=False, error=False))
                                 if not isNoneValue(comment):
-                                    infoMsg = "retrieved comment '%s' for column '%s'" % (comment, column)
+                                    infoMsg = "获取列名称 '%s' 的注释 '%s'" % (comment, column)
                                     logger.info(infoMsg)
                             else:
-                                warnMsg = "on %s it is not " % Backend.getIdentifiedDbms()
-                                warnMsg += "possible to get column comments"
+                                warnMsg = "在 %s 中，无法获取列注释" % Backend.getIdentifiedDbms()
                                 singleTimeWarnMessage(warnMsg)
 
                         if not onlyColNames:
@@ -921,10 +894,9 @@ class Databases(object):
                         kb.data.cachedColumns[safeSQLIdentificatorNaming(conf.db)] = table
 
         if not kb.data.cachedColumns:
-            warnMsg = "unable to retrieve column names for "
-            warnMsg += ("table '%s' " % unsafeSQLIdentificatorNaming(unArrayizeValue(tblList))) if len(tblList) == 1 else "any table "
+            warnMsg = "无法获取表格 '%s' 的列名称" % unsafeSQLIdentificatorNaming(unArrayizeValue(tblList)) if len(tblList) == 1 else "无法获取任何表格的列名称"
             if METADB_SUFFIX not in conf.db:
-                warnMsg += "in database '%s'" % unsafeSQLIdentificatorNaming(conf.db)
+                warnMsg += "在数据库 '%s'" % unsafeSQLIdentificatorNaming(conf.db)
             logger.warning(warnMsg)
 
             if bruteForce is None:
@@ -934,7 +906,7 @@ class Databases(object):
 
     @stackedmethod
     def getSchema(self):
-        infoMsg = "enumerating database management system schema"
+        infoMsg = "枚举数据库管理系统的模式"
         logger.info(infoMsg)
 
         try:
@@ -947,7 +919,7 @@ class Databases(object):
 
             self.getTables()
 
-            infoMsg = "fetched tables: "
+            infoMsg = "获取表名称: "
             infoMsg += ", ".join(["%s" % ", ".join("'%s%s%s'" % (unsafeSQLIdentificatorNaming(db), ".." if Backend.isDbms(DBMS.MSSQL) or Backend.isDbms(DBMS.SYBASE) else '.', unsafeSQLIdentificatorNaming(_)) for _ in tbl) for db, tbl in kb.data.cachedTables.items()])
             logger.info(infoMsg)
 
@@ -991,9 +963,7 @@ class Databases(object):
 
     def getCount(self):
         if not conf.tbl:
-            warnMsg = "missing table parameter, sqlmap will retrieve "
-            warnMsg += "the number of entries for all database "
-            warnMsg += "management system databases' tables"
+            warnMsg = "缺少表格参数，sqlmap将获取所有数据库管理系统数据表的数量"
             logger.warning(warnMsg)
 
         elif "." in conf.tbl:
@@ -1001,9 +971,7 @@ class Databases(object):
                 conf.db, conf.tbl = conf.tbl.split('.', 1)
 
         if conf.tbl is not None and conf.db is None and Backend.getIdentifiedDbms() not in (DBMS.SQLITE, DBMS.ACCESS, DBMS.FIREBIRD, DBMS.MCKOI, DBMS.EXTREMEDB):
-            warnMsg = "missing database parameter. sqlmap is going to "
-            warnMsg += "use the current database to retrieve the "
-            warnMsg += "number of entries for table '%s'" % unsafeSQLIdentificatorNaming(conf.tbl)
+            warnMsg = "缺少数据库参数。sqlmap将使用当前数据库来获取表格 '%s' 的数量" % unsafeSQLIdentificatorNaming(conf.tbl)
             logger.warning(warnMsg)
 
             conf.db = self.getCurrentDb()
@@ -1023,7 +991,7 @@ class Databases(object):
         return kb.data.cachedCounts
 
     def getStatements(self):
-        infoMsg = "fetching SQL statements"
+        infoMsg = "获取SQL语句"
         logger.info(infoMsg)
 
         rootQuery = queries[Backend.getIdentifiedDbms()].statements
@@ -1051,7 +1019,7 @@ class Databases(object):
                 break
 
         if not kb.data.cachedStatements and isInferenceAvailable() and not conf.direct:
-            infoMsg = "fetching number of statements"
+            infoMsg = "获取语句数量"
             logger.info(infoMsg)
 
             query = rootQuery.blind.count
@@ -1064,7 +1032,7 @@ class Databases(object):
             if count == 0:
                 return kb.data.cachedStatements
             elif not isNumPosStrValue(count):
-                errMsg = "unable to retrieve the number of statements"
+                errMsg = "无法获取语句数量"
                 raise SqlmapNoneDataException(errMsg)
 
             plusOne = Backend.getIdentifiedDbms() in PLUS_ONE_DBMSES
@@ -1093,7 +1061,7 @@ class Databases(object):
                     kb.data.cachedStatements.append(value)
 
         if not kb.data.cachedStatements:
-            errMsg = "unable to retrieve the statements"
+            errMsg = "无法获取语句"
             logger.error(errMsg)
         else:
             kb.data.cachedStatements = [_.replace(REFLECTED_VALUE_MARKER, "<payload>") for _ in kb.data.cachedStatements]
