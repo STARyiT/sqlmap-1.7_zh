@@ -15,7 +15,7 @@ from lib.core.enums import PRIORITY
 __priority__ = PRIORITY.HIGH
 
 def dependencies():
-    singleTimeWarnMessage("tamper script '%s' is only meant to be run against %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
+    singleTimeWarnMessage("tamper 脚本 '%s' 只适用于 %s" % (os.path.basename(__file__).split(".")[0], DBMS.MYSQL))
 
 def tamper(payload, **kwargs):
     """
@@ -33,8 +33,7 @@ def tamper(payload, **kwargs):
 
     retVal = payload
 
-    warnMsg = "you should consider usage of switch '--no-cast' along with "
-    warnMsg += "tamper script '%s'" % os.path.basename(__file__).split(".")[0]
+    warnMsg = "你应该考虑使用开关 '--no-cast' 以及与当前脚本相同的篡改脚本 '%s'" % os.path.basename(__file__).split(".")[0]
     singleTimeWarnMessage(warnMsg)
 
     match = re.search(r"(?i)MID\((.+?)\s*,\s*(\d+)\s*\,\s*(\d+)\s*\)", payload or "")
