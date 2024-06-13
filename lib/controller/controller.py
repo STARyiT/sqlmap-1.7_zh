@@ -549,7 +549,8 @@ def start():
                             check = checkDynParam(place, parameter, value)
 
                             if not check:
-                                warnMsg = "%参数'%s'似乎不是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                warnMsg = "%s参数 '%s' 似乎不是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                # warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.warning(warnMsg)
 
                                 if conf.skipStatic:
@@ -577,7 +578,8 @@ def start():
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "在 %s 参数'%s'上测试SQL注入 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "在%s参数 '%s' 上测试SQL注入" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                # infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injection = checkSqlInjection(place, parameter, value)

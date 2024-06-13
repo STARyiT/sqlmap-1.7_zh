@@ -155,8 +155,8 @@ def checkSqlInjection(place, parameter, value):
                 # DBMS
 
                 if kb.reduceTests is None and not conf.testFilter and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                    msg = "后端DBMS疑似是 '%s'. " % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
-                    msg += "你是否跳过其他DBMS的特定Payload测试? [Y/n]"
+                    msg = "后端DBMS疑似是'%s'。" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                    msg += "是否跳过其他DBMS的特定Payload测试? [Y/n]"
                     kb.reduceTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             # If the DBMS has been fingerprinted (via DBMS-specific error
@@ -164,10 +164,10 @@ def checkSqlInjection(place, parameter, value):
             # payload), ask the user to extend the tests to all DBMS-specific,
             # regardless of --level and --risk values provided
             if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                msg += "对于剩余的测试，你是否想包含所有的 '%s' 测试，并执行" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
-                msg += "检测等级为 (%d)" % conf.level if conf.level < 5 else ""
-                msg += " and " if conf.level < 5 and conf.risk < 3 else ""
-                msg += "检测风险为 (%d)" % conf.risk if conf.risk < 3 else ""
+                msg += "对于剩余的测试，你是否想包含所有的'%s'测试，并执行" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                msg += "检测等级为(%d)" % conf.level if conf.level < 5 else ""
+                msg += " 和 " if conf.level < 5 and conf.risk < 3 else ""
+                msg += "检测风险为(%d)" % conf.risk if conf.risk < 3 else ""
                 msg += " 吗? [Y/n]" if conf.level < 5 and conf.risk < 3 else " 吗? [Y/n]"
                 kb.extendTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
@@ -657,7 +657,7 @@ def checkSqlInjection(place, parameter, value):
                                 trueResult = Request.queryPage(reqPayload, place, timeBasedCompare=True, raise404=False)
 
                                 if trueResult:
-                                    infoMsg = "%s 参数 '%s' 似乎是可注入的 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                    infoMsg = "%s 参数'%s'似乎存在注入点 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter, title)
                                     logger.info(infoMsg)
 
                                     injectable = True
@@ -683,14 +683,15 @@ def checkSqlInjection(place, parameter, value):
                                     Backend.forceDbms(kb.heuristicDbms)
 
                             if unionExtended:
-                                infoMsg = "检测到至少还有一种其他(潜在的)技术,因此自动扩展 UNION 查询注入技术测试的范围"
+                                infoMsg = "检测到至少还有一种其他(潜在的)技术,因此将进行联合(UNION)查询注入"
                                 singleTimeLogMessage(infoMsg)
 
                             # Test for UNION query SQL injection
                             reqPayload, vector = unionTest(comment, place, parameter, value, prefix, suffix)
 
                             if isinstance(reqPayload, six.string_types):
-                                infoMsg = "% 参数 '%s' 是 '%s' 注入" % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                # infoMsg = "%sparameter '%s' is '%s' injectable" % ("%s " % paramType if paramType != parameter else "", parameter, title)
+                                infoMsg = "%s参数'%s'存在注入点" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 
                                 injectable = True

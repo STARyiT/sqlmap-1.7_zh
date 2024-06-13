@@ -68,7 +68,7 @@ def _findUnionCharCount(comment, place, parameter, value, prefix, suffix, where=
             return not any(re.search(_, page or "", re.I) and not re.search(_, kb.pageTemplate or "", re.I) for _ in ("(warning|error):", "order (by|clause)", "unknown column", "failed")) and not kb.heavilyDynamic and comparison(page, headers, code) or re.search(r"data types cannot be compared or sorted", page or "", re.I) is not None
 
         if _orderByTest(1 if lowerCount is None else lowerCount) and not _orderByTest(randomInt() if upperCount is None else upperCount + 1):
-            infoMsg = "似乎可以使用'ORDER BY'技术。这应该减少查找正确数量的查询列所需的时间。自动扩展当前UNION查询注入技术测试的范围"
+            infoMsg = "似乎可以使用'ORDER BY'技术。这应该减少查找正确数量的查询列所需的时间。将进行联合(UNION)查询注入"
             singleTimeLogMessage(infoMsg)
 
             lowCols, highCols = 1 if lowerCount is None else lowerCount, ORDER_BY_STEP if upperCount is None else upperCount
