@@ -120,10 +120,10 @@ def _selectInjection():
                 ptype = PAYLOAD.PARAMETER[ptype] if isinstance(ptype, int) else ptype
 
                 message += "[%d] 位置: %s, 参数: " % (i, place)
-                message += "%s, 类型: %s" % (parameter, ptype)
+                message += "%s,类型: %s" % (parameter, ptype)
 
                 if i == 0:
-                    message += " (default)"
+                    message += "(default)"
 
                 message += "\n"
 
@@ -171,7 +171,7 @@ def _showInjections():
         kb.wizardMode = False
 
     if kb.testQueryCount > 0:
-        header = "sqlmap识别出以下注入点, 共进行了 %d 个HTTP(s) 请求" % kb.testQueryCount
+        header = "sqlmap识别出以下注入点, 共进行了%d个HTTP(s)请求" % kb.testQueryCount
     else:
         header = "sqlmap从存储的会话中恢复了以下注入点"
 
@@ -257,7 +257,7 @@ def _saveToResultsFile():
 
         conf.resultsFP.flush()
     except IOError as ex:
-        errMsg = "无法写入结果文件'%s' ('%s'). " % (conf.resultsFile, getSafeExString(ex))
+        errMsg = "无法写入结果文件 '%s'('%s')" % (conf.resultsFile, getSafeExString(ex))
         raise SqlmapSystemException(errMsg)
 
 @stackedmethod
@@ -286,7 +286,7 @@ def start():
         return False
 
     if kb.targets and isListLike(kb.targets) and len(kb.targets) > 1:
-        infoMsg = "发现了 %d 个目标" % len(kb.targets)
+        infoMsg = "发现%d个目标" % len(kb.targets)
         logger.info(infoMsg)
 
     targetCount = 0
@@ -393,7 +393,7 @@ def start():
                         break
                     else:
                         if conf.method != HTTPMETHOD.GET:
-                            message = "边界 %s 数据 [Default: %s]%s: " % (conf.method, urlencode(conf.data or "") if re.search(r"\A\s*[<{]", conf.data or "None") is None else conf.data, " (Warning: 检测到空字段)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
+                            message = "编辑%s数据 [default: %s]%s: " % (conf.method, urlencode(conf.data or "") if re.search(r"\A\s*[<{]", conf.data or "None") is None else conf.data, " (Warning: 检测到空字段)" if conf.data and extractRegexResult(EMPTY_FORM_FIELDS_REGEX, conf.data) else "")
                             conf.data = readInput(message, default=conf.data)
                             conf.data = _randomFillBlankFields(conf.data)
                             conf.data = urldecode(conf.data) if conf.data and urlencode(DEFAULT_GET_POST_DELIMITER, None) not in conf.data else conf.data
@@ -401,7 +401,7 @@ def start():
                         else:
                             if '?' in targetUrl:
                                 firstPart, secondPart = targetUrl.split('?', 1)
-                                message = "编辑GET数据 [Default: %s]: " % secondPart
+                                message = "编辑GET数据 [default: %s]: " % secondPart
                                 test = readInput(message, default=secondPart)
                                 test = _randomFillBlankFields(test)
                                 conf.url = "%s?%s" % (firstPart, test)
@@ -508,7 +508,7 @@ def start():
                         if paramKey in kb.testedParams:
                             testSqlInj = False
 
-                            infoMsg = "跳过先前处理过的 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过先前处理过的%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif any(_ in conf.testParameter for _ in (parameter, removePostHintPrefix(parameter))):
@@ -517,19 +517,19 @@ def start():
                         elif parameter in conf.rParam:
                             testSqlInj = False
 
-                            infoMsg = "跳过随机化 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过随机化%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif parameter in conf.skip or kb.postHint and parameter.split(' ')[-1] in conf.skip:
                             testSqlInj = False
 
-                            infoMsg = "跳过 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.paramExclude and (re.search(conf.paramExclude, parameter, re.I) or kb.postHint and re.search(conf.paramExclude, parameter.split(' ')[-1], re.I)):
                             testSqlInj = False
 
-                            infoMsg = "跳过 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "跳过%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif conf.csrfToken and re.search(conf.csrfToken, parameter, re.I):
@@ -542,7 +542,7 @@ def start():
                         elif conf.level < 4 and (parameter.upper() in IGNORE_PARAMETERS or any(_ in parameter.lower() for _ in CSRF_TOKEN_PARAMETER_INFIXES) or parameter.upper().startswith(GOOGLE_ANALYTICS_COOKIE_PREFIX)):
                             testSqlInj = False
 
-                            infoMsg = "忽略 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                            infoMsg = "忽略%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                             logger.info(infoMsg)
 
                         elif PAYLOAD.TECHNIQUE.BOOLEAN in conf.technique or conf.skipStatic:
@@ -550,11 +550,10 @@ def start():
 
                             if not check:
                                 warnMsg = "%s参数 '%s' 似乎不是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
-                                # warnMsg = "%sparameter '%s' does not appear to be dynamic" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.warning(warnMsg)
 
                                 if conf.skipStatic:
-                                    infoMsg = "跳过静态 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                    infoMsg = "跳过静态%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                     logger.info(infoMsg)
 
                                     testSqlInj = False
@@ -574,7 +573,7 @@ def start():
 
                                 if check != HEURISTIC_TEST.POSITIVE:
                                     if conf.smart or (kb.ignoreCasted and check == HEURISTIC_TEST.CASTED):
-                                        infoMsg = "跳过 %s 参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                        infoMsg = "跳过%s参数 '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                         logger.info(infoMsg)
                                         continue
 
@@ -611,9 +610,7 @@ def start():
                                         if not proceed:
                                             break
 
-                                        msg = "%s 参数 '%s'" % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
-                                        msg += "存在漏洞。是否继续测试其他参数(如果有)? [y/N] "
-
+                                        msg = "%s参数'%s'存在漏洞，是否继续测试其他参数(如果有)? [y/N]" % ("%s " % injection.place if injection.place != injection.parameter else "", injection.parameter)
                                         if not readInput(msg, default='N', boolean=True):
                                             proceed = False
                                             paramKey = (conf.hostname, conf.path, None, None)
