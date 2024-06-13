@@ -1461,6 +1461,9 @@ def cleanReplaceUnicode(value):
 def setPaths(rootPath):
     """
     Sets absolute paths for project directories and files
+
+    ##### zh-CN #####
+    设置项目目录和文件的绝对路径
     """
 
     paths.SQLMAP_ROOT_PATH = rootPath
@@ -1536,8 +1539,10 @@ def weAreFrozen():
     This will affect how we find out where we are located.
 
     # Reference: http://www.py2exe.org/index.cgi/WhereAmI
-    """
 
+    ##### zh-CN #####
+    检查是否被py2exe封装
+    """
     return hasattr(sys, "frozen")
 
 def parseTargetDirect():

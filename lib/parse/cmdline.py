@@ -140,7 +140,7 @@ def cmdLineParser(argv=None):
             help="从文件中加载HTTP请求")
 
         target.add_argument("-g", dest="googleDork",
-            help="处理Google Dork搜索结果作为目标URL")
+            help="将Google Dork的搜索结果作为目标URL")
 
         target.add_argument("-c", dest="configFile",
             help="从配置INI文件中加载选项")
@@ -155,10 +155,10 @@ def cmdLineParser(argv=None):
             help="额外的Header (e.g. \"X-Forwarded-For: 127.0.0.1\")")
 
         request.add_argument("--method", dest="method",
-            help="强制使用给定的HTTP方法 (e.g. PUT)")
+            help="强制使用给定的HTTP请求方法 (e.g. PUT)")
 
         request.add_argument("--data", dest="data",
-            help="通过POST发送的数据字符串 (e.g. \"id=1\")")
+            help="通过POST请求发送的数据字符串 (e.g. \"id=1\")")
 
         request.add_argument("--param-del", dest="paramDel",
             help="用于分割参数值的字符 (e.g. &)")
@@ -170,7 +170,7 @@ def cmdLineParser(argv=None):
             help="用于分割cookie值的字符 (e.g. ;)")
 
         request.add_argument("--live-cookies", dest="liveCookies",
-            help="用于加载最新值的活动cookies文件")
+            help="用于加载最新值的cookies文件")
 
         request.add_argument("--load-cookies", dest="loadCookies",
             help="包含Netscape/wget格式的cookies的文件")
@@ -179,7 +179,7 @@ def cmdLineParser(argv=None):
             help="忽略响应中的Set-Cookie头")
 
         request.add_argument("--mobile", dest="mobile", action="store_true",
-            help="通过HTTP User-Agent Header模拟智能手机")
+            help="通过HTTP User-Agent Header模拟移动终端手机")
 
         request.add_argument("--random-agent", dest="randomAgent", action="store_true",
             help="使用随机选择的HTTP User-Agent Header值")
@@ -191,7 +191,7 @@ def cmdLineParser(argv=None):
             help="HTTP Referer Header值")
 
         request.add_argument("--headers", dest="headers",
-            help="额外的Headers (e.g. \"Accept-Language: fr\\nETag: 123\")")
+            help="额外的Headers参数 (e.g. \"Accept-Language: fr\\nETag: 123\")")
 
         request.add_argument("--auth-type", dest="authType",
             help="HTTP认证类型 (Basic, Digest, Bearer, ...)")
@@ -242,16 +242,16 @@ def cmdLineParser(argv=None):
             help="设置HTTP请求延迟间隔时间")
 
         request.add_argument("--timeout", dest="timeout", type=float,
-            help="等待超时连接的时间 (default %d)" % defaults.timeout)
+            help="等待超时连接的时间 (default: %d)" % defaults.timeout)
 
         request.add_argument("--retries", dest="retries", type=int,
-            help="当连接超时的时候重试 (default %d)" % defaults.retries)
+            help="当连接超时的时候重试 (default: %d)" % defaults.retries)
 
         request.add_argument("--retry-on", dest="retryOn",
             help="在内容匹配正则表达式时重试请求 (e.g. \"drop\")")
 
         request.add_argument("--randomize", dest="rParam",
-            help="为给定参数(s)随机更改值")
+            help="为给定参数随机更改值")
 
         request.add_argument("--safe-url", dest="safeUrl",
             help="测试期间访问的频繁的URL地址")
@@ -281,7 +281,7 @@ def cmdLineParser(argv=None):
             help="在访问反CSRF令牌页面时发送的POST数据")
 
         request.add_argument("--csrf-retries", dest="csrfRetries", type=int,
-            help="反CSRF令牌检索的重试次数 (default %d)" % defaults.csrfRetries)
+            help="反CSRF令牌检索的重试次数 (default: %d)" % defaults.csrfRetries)
 
         request.add_argument("--force-ssl", dest="forceSSL", action="store_true",
             help="强制使用SSL/HTTPS")
@@ -311,7 +311,7 @@ def cmdLineParser(argv=None):
             help="检索页面长度而不实际获取HTTP响应体")
 
         optimization.add_argument("--threads", dest="threads", type=int,
-            help="最大并发HTTP(s)请求数 (default %d)" % defaults.threads)
+            help="最大并发HTTP(s)请求数 (default: %d)" % defaults.threads)
 
         # Injection options
         injection = parser.add_argument_group("注入", "这些选项可用于指定要测试的参数，提供自定义的注入负载和可选的篡改脚本")
@@ -362,16 +362,16 @@ def cmdLineParser(argv=None):
             help="注入负载后缀字符串")
 
         injection.add_argument("--tamper", dest="tamper",
-            help="使用给定的脚本(s)篡改注入数据")
+            help="使用给定的脚本篡改注入数据")
 
         # Detection options
         detection = parser.add_argument_group("检测", "这些选项可用于自定义检测阶段")
 
         detection.add_argument("--level", dest="level", type=int,
-            help="要执行的测试级别 (1-5, default %d)" % defaults.level)
+            help="要执行的测试级别 (1-5, default: %d)" % defaults.level)
 
         detection.add_argument("--risk", dest="risk", type=int,
-            help="要执行的测试风险 (1-3, default %d)" % defaults.risk)
+            help="要执行的测试风险 (1-3, default: %d)" % defaults.risk)
 
         detection.add_argument("--string", dest="string",
             help="当查询为True时匹配的字符串")
@@ -395,13 +395,13 @@ def cmdLineParser(argv=None):
             help="仅基于标题比较页面")
 
         # Techniques options
-        techniques = parser.add_argument_group("技术", "这些选项可用于调整特定SQL注入技术的测试")
+        techniques = parser.add_argument_group("技术", "这些选项可用于调整特定SQL注入测试")
 
         techniques.add_argument("--technique", dest="technique",
-            help="要使用的SQL注入技术 (default \"%s\")" % defaults.technique)
+            help="要使用的SQL注入方法 (default: \"%s\")" % defaults.technique)
 
         techniques.add_argument("--time-sec", dest="timeSec", type=int,
-            help="延迟DBMS响应的秒数 (default %d)" % defaults.timeSec)
+            help="延迟DBMS响应的秒数 (default: %d)" % defaults.timeSec)
 
         techniques.add_argument("--union-cols", dest="uCols",
             help="UNION查询SQL注入的列数范围")
@@ -422,7 +422,7 @@ def cmdLineParser(argv=None):
             help="从文件加载第二响应的HTTP请求")
 
         # Fingerprint options
-        fingerprint = parser.add_argument_group("Fingerprint")
+        fingerprint = parser.add_argument_group("指纹相关")
 
         fingerprint.add_argument("-f", "--fingerprint", dest="extensiveFp", action="store_true",
             help="执行详细的DBMS版本指纹识别")
@@ -536,7 +536,7 @@ def cmdLineParser(argv=None):
             help="从给定文件执行SQL语句")
 
         # Brute force options
-        brute = parser.add_argument_group("Brute force", "这些选项可以用来进行暴力破解检查")
+        brute = parser.add_argument_group("暴力破解", "这些选项可以用来进行暴力破解检查")
 
         brute.add_argument("--common-tables", dest="commonTables", action="store_true",
             help="检查常见表的存在")
@@ -548,7 +548,7 @@ def cmdLineParser(argv=None):
             help="检查常见文件的存在")
 
         # User-defined function options
-        udf = parser.add_argument_group("User-defined function injection", "这些选项可以用来创建自定义用户定义的函数")
+        udf = parser.add_argument_group("用户自定义函数(UDF)注入", "这些选项可以用来创建自定义用户定义的函数")
 
         udf.add_argument("--udf-inject", dest="udfInject", action="store_true",
             help="注入自定义用户定义的函数")
@@ -557,7 +557,7 @@ def cmdLineParser(argv=None):
             help="共享库的本地路径")
 
         # File system options
-        filesystem = parser.add_argument_group("File system access", "这些选项可以用来访问后端数据库管理系统的底层文件系统")
+        filesystem = parser.add_argument_group("文件系统访问", "这些选项可以用来访问后端数据库管理系统的底层文件系统")
 
         filesystem.add_argument("--file-read", dest="fileRead",
             help="从后端DBMS文件系统读取文件")
@@ -569,7 +569,7 @@ def cmdLineParser(argv=None):
             help="写入的后端DBMS绝对文件路径")
 
         # Takeover options
-        takeover = parser.add_argument_group("Operating system access", "这些选项可以用来访问后端数据库管理系统底层的操作系统")
+        takeover = parser.add_argument_group("访问操作系统相关", "这些选项可以用来访问后端数据库管理系统底层的操作系统")
 
         takeover.add_argument("--os-cmd", dest="osCmd",
             help="执行一个操作系统命令")
@@ -596,7 +596,7 @@ def cmdLineParser(argv=None):
             help="临时文件目录的远程绝对路径")
 
         # Windows registry options
-        windows = parser.add_argument_group("Windows registry access", "这些选项可以用来访问后端数据库管理系统的Windows注册表")
+        windows = parser.add_argument_group("Windows注册表操作", "这些选项可以用来访问后端数据库管理系统的Windows注册表")
 
         windows.add_argument("--reg-read", dest="regRead", action="store_true",
             help="读取一个Windows注册表键值")
@@ -620,7 +620,7 @@ def cmdLineParser(argv=None):
             help="Windows注册表键值类型")
 
         # General options
-        general = parser.add_argument_group("General", "这些选项可以用于设置一些通用的工作参数")
+        general = parser.add_argument_group("常规", "这些选项可以用于设置一些通用的工作参数")
 
         general.add_argument("-s", dest="sessionFile",
                     help="从存储的(.sqlite)文件中加载会话")
@@ -638,7 +638,7 @@ def cmdLineParser(argv=None):
             help="使用URL和文件名安全的Base64字母表 (RFC 4648)")
 
         general.add_argument("--batch", dest="batch", action="store_true",
-            help="从不询问用户输入，使用默认行为")
+            help="不询问用户输入，使用默认行为")
 
         general.add_argument("--binary-fields", dest="binaryFields",
             help="具有二进制值的结果字段 (e.g. \"digest\")")
@@ -674,7 +674,7 @@ def cmdLineParser(argv=None):
             help="显示每个输出估计的到达时间")
 
         general.add_argument("--flush-session", dest="flushSession", action="store_true",
-            help="Flush session files for current target")
+            help="删除当前目标的会话文件")
 
         general.add_argument("--forms", dest="forms", action="store_true",
             help="在目标URL上解析和测试表单")
@@ -698,13 +698,13 @@ def cmdLineParser(argv=None):
             help="解析并显示DBMS错误消息")
 
         general.add_argument("--preprocess", dest="preprocess",
-            help="使用给定的脚本(s)进行预处理 (请求)")
+            help="使用给定的脚本进行预处理 (请求)")
 
         general.add_argument("--postprocess", dest="postprocess",
-            help="使用给定的脚本(s)进行后处理 (响应)")
+            help="使用给定的脚本进行后处理 (响应)")
 
         general.add_argument("--repair", dest="repair", action="store_true",
-            help="Redump entries having unknown character marker (%s)" % INFERENCE_UNKNOWN_CHAR)
+            help="重新转储具有未知字符标记(%s)的条目" % INFERENCE_UNKNOWN_CHAR)
 
         general.add_argument("--save", dest="saveConfig",
             help="将选项保存到配置INI文件中")
@@ -722,10 +722,10 @@ def cmdLineParser(argv=None):
             help="用于临时表的前缀 (default: \"%s\")" % defaults.tablePrefix)
 
         general.add_argument("--test-filter", dest="testFilter",
-            help="Select tests by payloads and/or titles (e.g. ROW)")
+            help="通过负载'and/or'标题选择测试 (e.g. ROW)")
 
         general.add_argument("--test-skip", dest="testSkip",
-            help="通过载荷和/或标题跳过测试 (e.g. BENCHMARK)")
+            help="通过载荷'and/or'标题跳过测试 (e.g. BENCHMARK)")
 
         general.add_argument("--web-root", dest="webRoot",
             help="Web服务器文档根目录 (e.g. \"/var/www\")")
@@ -734,7 +734,7 @@ def cmdLineParser(argv=None):
         miscellaneous = parser.add_argument_group("杂项", "这些选项不属于任何其他类别")
 
         miscellaneous.add_argument("-z", dest="mnemonics",
-            help="使用短mnemonics (e.g. \"flu,bat,ban,tec=EU\")")
+            help="使用短语 (e.g. \"flu,bat,ban,tec=EU\")")
 
         miscellaneous.add_argument("--alert", dest="alert",
             help="当发现SQL注入时运行主机OS命令")
