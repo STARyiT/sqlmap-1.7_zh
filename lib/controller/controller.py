@@ -577,7 +577,7 @@ def start():
                                         logger.info(infoMsg)
                                         continue
 
-                                infoMsg = "在%s参数 '%s' 上测试SQL注入" % ("%s " % paramType if paramType != parameter else "", parameter)
+                                infoMsg = "在 %s参数 '%s' 上测试SQL注入" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 # infoMsg = "testing for SQL injection on %sparameter '%s'" % ("%s " % paramType if paramType != parameter else "", parameter)
                                 logger.info(infoMsg)
 

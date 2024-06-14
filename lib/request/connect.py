@@ -1438,7 +1438,7 @@ class Connect(object):
                     Connect.queryPage(value=value, content=True, raise404=False)
                     dataToStdout('.')
 
-                dataToStdout(" (done)\n")
+                dataToStdout("(完成)\n")
 
             elif not kb.testMode:
                 warnMsg = "非常重要的是,在使用基于时间的负载时不要过度使用网络连接,以防止潜在的中断。"
@@ -1540,7 +1540,7 @@ class Connect(object):
         message = extractRegexResult(PERMISSION_DENIED_REGEX, page or "", re.I)
         if message:
             kb.permissionFlag = True
-            singleTimeWarnMessage("potential permission problems detected ('%s')" % message)
+            singleTimeWarnMessage("发现潜在权限问题('%s')" % message)
 
         headers = patchHeaders(headers)
 

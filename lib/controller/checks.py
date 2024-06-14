@@ -164,11 +164,11 @@ def checkSqlInjection(place, parameter, value):
             # payload), ask the user to extend the tests to all DBMS-specific,
             # regardless of --level and --risk values provided
             if kb.extendTests is None and not conf.testFilter and (conf.level < 5 or conf.risk < 3) and (intersect(Backend.getErrorParsedDBMSes(), SUPPORTED_DBMS, True) or kb.heuristicDbms or injection.dbms):
-                msg += "对于剩余的测试，你是否想包含所有的'%s'测试，并执行" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
+                msg = "对于剩余的测试，你是否想包含所有的'%s'测试，并执行" % (Format.getErrorParsedDBMSes() or kb.heuristicDbms or joinValue(injection.dbms, '/'))
                 msg += "检测等级为(%d)" % conf.level if conf.level < 5 else ""
-                msg += " 和 " if conf.level < 5 and conf.risk < 3 else ""
+                msg += "和" if conf.level < 5 and conf.risk < 3 else ""
                 msg += "检测风险为(%d)" % conf.risk if conf.risk < 3 else ""
-                msg += " 吗? [Y/n]" if conf.level < 5 and conf.risk < 3 else " 吗? [Y/n]"
+                msg += "吗? [Y/n]" if conf.level < 5 and conf.risk < 3 else " 吗? [Y/n]"
                 kb.extendTests = (Backend.getErrorParsedDBMSes() or [kb.heuristicDbms]) if readInput(msg, default='Y', boolean=True) else []
 
             title = test.title
@@ -794,7 +794,7 @@ def checkSqlInjection(place, parameter, value):
                 while not ((choice or "").isdigit() and 0 <= int(choice) <= 6):
                     if choice:
                         logger.warning("无效的值")
-                    msg = "请输入新的详细程度级别: [0-6] "
+                    msg = "请输入新的详细程度级别(级别越高越详细): [0-6] "
                     choice = readInput(msg, default=str(conf.verbose), checkBatch=False)
                 conf.verbose = int(choice)
                 setVerbosity()
@@ -1021,7 +1021,7 @@ def heuristicCheckSqlInjection(place, parameter):
     parseFilePaths(page)
     result = wasLastResponseDBMSError()
 
-    infoMsg = "启发式(基本)测试显示 %s参数 '%s' 可能" % ("%s " % paramType if paramType != parameter else "", parameter)
+    infoMsg = "启发式(基本)测试显示 %s参数'%s'可能" % ("%s " % paramType if paramType != parameter else "", parameter)
 
     def _(page):
         return any(_ in (page or "") for _ in FORMAT_EXCEPTION_STRINGS)
@@ -1048,7 +1048,7 @@ def heuristicCheckSqlInjection(place, parameter):
         return kb.heuristicTest
 
     if casting:
-        errMsg = "检测到可能的%s转换 (e.g. '" % ("整数" if origValue.isdigit() else "类型")
+        errMsg = "检测到可能的 %s转换 (e.g. '" % ("整数" if origValue.isdigit() else "类型")
 
         platform = conf.url.split('.')[-1].lower()
         if platform == WEB_PLATFORM.ASP:
@@ -1090,7 +1090,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     # Reference: https://bugs.python.org/issue18183
     if value.upper() in (page or "").upper():
-        infoMsg = "启发式(XSS)测试显示 %s参数 '%s' 可能存在跨站脚本攻击(XSS)漏洞" % ("%s " % paramType if paramType != parameter else "", parameter)
+        infoMsg = "启发式(XSS)测试显示 %s参数'%s'可能存在跨站脚本攻击(XSS)漏洞" % ("%s " % paramType if paramType != parameter else "", parameter)
         logger.info(infoMsg)
 
         if conf.beep:
@@ -1098,7 +1098,7 @@ def heuristicCheckSqlInjection(place, parameter):
 
     for match in re.finditer(FI_ERROR_REGEX, page or ""):
         if randStr1.lower() in match.group(0).lower():
-            infoMsg = "启发式(FI)测试显示 %s 参数 '%s' 可能受到文件包含(FI)攻击" % ("%s " % paramType if paramType != parameter else "", parameter)
+            infoMsg = "启发式(FI)测试显示 %s参数'%s'可能受到文件包含(FI)攻击" % ("%s " % paramType if paramType != parameter else "", parameter)
             logger.info(infoMsg)
 
             if conf.beep:
@@ -1127,7 +1127,7 @@ def checkDynParam(place, parameter, value):
 
     paramType = conf.method if conf.method not in (None, HTTPMETHOD.GET, HTTPMETHOD.POST) else place
 
-    infoMsg = "测试 %s 参数 '%s' 是否是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
+    infoMsg = "测试 %s参数'%s'是否是动态的" % ("%s " % paramType if paramType != parameter else "", parameter)
     logger.info(infoMsg)
 
     try:
